@@ -1,0 +1,95 @@
+﻿[url]http://jatekfejlesztes.hu/mgrespawnlist.php[/url]
+
+[url]http://jatekfejlesztes.hu/mgrespawn.php?id=ae503f988a2cc9c[/url]
+[b]RespOwned[/b]
+Malloy Games (1 fő)
+
+A legszebben kidolgozott játék a mezőnyben. Egész sokáig elvoltam vele. Engem emlékeztetett a jó öreg Crimsonland játékra. Amit lehetne fejleszteni az a szétfrőccsenő zombik vérének a particle animációja. Ez jól mutatna. Volt háttérzene, volt a lövésnek hangja, volt a zombi nyögésnek hangja, de nem volt hangja a zombi halálnak, nem volt hangja a töltény és az energia felvételnek, amik szintén dobtak volna a játékélményen. Az collition intersectionnel valami gond volt, mert a cuccok felvétele nehézkesen ment.
+Összességében szép, játszható játék.
+
+--------------------------------------------------------------------------------
+
+[url]http://jatekfejlesztes.hu/mgrespawn.php?id=63c4b62b1126097[/url]
+[b]Def Gun[/b]
+Kirob Games (1 fő)
+
+A Libgdxben íródott játékban egy űrhajót irányítok ideoda és lövöldözöm  a fentről jövő ellenséget. A program hamar elég nehéz lesz. Nekem a rekordom mindössze 25 pont lett, a játékidő pár másodperc volt. Háttér zenének örültem volna, ami motiválná a játékost, hogy minél tovább jusson a játékmenetben, hogy minél többet halljon a zenéből. Mivel a játék mobilra íródott, ezért egy állóképes beállítás jobban passzolna a játék stílusához és játszhatóbb is lenne kevesebb sávval. Az inkscapes-es grafika lehetett volna jobb is. Az érintőképernyőhöz ezek a gombméretek kicsik lesznek.
+
+--------------------------------------------------------------------------------
+
+[url]http://jatekfejlesztes.hu/mgrespawn.php?id=d1193ffd515bc18[/url]
+[b]Planet of Domination[/b]
+boyz in da haus (2 fő)
+
+Sajnos ezzel nem tudtam játszani, mert hálozatos és egy játékos üzemmódra nem volt lehetőségem.
+
+--------------------------------------------------------------------------------
+
+[url]http://jatekfejlesztes.hu/mgrespawn.php?id=8ba1725d6b5aaaf[/url]
+[b]Pyramid_watchdog[/b]
+HUNgryBirds (3 fő)
+
+Amikor megláttam, hogy 206M-ot akar letölteni, akkor abbahagytam az egészet.
+
+--------------------------------------------------------------------------------
+
+[url]http://jatekfejlesztes.hu/mgrespawn.php?id=9bbf23967d47b66[/url]
+[b]Szívlapátos eutanázia[/b]
+Not Trendy Software (1 fő)
+
+Az összméret 1M. Ez önnmagában dícséretes. Állatokat kell csapdosni egérrel. Beteg egy játék az biztos. Jobb lenne, ha az állat csapdosást 1,2,3,4 gombokkal is lehetne, akkor talán nem lenne ennyire egérgyilkos. A grafika nagyon jó, az egésznek van egy cartoon összhatása. Külön kiemelendő, hogy ms-paintes és saját kézzel rajzolt. A játékmenet az rettenetesen primitív és egyszerű. A pontszám kijelzése lehetne valamivel nagyobb és szintén ComicSans karakterekkel. A végén a gratulációnál nem lehet sehova menni.
+
+--------------------------------------------------------------------------------
+
+[url]http://jatekfejlesztes.hu/mgrespawn.php?id=d779ce601400a6e[/url]
+[b]Asclepius Inc[/b]
+Kosina Zoltán (1 fő)
+
+Toluolban íródott és számomra nagy könnyebbség, hogy nem kellett semmit sem letöltenem és kicsomagolnom hozzá, hogy játszhassak vele, mert böngészőből futtaható. Hangok nem voltak. Engem nagyon hamar szétlöttek az ellenfelek és csomó piros ládát behúrcoltak a barlangjaikba. Valahogy nem élveztem a játékmenetet. A grafika egész jó volt.
+
+--------------------------------------------------------------------------------
+
+[url]http://jatekfejlesztes.hu/mgrespawn.php?id=9a3acaf1faa77b9[/url]
+[b]Deadly and Dangerous Dungeons of Xandora[/b]
+krees9116
+
+Ha az egész játékot egy szóval kéne jellemeznem, akkor azt mondanám, hogy szivatós. Kezdve ott, hogy az elején a STUPID -ot begépelteti velem. A sok próbálkozásból csak egyszer indult el nálam a játék. A többi alkalommal megállt az intro feliratnál. Nálam is a default fontokat használta a pixelartos font helyett. Én is szanaszét szívtam magam annál a pályánál, ahol a szerző is a videóban. Itt abba is hagytam a próbálkozásokat. Nincs türelmem az ilyesmihez. A csipzene megy a játékhoz. A grafika tetszett nagyon. Gyerekkorom NES-es és C64-es időszakát juttatta eszembe. Nagy előnye, hogy minden pályán mutatott valami ötleteset, újat. Ezzel fenntartva a játékos érdeklődését. Anno a Rick Dangerous játszhatóbb volt, mert nem volt ennyire nehéz. Sok ilyen játékot játszottam még, amik Flashben íródtak flixel frameworkben. Ez a játék csak arról győzőtt meg engem, hogy Constructban ne írjak játékot. első sorban a fontok miatt.
+
+--------------------------------------------------------------------------------
+
+[url]http://jatekfejlesztes.hu/mgrespawn.php?id=91e8da28202f469[/url]
+[b]Verekedős játék[/b]
+SilentWorks (1 fő)
+
+A címe önmagában megérné az első helyezettet. Az ellenfél folyamatosan kihátrált jobbra. Az ütéseknek jó lett volna valami hang, hogy legalább tudjam, hogy mikor találtam el az emberkét. Az egész játék hangulatának jót tett volna egy retro pixeles grafika. A madarak a háttérben valóban sokat dob a hangulaton. Az alapötlet az nagyon jó. A dudorászós zene a háttérben nagyon király!!!
+
+--------------------------------------------------------------------------------
+
+[url]http://jatekfejlesztes.hu/mgrespawn.php?id=41686ca326b6b15[/url]
+[b]Budapesti éjszaka[/b]
+Szalontai István (1 fő)
+
+A játékhoz feltöltöttem egy térképet is, hátha így könnyebb lesz. Mivel még sosem írtam csúnya konzolos, szöveges játékot, ezért úgy gondoltam itt a remek alkalom. Maga programkód ultra primitív. A pályák sima egyszerű láncolt lista elemek és a játék során ezt a láncolt listát járjuk be történettel megfűszerezve.
+
+--------------------------------------------------------------------------------
+
+[url]http://jatekfejlesztes.hu/mgrespawn.php?id=029fa6c760d9f83[/url]
+[b]You mustnt die![/b]
+7th Variety (1 fő)
+
+Emberkéket üt le Zeusz a menyország kapujában, akik jönnek fel a létrán. Ezek az emberkék Doom karakterek és egy öreg mamika. Hang az semmi, pedig kellene. A pontszám ment mínuszba rendesen. Hamar abbahegytam. Azt sem mondanám, hogy folytassad, mert a Flashben nem érdemes tovább menni. Nem akarok hitvitát nyitni, de Flash felett eljárt az idő. A Java LibGdx-el vagy a Unity egy jobb irány lenne a mobilos fejlesztésekhez. Inkább tanuld azokat. A HTML+Javascript+CSS is csak nyakatekerten alakítható mobilos játékká.
+
+--------------------------------------------------------------------------------
+
+Sorrendem
+
+1. RespOwned
+2. Deadly and Dangerous Dungeons of Xandora
+3. Verekedős játék
+4. Asclepius Inc
+5. Def Gun
+6. Szívlapátos eutanázia
+7. You mustnt die!
+8. Budapesti éjszaka
+9. Planet of Domination
+10. Pyramid_watchdog

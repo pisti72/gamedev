@@ -1,0 +1,41 @@
+<html>
+<head>
+<title>Async</title>
+</head>
+<body>
+<div id="d">placeholder</div>
+<script>
+var i=0;
+var url = 'http://localhost:3000/';
+var myHeaders = new Headers({
+    "Content-Type": "application/json",
+    "X-Custom-Header": "ProcessThisImmediately"
+});
+
+var myInit = { method: 'GET',
+               headers: myHeaders,
+               mode: 'no-cors',
+               cache: 'default' };
+               
+var myRequest = new Request(url, myInit);
+
+//window.setInterval('loop()',5000);
+loop();
+
+function loop(){
+    console.log(url);
+    var xhr = new XMLHttpRequest();
+    xhr.open('GET', url);
+    xhr.responseType = 'json';
+
+    xhr.onload = function() {
+      console.log(xhr.response);
+    };
+
+    xhr.onerror = function() {
+      console.log("Booo");
+    };
+}
+</script>
+</body>
+</html>

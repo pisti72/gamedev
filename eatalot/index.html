@@ -1,0 +1,304 @@
+<html>
+
+<head>
+    <title>mazerun</title>
+    <meta charset="utf-8" />
+    <link rel="icon" href="favicon.ico" type="image/png" sizes="16x16">
+    <style>
+        body {
+            background-color: darkblue;
+            margin: 0px;
+            padding: 0px;
+        }
+
+        #debug {
+            position: absolute;
+            top: 0px;
+            left: 0px;
+        }
+
+        .key {
+            width: 20vmin;
+            height: 20vmin;
+            position: absolute;
+            border: black solid 2px;
+            border-radius: 10vmin;
+            text-align: center;
+            font-size: 18vmin;
+            background-color: rgba(128, 128, 128, .5);
+        }
+
+        #leftbutton {
+            bottom: 2vmin;
+            left: 2vmin;
+        }
+
+        #rightbutton {
+            bottom: 2vmin;
+            left: 24vmin;
+        }
+
+        #upbutton {
+            bottom: 24vmin;
+            right: 2vmin;
+        }
+
+        #downbutton {
+            bottom: 2vmin;
+            right: 2vmin;
+        }
+    </style>
+    <link rel="icon" type="image/png" href="favicon.ico">
+</head>
+
+<body>
+    <!--
+    <div id="debug">nil</div>
+-->
+    <canvas id="canvas"></canvas>
+    <div id="leftbutton" class="key">Z</div>
+    <div id="rightbutton" class="key">X</div>
+    <div id="upbutton" class="key">P</div>
+    <div id="downbutton" class="key">L</div>
+    <script>
+        /*
+ *
+ * EATALOT
+ */
+
+        const NONE = 0;
+        const LEFT = 1;
+        const RIGHT = 2;
+        const UP = 3;
+        const DOWN = 4;
+        const TILE = 8;
+        const TILEDRAW = 16;
+        const SPEED = 2;
+        const BLOCK = 0;
+        const DOT = 1;
+
+        var canvas = document.getElementById('canvas');
+        var w = canvas.width = window.innerWidth;
+        var h = canvas.height = window.innerHeight;
+        var img = new Image();
+        var ctx = canvas.getContext('2d');
+        var isKeyDown = false;
+        var direction = NONE;
+
+        var Actor = {
+            x: 0,
+            y: 0,
+            xd: 0,
+            yd: 0,
+            c: 0,
+            init: function (x, y) {
+                this.x = x * TILEDRAW;
+                this.y = y * TILEDRAW;
+            },
+            update: function (isKeyDown, direction, blocks) {
+                if (isKeyDown && direction == LEFT) {
+                    this.xd = -SPEED;
+                }
+                if (isKeyDown && direction == RIGHT) {
+                    this.xd = SPEED;
+                }
+                if (isKeyDown && direction == UP) {
+                    this.yd = -SPEED;
+                }
+                if (isKeyDown && direction == DOWN) {
+                    this.yd = SPEED;
+                }
+                if (!isActorVsBlocks(this.x + this.xd, this.y + this.yd)) {
+                    this.x += this.xd;
+                    this.y += this.yd;
+                }
+                if(this.x%TILEDRAW==0){
+                    this.xd = 0;
+                }
+                if(this.y%TILEDRAW==0){
+                    this.yd = 0;
+                }
+            },
+            //context.drawImage(img,sx,sy,swidth,sheight,x,y,width,height);
+            draw: function (ctx) {
+                ctx.drawImage(
+                    img,
+                    0 * TILEDRAW, 0,
+                    TILE, TILE,
+                    this.x, this.y,
+                    TILEDRAW, TILEDRAW);
+            }
+        }
+        function Block(x, y) {
+            this.x = x;
+            this.y = y;
+            this.draw = function (ctx) {
+                ctx.fillStyle = '#f08';
+                ctx.fillRect(
+                    this.x, this.y,
+                    TILEDRAW, TILEDRAW);
+            };
+        }
+        function Dots(x, y) {
+            this.x = x;
+            this.y = y;
+            this.draw = function (ctx) {
+                ctx.fillStyle = '#fff';
+                ctx.fillRect(
+                    this.x + 6, this.y + 6,
+                    TILEDRAW - 12, TILEDRAW - 12);
+            }
+        }
+        function Enemy(x, y) {
+            this.x = x;
+            this.y = y;
+            this.draw = function draw(ctx) {
+                ctx.drawImage(
+                    img,
+                    1 * TILEDRAW, 0,
+                    TILE, TILE,
+                    this.x, this.y,
+                    TILEDRAW, TILEDRAW);
+            }
+        }
+        var blocks = [];
+        var dots = [];
+        var enemies = [];
+        //var bulletts = [];
+        ctx.webkitImageSmoothingEnabled = false;
+        ctx.imageSmoothingEnabled = false;
+
+        document.addEventListener('keydown', onkeydown);
+        document.addEventListener('keyup', onkeyup);
+        f('leftbutton').addEventListener('touchstart', moveleft);
+        f('leftbutton').addEventListener('touchend', onkeyup);
+        f('rightbutton').addEventListener('touchstart', moveright);
+        f('rightbutton').addEventListener('touchend', onkeyup);
+        f('upbutton').addEventListener('touchstart', moveup);
+        f('upbutton').addEventListener('touchend', onkeyup);
+        f('downbutton').addEventListener('touchstart', movedown);
+        f('downbutton').addEventListener('touchend', onkeyup);
+
+        img.src = 'tiles.png';
+        init();
+        function init() {
+            Actor.init(3, 2);
+            line(BLOCK, 0, 1, 1, 9);
+            line(BLOCK, 0, 1, 9, 9);
+            line(BLOCK, 0, 3, 3, 5);
+            line(BLOCK, 0, 3, 5, 5);
+            line(BLOCK, 1, 1, 2, 7);
+            line(BLOCK, 1, 9, 2, 7);
+            line(DOT,   0, 3, 4, 5);
+        }
+        img.onload = function () {
+            //f('debug').innerHTML = 'this';
+            window.requestAnimationFrame(update);
+        }
+        function onkeydown(e) {
+            var k = e.keyCode;
+            e.preventDefault();
+            //f('debug').innerHTML = k;
+            if (k == 90 || k == 37) {
+                moveleft();
+            }
+            if (k == 88 || k == 39) {
+                moveright();
+            }
+            if (k == 80 || k == 38) {
+                moveup();
+            }
+            if (k == 76 || k == 40) {
+                movedown();
+            }
+        }
+        function onkeyup() {
+            isKeyDown = true;
+            direction = NONE;
+        }
+        function moveleft() {
+            isKeyDown = true;
+            direction = LEFT;
+        }
+        function moveright() {
+            isKeyDown = true;
+            direction = RIGHT;
+        }
+        function moveup() {
+            isKeyDown = true;
+            direction = UP;
+        }
+        function movedown() {
+            isKeyDown = true;
+            direction = DOWN;
+        }
+        function update() {
+            ctx.clearRect(0, 0, w, h);
+            // Actor.move(4, 2);
+            Actor.update(isKeyDown, direction, blocks);
+            Actor.draw(ctx);
+            isDotEaten();
+            for (var i = 0; i < blocks.length; i++) {
+                blocks[i].draw(ctx);
+            }
+            for (var i = 0; i < dots.length; i++) {
+                dots[i].draw(ctx);
+            }
+            window.requestAnimationFrame(update);
+        }
+        function line(what, isV, x, y, l) {
+            var j = 0;
+            var k = 0;
+            for (var i = 0; i < l; i++) {
+                console.log(what);
+                if (what == BLOCK) {
+                    blocks.push(
+                        new Block(
+                            (j + x) * TILEDRAW,
+                            (k + y) * TILEDRAW)
+                    );
+                }
+                if (what == DOT) {
+                    
+                    dots.push(
+                        new Dots(
+                            (j + x) * TILEDRAW,
+                            (k + y) * TILEDRAW)
+                    );
+                }
+                if (isV == 0) {
+                    j++;
+                } else {
+                    k++;
+                }
+            }
+        }
+        function isActorVsBlocks(x, y) {
+            var overlapped = false;
+            for (var i = 0; i < blocks.length; i++) {
+                if (isOverlap(x, y, blocks[i].x, blocks[i].y)) {
+                    overlapped = true;
+                }
+            }
+            return overlapped;
+        }
+        function isDotEaten() {
+            for (var i = 0; i < dots.length; i++) {
+                if (isOverlap(Actor.x, Actor.y, dots[i].x, dots[i].y)) {
+                    dots.splice(i, 1);
+                }
+            }
+        }
+        function isOverlap(x1, y1, x2, y2) {
+            return x1 < x2 + TILEDRAW &&
+                x1 + TILEDRAW > x2 &&
+                y1 < y2 + TILEDRAW &&
+                TILEDRAW + y1 > y2;
+        }
+        function f(n) {
+            return document.getElementById(n);
+        }
+    </script>
+</body>
+
+</html>

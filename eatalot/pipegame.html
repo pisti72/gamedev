@@ -1,0 +1,78 @@
+<html>
+
+<head>
+    <title>Pipe_game</title>
+    <style>
+        body {
+            background: black;
+            color: white;
+            margin: 0px;
+        }
+
+        svg {
+            width: 100%;
+            height: 100%;
+        }
+        #fullscreen{
+            cursor: pointer;
+        }
+    </style>
+</head>
+
+<body>
+    <div id="ingame">
+            <svg width="800" height="480" version="1.1" viewBox="0 0 211.67 127" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+                <g transform="translate(0 -170)">
+                 <path d="m52.228 218.4c-2.1942 7e-3 -13.436-8.7645-16.982-13.928-3.5466-5.1634-3.8527-9.9469-1.3473-14.554 5.4341-8.2863 13.79-6.1293 19.055-3.2108 4.3567-2.8462 11.927-5.3194 17.243 2.0112 3.3565 4.7297 3.1953 11.164-0.69017 15.881-3.8854 4.7165-15.276 13.794-17.278 13.801z" fill="#f00" stroke="#fff" stroke-width="2.2008"/>
+                 <g fill="#000000" font-family="sans-serif" letter-spacing="0px" word-spacing="0px">
+                  <text id="minHi" x="22.476673" y="276.97778" font-size="56.572px" stroke-width=".58929" style="line-height:1.25" xml:space="preserve"><tspan x="22.476673" y="276.97778" stroke-width=".58929"><tspan x="22.476673" y="276.97778" fill="#ffffff" font-family="Bahnschrift" font-size="56.572px" stroke-width=".58929" text-align="center" text-anchor="middle">0</tspan></tspan></text>
+                  <flowRoot transform="matrix(.26458 0 0 .26458 0 170)" font-size="40px" style="line-height:1.25" xml:space="preserve"><flowRegion><rect x="247.14" y="392.86" width="72.857" height="57.143"/></flowRegion><flowPara/></flowRoot>
+                  <g font-size="56.572px" stroke-width=".58929">
+                   <text id="minLo" x="52.291618" y="276.97778" style="line-height:1.25" xml:space="preserve"><tspan x="52.291618" y="276.97778" stroke-width=".58929"><tspan x="52.291618" y="276.97778" fill="#ffffff" font-family="Bahnschrift" font-size="56.572px" stroke-width=".58929" text-align="center" text-anchor="middle">0</tspan></tspan></text>
+                   <text id="secHi" x="91.760735" y="276.97778" style="line-height:1.25" xml:space="preserve"><tspan x="91.760735" y="276.97778" stroke-width=".58929"><tspan x="91.760735" y="276.97778" fill="#ffffff" font-family="Bahnschrift" font-size="56.572px" stroke-width=".58929" text-align="center" text-anchor="middle">0</tspan></tspan></text>
+                   <text id="secLo" x="121.57559" y="276.97778" style="line-height:1.25" xml:space="preserve"><tspan x="121.57559" y="276.97778" stroke-width=".58929"><tspan x="121.57559" y="276.97778" fill="#ffffff" font-family="Bahnschrift" font-size="56.572px" stroke-width=".58929" text-align="center" text-anchor="middle">0</tspan></tspan></text>
+                   <text id="msHi" x="162.13971" y="276.97778" style="line-height:1.25" xml:space="preserve"><tspan x="162.13971" y="276.97778" stroke-width=".58929"><tspan x="162.13971" y="276.97778" fill="#ffffff" font-family="Bahnschrift" font-size="56.572px" stroke-width=".58929" text-align="center" text-anchor="middle">0</tspan></tspan></text>
+                   <text id="msLo" x="190.89632" y="276.97778" style="line-height:1.25" xml:space="preserve"><tspan x="190.89632" y="276.97778" stroke-width=".58929"><tspan x="190.89632" y="276.97778" fill="#ffffff" font-family="Bahnschrift" font-size="56.572px" stroke-width=".58929" text-align="center" text-anchor="middle">0</tspan></tspan></text>
+                  </g>
+                 </g>
+                 <rect id="rect4862" x="70.014" y="247.29" width="3.7418" height="3.2072" fill="#fff" opacity=".99" stroke="#fff" stroke-width="2"/>
+                 <use id="use4864" transform="translate(69.49)" width="100%" height="100%" xlink:href="#rect4862"/>
+                 <use transform="translate(0 14.433)" width="100%" height="100%" xlink:href="#rect4862"/>
+                 <use transform="translate(0 14.433)" width="100%" height="100%" xlink:href="#use4864"/>
+                 <text x="21.486559" y="218.20248" fill="#000000" font-family="sans-serif" font-size="56.572px" letter-spacing="0px" stroke-width=".58929" word-spacing="0px" style="line-height:1.25" xml:space="preserve"><tspan x="21.486559" y="269.81448" stroke-width=".58929"/></text>
+                 <path d="m107.26 218.4c-2.1942 7e-3 -13.436-8.7645-16.982-13.928-3.5466-5.1634-3.8527-9.9469-1.3473-14.554 5.4341-8.2863 13.79-6.1293 19.055-3.2108 4.3568-2.8462 11.927-5.3194 17.243 2.0112 3.3566 4.7297 3.1953 11.164-0.69018 15.881-3.8854 4.7165-15.276 13.794-17.278 13.801z" fill="#f00" stroke="#fff" stroke-width="2.2008"/>
+                 <path d="m162.29 218.4c-2.1942 7e-3 -13.436-8.7645-16.982-13.928-3.5466-5.1634-3.8527-9.9469-1.3473-14.554 5.4341-8.2863 13.79-6.1293 19.055-3.2108 4.3568-2.8462 11.927-5.3194 17.243 2.0112 3.3566 4.7297 3.1953 11.164-0.69018 15.881-3.8854 4.7165-15.276 13.794-17.278 13.801z" fill="#f00" stroke="#fff" stroke-width="2.2008"/>
+                 <path id="fullscreen" transform="matrix(.26458 0 0 .26458 0 170)" d="m727.16 426.59v42.928h53.055v-42.928zm3.4277 2.8867h14.213v3.0938h-11.252v10.186h-2.9609zm32.115 0h14.211v13.279h-2.959v-10.186h-11.252zm-32.115 23.787h2.9609v10.184h11.252v3.0957h-14.213zm43.367 0h2.959v13.279h-14.211v-3.0957h11.252z" fill="#fff" opacity=".99"/>
+                </g>
+               </svg>
+               
+               
+               
+               
+                       
+               
+    </div>
+    <div id="endgame">
+
+    </div>
+    <div id="hiscorelist">
+
+        
+    </div>
+    <script>
+const INGAME = 0;
+const ENTERNAME = 1;
+const TOPLIST = 2;
+var fullscreen = false;
+
+f('fullscreen').addEventListener('click',fullscreenClicked);
+function fullscreenClicked(){
+    alert('hi');
+}
+function f(i){
+    return document.getElementById(i);
+}
+    </script>
+</body>
+
+</html>
