@@ -1,7 +1,7 @@
 # Should be
 
-* multiplayer fun
-* Inspired by MsPacMan, Wizard_Of_Wor, Squirm (C-16)
+* multiplayer fun 1-4 player
+* Inspired by MsPacMan, Wizard_Of_Wor, Squirm (C-16), n++
 * 
 
 
