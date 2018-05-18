@@ -3,32 +3,41 @@ This is my lua game
 ]]--
 
 function love.load()
+    love.graphics.setDefaultFilter( 'nearest', 'nearest',1)
+    Tileset = love.graphics.newImage('res/countryside.png')
+    local tilesetW, tilesetH = Tileset:getWidth(), Tileset:getHeight()
+    TileW, TileH = 32,32
+  
+    Quads = {
+        love.graphics.newQuad(0,   0, TileW, TileH, tilesetW, tilesetH), -- 1 = grass
+        love.graphics.newQuad(32,  0, TileW, TileH, tilesetW, tilesetH), -- 2 = box
+        love.graphics.newQuad(0,  32, TileW, TileH, tilesetW, tilesetH), -- 3 = flowers
+        love.graphics.newQuad(32, 32, TileW, TileH, tilesetW, tilesetH)  -- 4 = boxtop
+    }
     wallsHeight = 21
     stage = 1
-	local flags = {fullscreen=true, resizable=true, vsync=false, minwidth=400, minheight=300}
-	local joysticks = love.joystick.getJoysticks()
-    joystick = joysticks[1]
-	w, h = love.window.getDesktopDimensions(flags.display)
-	local success = love.window.setMode( w, h, flags )
-	love.graphics.setDefaultFilter( 'nearest', 'nearest', 1 )
-    unit = math.floor(h/wallsHeight)
-    wallsWidth = math.floor(w/unit)
-	actors = {}
+	local flags = {fullscreen=false, resizable=true, vsync=false, minwidth=400, minheight=300}
+	joysticks = love.joystick.getJoysticks()
+    joystick1 = joysticks[1]
+    joystick2 = joysticks[2]
+    debug1 = ""
+    debug2 = ""
+	
+    w, h = love.window.getDesktopDimensions(flags.display)
+    local success = love.window.setMode( w, h, flags )
+    grid = math.floor(h/wallsHeight)
+    grid4 = math.floor(grid/4)
+    wallsWidth = math.floor(w/grid)
+	enemies = {}
     players = {}
 	walls = {}
-	listOfBullets = {}
-    listOfParticles = {}
-    speed = 120
-	addActor("hero",10,12)
-    --p1 = {x=unit*15,y=unit*8,xd=0,yd=0,xi=0,yi=0}
-    fillWalls(wallsWidth,wallsHeight,0)
-    --wallBox(2,2,3,2)
-    --setWall(0,0)
-    --setWall(0,1)
-    --setWall(0,2)
-    --setWall(0,3)
+	bullets = {}
+    particles = {}
+    speed = grid * 8
     createFirstStage()
-    createPlayer("p1",10,10)
+    createPlayer("p1",math.floor(wallsWidth/2),math.floor(wallsHeight/2))
+    createEnemy("e1",1,1)
+    createEnemy("e2",wallsWidth-2,wallsHeight-2)
     --wallFrame(2,2,3,3,1)
 end
 
@@ -38,52 +47,158 @@ function love.keypressed(key)
     end
     local p1 = players["p1"]
     if key == "left" then
-        p1.xi = -1
-        p1.yi = 0
+        p1.want = "left"
     elseif key == "right" then
-        p1.xi = 1
-        p1.yi = 0
-    end
-    if key == "up" then
-        p1.yi = -1
-        p1.xi = 0
+        p1.want = "right"
+    elseif key == "up" then
+        p1.want = "up"
     elseif key == "down" then
-        p1.yi = 1
-        p1.xi = 0
+        p1.want = "down"
     end
     if key == "ctrl" then
         addBullet(p1.x, p1.y, p1.xi, p1.yi)
     end
 end
 
-function love.joystickpressed(joystick,button)
-   --player:jumping()
-   if not joystick then return end
+function updateJoystick()
+    local p1 = players["p1"]
+    if joystick1 then
+        debug2 = joystick1:getAxis(0)
+        if joystick1:getAxis(1) == -1 then
+            p1.want = "left"
+        elseif joystick1:getAxis(1) == 1 then
+            p1.want = "right"
+        elseif joystick1:getAxis(2) == -1 then
+            p1.want = "up"
+        elseif joystick1:getAxis(2) == 1 then
+            p1.want = "down"
+        end
+    end
+    if joystick2 then
+        --debug2 = joystick2:getName()
+    end
+    
    
 end
 
-function love.update(dt)
-    local p1 = players["p1"]
-	if p1.xi == -1 then
-        p1.xd = -dt * speed
-    end
-    if p1.xi == 1 then
-        p1.xd = dt * speed
-    end
-    if p1.yi == -1 then
-        p1.yd = -dt * speed
-    end
-    if p1.yi == 1 then
-        p1.yd = dt * speed
-    end
-    if notWall(p1.x + p1.xd, p1.y + p1.yd) then
-        p1.x = p1.x + p1.xd
-        p1.y = p1.y + p1.yd
+function love.joystickpressed( joystick, button )
+
+    debug1 = "joybutton"
+    if joystick then
+        --debug2 = "joy"
     end
 end
 
-function notWall(x,y)
-    return true
+function love.gamepadpressed( joystick, button )
+
+    debug2 = "gamepad"
+end
+
+function updatePlayers(dt)
+    local p1 = players["p1"]
+    --local d = speed * dt
+    local d = grid/16
+    --want move
+	if p1.want == "left" then
+        if notWall(p1.x - d, p1.y, grid, grid) then
+            p1.direction = "left"
+        end
+    elseif p1.want == "right" then
+        if notWall(p1.x + d, p1.y, grid, grid) then
+            p1.direction = "right"
+        end
+    elseif p1.want == "up" then
+        if notWall(p1.x, p1.y - d, grid, grid) then
+            p1.direction = "up"
+        end
+    elseif p1.want == "down" then
+        if notWall(p1.x, p1.y + d, grid, grid) then
+            p1.direction = "down"
+        end
+    end
+    --direction
+    if p1.direction == "left" then
+        if notWall(p1.x - d, p1.y, grid, grid) then
+            p1.xd = - d
+        else
+            p1.xd = 0
+        end
+        p1.yd = 0
+    elseif p1.direction == "right" then
+        if notWall(p1.x + d, p1.y, grid, grid) then
+            p1.xd = d
+        else
+            p1.xd = 0
+        end
+        p1.yd = 0
+    elseif p1.direction == "up" then
+        if notWall(p1.x, p1.y - d, grid, grid) then
+            p1.yd = -d
+        else
+            p1.yd = 0
+        end
+        p1.xd = 0
+    elseif p1.direction == "down" then
+        if notWall(p1.x, p1.y + d, grid, grid) then
+            p1.yd = d
+        else
+            p1.yd = 0
+        end
+        p1.xd = 0
+    end
+    p1.x = p1.x + p1.xd
+    p1.y = p1.y + p1.yd
+    
+    if getWallPixel(p1.x+grid/2,p1.y+grid/2) == 2 then
+        setWallPixel(p1.x+grid/2,p1.y+grid/2,0)
+    end
+end
+
+function updateEnemies(dt)
+    for k,e in pairs(enemies) do
+        --local e = enemies[k]
+        local p = players["p1"]
+        local d = grid/32
+        if p.x<e.x and notWall(e.x - d, e.y, grid, grid) and notEnemy(e.id,e.x - d,e.y) then
+            e.direction = "left"
+        elseif p.x>e.x and notWall(e.x + d, e.y, grid, grid) and notEnemy(e.id,e.x + d,e.y) then
+            e.direction = "right"
+        elseif p.y<e.y and notWall(e.x, e.y - d, grid, grid) and notEnemy(e.id,e.x,e.y - d) then
+            e.direction = "up"
+        elseif p.y>e.y and notWall(e.x, e.y + d, grid, grid) and notEnemy(e.id,e.x,e.y + d) then
+            e.direction = "down"
+        else
+            e.direction = "none"
+        end
+        --local d = speed * dt
+       
+        --direction
+        if e.direction == "left" then
+            e.xd = - d
+            e.yd = 0
+        elseif e.direction == "right" then
+            e.xd = d
+            e.yd = 0
+        elseif e.direction == "up" then
+            e.yd = -d
+            e.xd = 0
+        elseif e.direction == "down" then
+            e.yd = d
+            e.xd = 0
+        end
+        e.x = e.x + e.xd
+        e.y = e.y + e.yd
+    end
+end
+
+function love.update(dt)
+    updateJoystick()
+    updatePlayers(dt)
+    updateEnemies(dt)
+end
+
+function notWall(x,y,w,h)
+    return not(getWallPixel(x,y)==1) and not(getWallPixel(x+w-1,y)==1) and not(getWallPixel(x,y+h-1)==1) and not(getWallPixel(x+w-1,y+h-1)==1)
 end
 
 function love.draw()
@@ -93,24 +208,36 @@ function love.draw()
 		--p1.xi = -1
 	--end
     
-	love.graphics.clear(1,0.9,0,1,true,true)
-    drawPlayers()
-    drawDebug(#walls)
-	love.graphics.setColor(1,0,0)
-	--love.graphics.rectangle("fill",0,0,w,10)
+    cls()
     drawWalls()
+    drawPlayers()
+    drawEnemies()
+    drawDebug()
+end
+
+function cls()
+    love.graphics.setColor(192,192,0)
+    love.graphics.rectangle("fill", 0, 0, w, h)
 end
 
 function drawPlayers()
     for i,v in pairs(players) do
-        love.graphics.setColor(0,0,1)
-        love.graphics.rectangle("fill", v.x, v.y, unit, unit)
+        love.graphics.setColor(0,0,192)
+        love.graphics.rectangle("fill", v.x, v.y, grid, grid)
     end
 end
 
-function drawDebug(n)
+function drawEnemies()
+    for i,v in pairs(enemies) do
+        love.graphics.setColor(192,0,0)
+        love.graphics.rectangle("fill", v.x, v.y, grid, grid)
+    end
+end
+
+function drawDebug()
     love.graphics.setColor(0,0,0)
-    love.graphics.print("Debug : " .. n, 10, 10)
+    love.graphics.print("Debug1 : " .. debug1, 10, 10)
+    love.graphics.print("Debug2 : " .. debug2, 10, 20)
 end
 
 function fillWalls(w,h,n)
@@ -120,10 +247,27 @@ function fillWalls(w,h,n)
 end
 
 function drawWalls()
-    love.graphics.setColor(1,0,1)
+    
     for i=1,#walls do
-        if walls[i] == 1 then
-            love.graphics.rectangle("fill", ((i-1)%wallsWidth)*unit, math.floor((i-1)/wallsWidth)*unit,unit,unit)
+        local x = ((i-1)%wallsWidth)*grid
+        local y = math.floor((i-1)/wallsWidth)*grid
+        if false then
+            if walls[i] == 1 then
+                love.graphics.setColor(192,0,192)
+                love.graphics.rectangle("fill", x, y,grid,grid)
+            elseif walls[i] == 2 then
+                love.graphics.setColor(0,0,0)
+                love.graphics.rectangle("fill", x+grid/8*3, y+grid/8*3,grid/4,grid/4)
+            end
+        elseif true then
+            love.graphics.setColor(255,255,255)
+            
+            if walls[i] == 1 then
+                love.graphics.draw(Tileset, Quads[2], x, y,0,grid/TileW,grid/TileH)
+            elseif walls[i] == 2 then
+                love.graphics.setColor(0,0,0)
+                love.graphics.rectangle("fill", x+grid/8*3, y+grid/8*3,grid/4,grid/4)
+            end
         end
     end
 end
@@ -164,7 +308,11 @@ function getWall(x,y)
 end
 
 function getWallPixel(x,y)
-    return
+    return getWall(math.floor(x/grid),math.floor(y/grid))
+end
+
+function setWallPixel(x,y,n)
+    setWall(math.floor(x/grid),math.floor(y/grid),n)
 end
 
 function addActor(id,x,y)
@@ -173,15 +321,36 @@ function addActor(id,x,y)
 end
 
 function createPlayer(n,x,y)
-    local p={x=unit*x,y=unit*y,xd=0,yd=0,xi=0,yi=0}
+    local p={x=grid*x,y=grid*y,xd=0,yd=0,want="none",direction="none"}
     players[n] = p
 end
 
+function createEnemy(n,x,y)
+    local p={id=n,x=grid*x,y=grid*y,xd=0,yd=0,want="none",direction="none"}
+    enemies[n] = p
+end
+
 function createFirstStage()
+    fillWalls(wallsWidth,wallsHeight,0)
+    fillWalls(wallsWidth,wallsHeight,2)--gems
     for i=0,math.floor(wallsHeight/4)-1 do
         wallFrame(i*2,i*2,wallsWidth-i*4,wallsHeight-i*4,1)
     end
-    wallHorizontal(1,10,wallsWidth-2,0)
+    wallHorizontal(1,math.floor(wallsHeight/2),wallsWidth-2,0)
+    wallVertical(math.floor(wallsWidth/2),1,wallsHeight-2,0)
+end
+
+function notEnemy(id,x,y)
+    for k,v in pairs(enemies) do
+        if not id == v.id and isOverlap(x,y,v.x,v.y)then
+            return false
+        end
+    end
+    return true
+end
+
+function isOverlap(x1,y1,x2,y2)
+    return math.abs(x1-x2)<grid and math.abs(y1-y2)<grid
 end
     
 function addBullet(x, y, xd, yd)
