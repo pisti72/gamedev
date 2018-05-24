@@ -3,16 +3,47 @@ This is my lua game
 ]]--
 
 function love.load()
+    EMPTY = 0
+    WALL = 1
+    GEM = 2
+    
+    NONE = 0
+    VERTICAL = 1
+    HORIZONTAL =2
+    
+    NORTH = 1
+    SOUTH = 2
+    WEST = 3
+    EAST = 4
+    
+    PLAYER = 0
+    ENEMY1 = 1
+    
+    BRICK = 1
+    HUMAN = 2
+    GOLD = 3
+    
+    FAST = 200
+    SLOW = 150
+    
+    WHITE = 0
+    YELLOW = 1
+    ORANGE = 2
+    RED = 3
+    BLUE = 4
+    GREEN = 5
+    PINK = 6
+    DARKGRAY = 7
     love.graphics.setDefaultFilter( 'nearest', 'nearest',1)
-    Tileset = love.graphics.newImage('res/countryside.png')
+    Tileset = love.graphics.newImage('res/tiles8x8.png')
     local tilesetW, tilesetH = Tileset:getWidth(), Tileset:getHeight()
-    TileW, TileH = 32,32
+    TileW, TileH = 8,8
   
     Quads = {
-        love.graphics.newQuad(0,   0, TileW, TileH, tilesetW, tilesetH), -- 1 = grass
-        love.graphics.newQuad(32,  0, TileW, TileH, tilesetW, tilesetH), -- 2 = box
-        love.graphics.newQuad(0,  32, TileW, TileH, tilesetW, tilesetH), -- 3 = flowers
-        love.graphics.newQuad(32, 32, TileW, TileH, tilesetW, tilesetH)  -- 4 = boxtop
+        love.graphics.newQuad(0, 0, TileW, TileH, tilesetW, tilesetH), -- 1 = brick
+        love.graphics.newQuad(8, 0, TileW, TileH, tilesetW, tilesetH), -- 2 = human
+        love.graphics.newQuad(0, 8, TileW, TileH, tilesetW, tilesetH), -- 3 = gold
+        love.graphics.newQuad(8, 8, TileW, TileH, tilesetW, tilesetH)  -- 4 = boxtop
     }
     wallsHeight = 21
     stage = 1
@@ -26,34 +57,30 @@ function love.load()
     w, h = love.window.getDesktopDimensions(flags.display)
     local success = love.window.setMode( w, h, flags )
     grid = math.floor(h/wallsHeight)
-    grid4 = math.floor(grid/4)
     wallsWidth = math.floor(w/grid)
-	enemies = {}
-    players = {}
+    actors = {}
 	walls = {}
 	bullets = {}
     particles = {}
-    speed = grid * 8
     createFirstStage()
-    createPlayer("p1",math.floor(wallsWidth/2),math.floor(wallsHeight/2))
-    createEnemy("e1",1,1)
-    createEnemy("e2",wallsWidth-2,wallsHeight-2)
-    --wallFrame(2,2,3,3,1)
+    createActor("p1",PLAYER,BLUE,FAST,math.floor(wallsWidth/2),math.floor(wallsHeight/2))
+    --createActor("e1",ENEMY1,RED,SLOW,1,1)
+    createActor("e2",ENEMY1,RED,SLOW,wallsWidth-2,wallsHeight-2)
 end
 
 function love.keypressed(key)
     if key == "escape" then
         love.event.quit()
     end
-    local p1 = players["p1"]
+    local p1 = actors["p1"]
     if key == "left" then
-        p1.want = "left"
+        p1.want = WEST
     elseif key == "right" then
-        p1.want = "right"
+        p1.want = EAST
     elseif key == "up" then
-        p1.want = "up"
+        p1.want = NORTH
     elseif key == "down" then
-        p1.want = "down"
+        p1.want = SOUTH
     end
     if key == "ctrl" then
         addBullet(p1.x, p1.y, p1.xi, p1.yi)
@@ -61,17 +88,17 @@ function love.keypressed(key)
 end
 
 function updateJoystick()
-    local p1 = players["p1"]
+    local p1 = actors["p1"]
     if joystick1 then
         debug2 = joystick1:getAxis(0)
         if joystick1:getAxis(1) == -1 then
-            p1.want = "left"
+            p1.want = WEST
         elseif joystick1:getAxis(1) == 1 then
-            p1.want = "right"
+            p1.want = EAST
         elseif joystick1:getAxis(2) == -1 then
-            p1.want = "up"
+            p1.want = NORTH
         elseif joystick1:getAxis(2) == 1 then
-            p1.want = "down"
+            p1.want = SOUTH
         end
     end
     if joystick2 then
@@ -94,111 +121,145 @@ function love.gamepadpressed( joystick, button )
     debug2 = "gamepad"
 end
 
-function updatePlayers(dt)
-    local p1 = players["p1"]
-    --local d = speed * dt
-    local d = grid/16
-    --want move
-	if p1.want == "left" then
-        if notWall(p1.x - d, p1.y, grid, grid) then
-            p1.direction = "left"
+function updateActors(dt)
+    for k,v in pairs(actors) do
+        local speed = v.speed * dt
+        --want move
+        --akkor valtunk tengelyt ha ott vagyunk a vonalon vagy a kozeleben vagyunk
+        if v.want == WEST and onHorizontalGrid(v) then
+            snapToHorizontalGrid(v)
+            v.v = -speed
+            v.axis = HORIZONTAL
+        elseif v.want == EAST and onHorizontalGrid(v) then
+            snapToHorizontalGrid(v)
+            v.v = speed
+            v.axis = HORIZONTAL
+        elseif v.want == NORTH and onVerticalGrid(v) then
+            snapToVerticalGrid(v)
+            v.v = -speed
+            v.axis = VERTICAL
+        elseif v.want == SOUTH and onVerticalGrid(v) then
+            snapToVerticalGrid(v)
+            v.v = speed
+            v.axis = VERTICAL
+        elseif v.want == NONE then
+            snapToVerticalGrid(v)
+            snapToHorizontalGrid(v)
+            v.v = 0
         end
-    elseif p1.want == "right" then
-        if notWall(p1.x + d, p1.y, grid, grid) then
-            p1.direction = "right"
+        --checks gem collected
+        if getWallPixel(v.x+grid/2,v.y+grid/2) == GEM then
+            setWallPixel(v.x+grid/2,v.y+grid/2,EMPTY)
+            createParticles(10,YELLOW,10,v.x+grid/2,v.y+grid/2)
         end
-    elseif p1.want == "up" then
-        if notWall(p1.x, p1.y - d, grid, grid) then
-            p1.direction = "up"
-        end
-    elseif p1.want == "down" then
-        if notWall(p1.x, p1.y + d, grid, grid) then
-            p1.direction = "down"
-        end
-    end
-    --direction
-    if p1.direction == "left" then
-        if notWall(p1.x - d, p1.y, grid, grid) then
-            p1.xd = - d
-        else
-            p1.xd = 0
-        end
-        p1.yd = 0
-    elseif p1.direction == "right" then
-        if notWall(p1.x + d, p1.y, grid, grid) then
-            p1.xd = d
-        else
-            p1.xd = 0
-        end
-        p1.yd = 0
-    elseif p1.direction == "up" then
-        if notWall(p1.x, p1.y - d, grid, grid) then
-            p1.yd = -d
-        else
-            p1.yd = 0
-        end
-        p1.xd = 0
-    elseif p1.direction == "down" then
-        if notWall(p1.x, p1.y + d, grid, grid) then
-            p1.yd = d
-        else
-            p1.yd = 0
-        end
-        p1.xd = 0
-    end
-    p1.x = p1.x + p1.xd
-    p1.y = p1.y + p1.yd
-    
-    if getWallPixel(p1.x+grid/2,p1.y+grid/2) == 2 then
-        setWallPixel(p1.x+grid/2,p1.y+grid/2,0)
     end
 end
 
-function updateEnemies(dt)
-    for k,e in pairs(enemies) do
-        --local e = enemies[k]
-        local p = players["p1"]
-        local d = grid/32
-        if p.x<e.x and notWall(e.x - d, e.y, grid, grid) and notEnemy(e.id,e.x - d,e.y) then
-            e.direction = "left"
-        elseif p.x>e.x and notWall(e.x + d, e.y, grid, grid) and notEnemy(e.id,e.x + d,e.y) then
-            e.direction = "right"
-        elseif p.y<e.y and notWall(e.x, e.y - d, grid, grid) and notEnemy(e.id,e.x,e.y - d) then
-            e.direction = "up"
-        elseif p.y>e.y and notWall(e.x, e.y + d, grid, grid) and notEnemy(e.id,e.x,e.y + d) then
-            e.direction = "down"
+function snapToHorizontalGrid(actor)
+    local mod = math.floor(actor.y)%grid
+    if mod <= grid/2 then
+        actor.y = math.floor(actor.y/grid) * grid
+    else
+        actor.y = math.ceil(actor.y/grid) * grid
+    end
+end
+
+function snapToVerticalGrid(actor)
+    local mod = math.floor(actor.x)%grid
+    if mod <= grid/2 then
+        actor.x = math.floor(actor.x/grid) * grid
+    else
+        actor.x = math.ceil(actor.x/grid) * grid
+    end
+end
+
+function onHorizontalGrid(actor)
+    local mod = math.floor(actor.y)%grid
+    if mod <= grid * 0.25 then
+        return true
+    elseif mod >= grid * 0.75 then
+        return true
+    else
+        return false
+    end
+end
+
+function onVerticalGrid(actor)
+    local mod = math.floor(actor.x)%grid
+    if mod <= grid * 0.25 then
+        return true
+    elseif mod >= grid * 0.75 then
+        return true
+    else
+        return false
+    end
+end
+
+function moveActors()
+    for k,v in pairs(actors) do
+        if notWall2(v) and not (v.axis == NONE) then
+            createParticles(1,v.color,20,v.x+grid/2,v.y+grid)
+            if v.axis == HORIZONTAL then
+                v.x = v.x + v.v
+            else
+                v.y = v.y + v.v
+            end
         else
-            e.direction = "none"
+            snapToVerticalGrid(v)
+            snapToHorizontalGrid(v)
         end
-        --local d = speed * dt
-       
-        --direction
-        if e.direction == "left" then
-            e.xd = - d
-            e.yd = 0
-        elseif e.direction == "right" then
-            e.xd = d
-            e.yd = 0
-        elseif e.direction == "up" then
-            e.yd = -d
-            e.xd = 0
-        elseif e.direction == "down" then
-            e.yd = d
-            e.xd = 0
+    end
+end
+
+function updateEnemies()
+    for k,v in pairs(actors) do
+        if v.typ == ENEMY1 then
+            --get nearest player
+            local p = actors["p1"]
+            --if math.floor(v.x/grid) < math.floor(p.x/grid) then
+            --    v.want = EAST
+            if math.floor(v.x/grid) >= math.floor(p.x/grid) then
+                v.want = WEST
+                debug1 = "west"
+            else
+                v.want = NONE
+                debug1 = "none"
+            end
+         end
+    end
+end
+
+function updateParticles(dt)
+    for k,v in pairs(particles) do
+        v.x = v.x + v.xd * dt
+        v.y = v.y + v.yd * dt
+        v.life = v.life - 1
+        if v.life<0 then
+            table.remove(particles,k)
         end
-        e.x = e.x + e.xd
-        e.y = e.y + e.yd
     end
 end
 
 function love.update(dt)
     updateJoystick()
-    updatePlayers(dt)
-    updateEnemies(dt)
+    updateEnemies()
+    updateActors(dt)
+    updateParticles(dt)
+    --updatePlayers()
+    moveActors()
+    --
+end
+
+function notWall2(actor)
+    if actor.axis == HORIZONTAL then
+        return notWall(actor.x + actor.v, actor.y, grid, grid)
+    else
+        return notWall(actor.x, actor.y + actor.v, grid, grid)
+    end
 end
 
 function notWall(x,y,w,h)
-    return not(getWallPixel(x,y)==1) and not(getWallPixel(x+w-1,y)==1) and not(getWallPixel(x,y+h-1)==1) and not(getWallPixel(x+w-1,y+h-1)==1)
+    return not(getWallPixel(x,y)==WALL) and not(getWallPixel(x+w-1,y)==WALL) and not(getWallPixel(x,y+h-1)==WALL) and not(getWallPixel(x+w-1,y+h-1)==WALL)
 end
 
 function love.draw()
@@ -208,34 +269,36 @@ function love.draw()
 		--p1.xi = -1
 	--end
     
-    cls()
+    --cls()
     drawWalls()
-    drawPlayers()
-    drawEnemies()
+    drawActors()
+    drawParticles()
     drawDebug()
 end
 
 function cls()
-    love.graphics.setColor(192,192,0)
+    setColor(YELLOW)
     love.graphics.rectangle("fill", 0, 0, w, h)
 end
 
-function drawPlayers()
-    for i,v in pairs(players) do
-        love.graphics.setColor(0,0,192)
-        love.graphics.rectangle("fill", v.x, v.y, grid, grid)
+function drawActors()
+    for i,v in pairs(actors) do
+        setColor(v.color)
+        love.graphics.draw(Tileset, Quads[HUMAN], v.x, v.y,0,grid/TileW,grid/TileH)
     end
 end
 
-function drawEnemies()
-    for i,v in pairs(enemies) do
-        love.graphics.setColor(192,0,0)
-        love.graphics.rectangle("fill", v.x, v.y, grid, grid)
-    end
+function drawParticles()
+    --if particles then
+        for i,v in pairs(particles) do
+            setColor(v.color)
+            love.graphics.rectangle("fill",v.x-2,v.y-2,4,4)
+        end
+    --end
 end
 
 function drawDebug()
-    love.graphics.setColor(0,0,0)
+    setColor(WHITE)
     love.graphics.print("Debug1 : " .. debug1, 10, 10)
     love.graphics.print("Debug2 : " .. debug2, 10, 20)
 end
@@ -251,23 +314,17 @@ function drawWalls()
     for i=1,#walls do
         local x = ((i-1)%wallsWidth)*grid
         local y = math.floor((i-1)/wallsWidth)*grid
-        if false then
-            if walls[i] == 1 then
-                love.graphics.setColor(192,0,192)
-                love.graphics.rectangle("fill", x, y,grid,grid)
-            elseif walls[i] == 2 then
-                love.graphics.setColor(0,0,0)
-                love.graphics.rectangle("fill", x+grid/8*3, y+grid/8*3,grid/4,grid/4)
-            end
-        elseif true then
-            love.graphics.setColor(255,255,255)
             
-            if walls[i] == 1 then
-                love.graphics.draw(Tileset, Quads[2], x, y,0,grid/TileW,grid/TileH)
-            elseif walls[i] == 2 then
-                love.graphics.setColor(0,0,0)
-                love.graphics.rectangle("fill", x+grid/8*3, y+grid/8*3,grid/4,grid/4)
-            end
+        if walls[i] == EMPTY or walls[i] == GEM then 
+            setColor(DARKGRAY)
+            love.graphics.rectangle("fill", x, y,grid,grid)
+        end
+        if walls[i] == WALL then
+            setColor(ORANGE)
+            love.graphics.draw(Tileset, Quads[BRICK], x, y,0,grid/TileW,grid/TileH)
+        elseif walls[i] == GEM then
+            setColor(YELLOW)
+            love.graphics.draw(Tileset, Quads[GOLD], x, y,0,grid/TileW,grid/TileH)
         end
     end
 end
@@ -315,33 +372,67 @@ function setWallPixel(x,y,n)
     setWall(math.floor(x/grid),math.floor(y/grid),n)
 end
 
-function addActor(id,x,y)
-	local actor = {x=x,y=y}
-	actors[id] = actor
+function createActor(id,typ,color,speed,x,y)
+    local p={
+        id=id,
+        typ=typ,
+        color=color,
+        x=x*grid,
+        y=y*grid,
+        speed=speed,
+        v=0,
+        acc=0,
+        axis=HORIZONTAL,
+        want=NONE,
+        direction=NONE}
+    actors[id] = p
 end
 
-function createPlayer(n,x,y)
-    local p={x=grid*x,y=grid*y,xd=0,yd=0,want="none",direction="none"}
-    players[n] = p
+function createParticles(n,color,life,x,y)
+    for i=1,n do
+        local particle = {
+            x=x,
+            y=y,
+            color=color,
+            life=math.random(life),
+            xd=math.random(-grid,grid),
+            yd=math.random(-grid,grid)
+        }
+        table.insert(particles,particle)
+    end
 end
 
-function createEnemy(n,x,y)
-    local p={id=n,x=grid*x,y=grid*y,xd=0,yd=0,want="none",direction="none"}
-    enemies[n] = p
+--https://www.romanzolotarev.com/pico-8-color-palette/
+function setColor(color)
+    local r,g,b=0
+    if color==WHITE then
+        r,g,b = 1,241/255,232/255
+    elseif color==YELLOW then
+        r,g,b = 1,236/255,39/255
+    elseif color==ORANGE then
+        r,g,b = 1,163/255,0
+    elseif color==RED then
+        r,g,b = 1,0,77/255
+    elseif color==BLUE then
+        r,g,b = 41/255,173/255,1
+    elseif color==DARKGRAY then
+        r,g,b = 95/255,87/255,79/255
+    end
+    love.graphics.setColor(r,g,b)
 end
 
 function createFirstStage()
-    fillWalls(wallsWidth,wallsHeight,0)
-    fillWalls(wallsWidth,wallsHeight,2)--gems
+    fillWalls(wallsWidth,wallsHeight,EMPTY)
+    fillWalls(wallsWidth,wallsHeight,GEM)--gems
     for i=0,math.floor(wallsHeight/4)-1 do
-        wallFrame(i*2,i*2,wallsWidth-i*4,wallsHeight-i*4,1)
+        wallFrame(i*2,i*2,wallsWidth-i*4,wallsHeight-i*4,WALL)
     end
-    wallHorizontal(1,math.floor(wallsHeight/2),wallsWidth-2,0)
-    wallVertical(math.floor(wallsWidth/2),1,wallsHeight-2,0)
+    wallHorizontal(1,math.floor(wallsHeight/2),wallsWidth-2,EMPTY)
+    wallVertical(math.floor(wallsWidth/2),1,wallsHeight-2,EMPTY)
 end
 
-function notEnemy(id,x,y)
-    for k,v in pairs(enemies) do
+function notActorHere(id,x,y)
+    for k,v in pairs(actors) do
         if not id == v.id and isOverlap(x,y,v.x,v.y)then
             return false
         end

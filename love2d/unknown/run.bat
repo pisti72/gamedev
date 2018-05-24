@@ -1,1 +1,1 @@
-"C:\Program Files\LOVE\love.exe" ../unknown
+"C:\Program Files\LOVE\love.exe" "..\unknown"

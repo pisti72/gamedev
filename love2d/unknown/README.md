@@ -16,6 +16,9 @@
 
 # Diary
 
-2018/05/15 - maze, display, player, keyboard, simple collition
-2018/05/16 - runs on retropie
-            todo: improved control, gamepad imlementation
+2018/05/15 Tue - maze, display, player, keyboard, simple collition
+2018/05/16 Wed - runs on retropie, enemies, gems
+2018/05/17 Thu - improved control, joystick imlementation
+2018/05/18 Fri - 
+
+2018/05/23 Fri - 
