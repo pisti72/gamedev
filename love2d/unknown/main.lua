@@ -55,7 +55,7 @@ function love.load()
     STATE_NEXTSTAGE = 2
     STATE_GAMEOVER = 3
     
-    state = STATE_INGAME
+    state = STATE_TITLE
     music = love.audio.newSource('snd/title.ogg','stream')
     --https://www.bfxr.net/
     sndExplosion = love.audio.newSource('snd/Explosion5.wav','static')
@@ -70,7 +70,7 @@ function love.load()
         sndShoot:setVolume(0)
         sndPowerup:setVolume(0) 
     else
-        music:setVolume(0.5) 
+        music:setVolume(0) 
         sndExplosion:setVolume(0.9)
         sndHit:setVolume(0.3)
         sndShoot:setVolume(0.3)
@@ -93,8 +93,11 @@ function love.load()
         love.graphics.newQuad(32, 16, TileW, TileW, tilesetW, tilesetH),  -- 5 = GFX_SKELETON
         love.graphics.newQuad(0, 16, TileW, TileW, tilesetW, tilesetH),  -- 6 = GFX_FIRE
     }
-    wallsHeight = 51
-    stage = 1
+    wallsHeight = 17
+    stage = 0
+    gemsAll = 0
+    gems = 0
+    
 	local flags = {fullscreen=false, resizable=true, vsync=false, minwidth=400, minheight=300}
 	joysticks = love.joystick.getJoysticks()
     joystick1 = joysticks[1]
@@ -106,19 +109,18 @@ function love.load()
     local success = love.window.setMode( w, h, flags )
     grid = math.floor(h/wallsHeight/2)*2
     gridHalf = grid/2
+    pixel = math.floor(grid/TileW)
+    debug1 = pixel
     wallsWidth = math.floor(w/grid)
     love.graphics.setNewFont('res/I-pixel-u.ttf', gridHalf)
     actors = {}
 	walls = {}
 	bullets = {}
     particles = {}
-    createFirstStage()
-    --createActor(id,typ,gfx,speed,x,y)
-    createActor("p1",PLAYER,GFX_KNIGHT,10,FAST,math.floor(wallsWidth/2)+2,math.floor(wallsHeight/2))
-    createActor("p2",PLAYER,GFX_KNIGHT,10,FAST,math.floor(wallsWidth/2)-2,math.floor(wallsHeight/2))
     
-    createActor("e1",ENEMY1,GFX_SKELETON,3,SLOW,1,1)
-    createActor("e2",ENEMY1,GFX_SKELETON,3,SLOW,wallsWidth-2,wallsHeight-2)
+    createFirstStage()
+    
+    
 end
 
 function love.keypressed(key)
@@ -137,11 +139,8 @@ function love.keypressed(key)
             actor.want = SOUTH
         end
         if key == "rctrl" then
-            createBullet(LASER, actor)
-            --debug2 = 'hi'
+            firePressed(actor)
         end
-    else
-        debug1 = "BASZOD"
     end
     
     local actor = getActorById('p2')
@@ -156,46 +155,87 @@ function love.keypressed(key)
             actor.want = SOUTH
         end
         if key == "lctrl" then
-            createBullet(LASER, actor)
-            --debug2 = 'hi'
+            firePressed(actor)
         end
-    else
-        debug1 = "BASZOD"
     end
 end
 
 function updateJoystick()
-    local p1 = getActorById('p1')
-    if joystick1 then
-        debug2 = joystick1:getAxis(0)
+    
+    local actor = getActorById('p1')
+    if joystick1 and not(actor == NOTFOUND) then
+        --debug2 = joystick1:getAxis(0)
         if joystick1:getAxis(1) == -1 then
-            p1.want = WEST
+            actor.want = WEST
         elseif joystick1:getAxis(1) == 1 then
-            p1.want = EAST
+            actor.want = EAST
         elseif joystick1:getAxis(2) == -1 then
-            p1.want = NORTH
+            actor.want = NORTH
         elseif joystick1:getAxis(2) == 1 then
-            p1.want = SOUTH
+            actor.want = SOUTH
         end
-    end
-    if joystick2 then
-        --debug2 = joystick2:getName()
+        
     end
     
-   
+    local actor = getActorById('p2')
+    if joystick2 and not(actor == NOTFOUND) then
+        if joystick2:getAxis(1) == -1 then
+            actor.want = WEST
+        elseif joystick2:getAxis(1) == 1 then
+            actor.want = EAST
+        elseif joystick2:getAxis(2) == -1 then
+            actor.want = NORTH
+        elseif joystick2:getAxis(2) == 1 then
+            actor.want = SOUTH
+        end
+        
+    end
 end
 
 function love.joystickpressed( joystick, button )
-
-    debug1 = "joybutton"
-    if joystick then
-        --debug2 = "joy"
+    local actor = getActorById('p1')
+    if joystick1 and joystick1:isDown(1,2,3,4) and not(actor == NOTFOUND) then
+        firePressed(actor)
+    end
+    
+    local actor = getActorById('p2')
+    if joystick2 and joystick2:isDown(1,2,3,4) and not(actor == NOTFOUND) then
+        firePressed(actor)
     end
 end
 
-function love.gamepadpressed( joystick, button )
+function firePressed(actor)
+    if state == STATE_TITLE then
+        inicStage()
+    elseif state == STATE_NEXTSTAGE then
+        state = STATE_INGAME
+    elseif state == STATE_GAMEOVER then
+        state = STATE_TITLE
+    elseif state == STATE_INGAME then
+        createBullet(LASER, actor)
+    end
+end
 
-    debug2 = "gamepad"
+function inicStage()
+    state = STATE_NEXTSTAGE
+    stage = stage + 1
+    actors = {}
+	walls = {}
+	bullets = {}
+    particles = {}
+    gems = 0
+    --debug1 = 'next'
+    if stage == 1 then
+        createFirstStage()
+    elseif stage == 2 then
+        createSecondStage()
+    elseif stage == 3 then
+        createThirdStage()
+    end
+    gemsAll = countGems()
+end
+
+function inicTitle()
 end
 
 function updateActors(dt)
@@ -236,19 +276,43 @@ function updateActors(dt)
             v.x = math.floor(v.x / grid) * grid + gridHalf
             v.y = math.floor(v.y / grid) * grid + gridHalf
         end
-        --checks whether gem collected
+        --checks whether gem collected by players
         if v.typ == PLAYER then
+            --checks whether gem collected by players
             if getWallPixel(v.x, v.y) == GEM then
                 sndPowerup:play()
                 setWallPixel(v.x, v.y, EMPTY)
                 createParticles(5,YELLOW,10,v.x+grid/2,v.y+grid/2,1)
                 createParticles(5,WHITE,10,v.x+grid/2,v.y+grid/2,1)
+                gems = gems + 1
+                if gems == gemsAll then
+                    inicStage()
+                end
+            end
+            --checks collition with enemies
+            for key,value in pairs(actors) do
+                if value.typ == ENEMY1 and isOverlap(v.x,v.y,value.x,value.y) and v.protected == 0 then
+                    v.hit = v.hit - 1
+                    if v.hit == 0 then
+                        --die
+                        table.remove(actors,k)
+                        createParticles(30,RED,100,v.x,v.y,8)
+                        createParticles(30,ORANGE,80,v.x,v.y,8)
+                        sndExplosion:play()
+                    else
+                        --hit
+                        v.protected = 200
+                        createParticles(30,YELLOW,60,v.x,v.y,8)
+                        sndHit:play()
+                    end
+                end
             end
         end
         --protected
         if v.protected > 0 then
             v.protected = v.protected - 1
         end
+        
     end
 end
 
@@ -322,8 +386,6 @@ function aiEnemies()
                 else
                     v.want = NONE
                 end
-            else
-                debug1 = "FUCK"
             end
          end
     end
@@ -416,16 +478,40 @@ function notWall(x,y,w,h)
 end
 
 function love.draw()
-    drawWalls()
-    drawActors()
-    drawParticles()
-    drawBullets()
+    if state == STATE_TITLE then
+        drawWalls()
+        drawTitle()
+        drawPressFire()
+    elseif state == STATE_NEXTSTAGE then
+        drawWalls()
+        drawNextStage()
+        drawPressFire()
+    elseif state == STATE_INGAME then
+        drawWalls()
+        drawActors()
+        drawParticles()
+        drawBullets()
+    end
     drawDebug()
 end
 
-function cls()
-    setColor(YELLOW)
-    love.graphics.rectangle("fill", 0, 0, w, h)
+function drawTitle()
+    setColor(BLACK)
+    love.graphics.printf('THE TITLE',0,h*0.4,w/4,"center",0,4)
+    setColor(RED)
+    love.graphics.printf('THE TITLE',0,h*0.4-pixel*4,w/4,"center",0,4)
+end
+
+function drawNextStage()
+    setColor(WHITE)
+    --coloredtext = {{1,1,1},'PRESS',{1,0,0},' FIRE ',{1,1,1},'TO START'}
+    love.graphics.printf('NEXT STAGE',0,h*0.5,w,"center")
+end
+
+function drawPressFire()
+    setColor(WHITE)
+    coloredtext = {{1,1,1},'PRESS',{1,0,0},' FIRE ',{1,1,1},'TO START'}
+    love.graphics.printf(coloredtext,0,h*0.60,w,"center")
 end
 
 function drawActors()
@@ -627,13 +713,55 @@ function setColor(color)
 end
 
 function createFirstStage()
-    fillWalls(wallsWidth,wallsHeight,EMPTY)
-    fillWalls(wallsWidth,wallsHeight,GEM)--gems
+    fillWalls(wallsWidth, wallsHeight, EMPTY)
+    wallFrame(math.floor(wallsWidth/4),math.floor(wallsHeight/4),math.floor(wallsWidth/2),math.floor(wallsHeight/2),GEM)
+    wallFrame(0,0,wallsWidth,wallsHeight,WALL)
+    createActor("p1",PLAYER,GFX_KNIGHT,10,FAST,2,2)
+    createActor("p2",PLAYER,GFX_KNIGHT,10,FAST,wallsWidth-3,wallsHeight-3)
+end
+
+function createSecondStage()
+    fillWalls(wallsWidth, wallsHeight, GEM)
     for i=0,math.floor(wallsHeight/4)-1 do
         wallFrame(i*2,i*2,wallsWidth-i*4,wallsHeight-i*4,WALL)
     end
     wallHorizontal(1,math.floor(wallsHeight/2),wallsWidth-2,EMPTY)
     wallVertical(math.floor(wallsWidth/2),1,wallsHeight-2,EMPTY)
+    
+    createActor("p1",PLAYER,GFX_KNIGHT,10,FAST,math.floor(wallsWidth/2)+2,math.floor(wallsHeight/2))
+    createActor("p2",PLAYER,GFX_KNIGHT,10,FAST,math.floor(wallsWidth/2)-2,math.floor(wallsHeight/2))
+    
+    createActor("e1",ENEMY1,GFX_SKELETON,3,SLOW,1,1)
+    createActor("e2",ENEMY1,GFX_SKELETON,3,SLOW,wallsWidth-2,wallsHeight-2)
+end
+
+function createThirdStage()
+    fillWalls(wallsWidth,wallsHeight,GEM)
+    wallFrame(0,0,wallsWidth,wallsHeight,WALL)
+    
+    for i=2,wallsHeight-2 do
+        if i%2 == 0 then
+            wallHorizontal(2,i,wallsWidth-4,WALL)
+        end
+    end
+    
+    createActor("p1",PLAYER,GFX_KNIGHT,10,FAST,1,math.floor(wallsHeight/2))
+    createActor("p2",PLAYER,GFX_KNIGHT,10,FAST,wallsWidth-2,math.floor(wallsHeight/2))
+
+    createActor("e1",ENEMY1,GFX_SKELETON,3,SLOW,1,1)
+    createActor("e2",ENEMY1,GFX_SKELETON,3,SLOW,wallsWidth-2,wallsHeight-2)
+    createActor("e3",ENEMY1,GFX_SKELETON,3,SLOW,1,wallsHeight-2)
+    createActor("e4",ENEMY1,GFX_SKELETON,3,SLOW,wallsWidth-2,1)
+end
+
+function countGems()
+    local n = 0
+    for i=1,#walls do
+        if walls[i] == GEM then
+            n = n + 1
+        end
+    end
+    return n
 end
 
 function notActorHere(actor)
