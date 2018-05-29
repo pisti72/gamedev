@@ -9,10 +9,26 @@
 
 # TODO
 
-* procedual map generation
-* player movement
-* collition
-* enemy_follower
+* procedual map generation      - done
+* player movement               - done
+* collition                     - done
+* enemy_follower                - done
+* bitmap texts, beacuse of setColor love2d anomaly
+* bitmap title snes like gfx
+* improve enemy ai
+* more levels
+* add animation
+* add more bullets
+* add boss at least one, gfx too
+* improve gfx to snes gfx
+* add more walls
+* add side walls
+* add powerups like new weapons, extra life, festener, slowener
+* add more enemies
+* add end scene
+* add main title gfx
+* 3rd and 4th player
+* add menu items
 
 # Diary
 
@@ -29,5 +45,5 @@
 2018/05/25 Fri - speccy tiles, bulletts added
 2018/05/26 Sat - 
 2018/05/27 Sun - fixed movement, 2nd player added, protected added, 
-2018/05/28 Mon - 
-2018/05/29 Tue - 
+2018/05/28 Mon - game states added
+2018/05/29 Tue - bullets merged to actors, bugfixes

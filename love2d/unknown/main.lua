@@ -36,6 +36,7 @@ function love.load()
     GFX_BRICKSIDE = 11
     GFX_BALL = 12
     
+    BULLET_SPEED = 18
     FAST = 6
     SLOW = 4
     
@@ -58,6 +59,7 @@ function love.load()
     
     state = STATE_TITLE
     music = love.audio.newSource('snd/title.ogg','stream')
+    music:setLooping(true)
     --https://www.bfxr.net/
     sndExplosion = love.audio.newSource('snd/Explosion5.wav','static')
     sndHit = love.audio.newSource('snd/Hit_Hurt4.wav','static')
@@ -71,9 +73,9 @@ function love.load()
         sndShoot:setVolume(0)
         sndPowerup:setVolume(0) 
     else
-        music:setVolume(0) 
+        music:setVolume(0.3) 
         sndExplosion:setVolume(0.9)
-        sndHit:setVolume(0.3)
+        sndHit:setVolume(0.5)
         sndShoot:setVolume(0.3)
         sndPowerup:setVolume(0.3) 
     end
@@ -105,15 +107,16 @@ function love.load()
     gemsAll = 0
     gems = 0
     
-	local flags = {fullscreen=false, resizable=true, vsync=false, minwidth=400, minheight=300}
 	joysticks = love.joystick.getJoysticks()
     joystick1 = joysticks[1]
     joystick2 = joysticks[2]
     debug1 = ""
     debug2 = ""
-	
+    
+	local flags = {fullscreen=false, resizable=true, vsync=false, minwidth=400, minheight=300}
     w, h = love.window.getDesktopDimensions(flags.display)
     local success = love.window.setMode( w, h, flags )
+    
     grid = math.floor(h/wallsHeight/2)*2
     gridHalf = grid/2
     pixel = math.floor(grid/TileW)
@@ -125,8 +128,6 @@ function love.load()
     particles = {}
     
     createFirstStage()
-    
-    
 end
 
 function love.keypressed(key)
@@ -410,8 +411,15 @@ function aiEnemies()
                     v.want = NONE
                 end
             end
+            if isPlayerAhead(p,v) then
+                --createBullet(v)
+            end
          end
     end
+end
+
+function isPlayerAhead(actor1,actor2)
+    return ((actor1.x == actor2.x) or (actor1.y == actor2.y)) and math.random(100) > 98
 end
 
 function updateParticles(dt)
@@ -508,14 +516,15 @@ function love.draw()
         drawGameOver()
         drawPressFire()
     end
-    drawDebug()
+    --drawDebug()
 end
 
 function drawTitle()
     setColor(BLACK)
-    love.graphics.printf('THE TITLE',0,h*0.4,w/4,"center",0,4)
+    local title = 'Game Of Thrones'
+    love.graphics.printf(title,0,h*0.4,w/4,"center",0,4)
     setColor(RED)
-    love.graphics.printf('THE TITLE',0,h*0.4-pixel*4,w/4,"center",0,4)
+    love.graphics.printf(title,0,h*0.4-pixel*4,w/4,"center",0,4)
 end
 
 function drawNextStage()
@@ -695,7 +704,7 @@ function createBullet(shooter)
         protected=0,
         x=shooter.x,
         y=shooter.y,
-        speed=FAST * grid * 4,
+        speed=BULLET_SPEED * grid,
         v=0,
         acc=0,
         axis=shooter.axis,
@@ -770,6 +779,8 @@ function setColor(color)
         r,g,b = 95/255,87/255,79/255
     end
     love.graphics.setColor(r,g,b)
+    --In versions prior to 11.0, color component values were within the range of 0 to 255 instead of 0 to 1
+    love.graphics.setColor(255,255,255)
 end
 
 function createFirstStage()
