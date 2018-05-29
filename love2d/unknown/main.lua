@@ -20,15 +20,21 @@ function love.load()
     
     PLAYER = 0
     ENEMY1 = 1
+    FLAME = 2
+    NOBODY = 99
     
     GFX_BRICK = 1
     GFX_KNIGHT = 2
     GFX_CASE = 3
     GFX_FLOOR = 4
     GFX_SKELETON = 5
-    --GFX_BRICKSIDE = 5
     GFX_FIRE = 6
-    --GFX_BALL = 7
+    GFX_KNIGHT_BLUE = 7
+    GFX_FIRE_V = 8
+    GFX_HEART_EMPTY = 9
+    GFX_HEART_FULL = 10
+    GFX_BRICKSIDE = 11
+    GFX_BALL = 12
     
     FAST = 6
     SLOW = 4
@@ -44,11 +50,6 @@ function love.load()
     PINK = 6
     DARKGRAY = 7
     BLACK = 8
-    
-    LASER = 0
-    BULLET = 1
-    FLAME = 2
-    WAVE = 3
     
     STATE_TITLE = 0
     STATE_INGAME = 1
@@ -92,6 +93,12 @@ function love.load()
         love.graphics.newQuad(48, 0, TileW, TileW, tilesetW, tilesetH),  -- 4 = GFX_FLOOR
         love.graphics.newQuad(32, 16, TileW, TileW, tilesetW, tilesetH),  -- 5 = GFX_SKELETON
         love.graphics.newQuad(0, 16, TileW, TileW, tilesetW, tilesetH),  -- 6 = GFX_FIRE
+        love.graphics.newQuad(32, 32, TileW, TileW, tilesetW, tilesetH),  -- 7 = GFX_KNIGHT_BLUE
+        love.graphics.newQuad(0, 32, TileW, TileW, tilesetW, tilesetH),  -- 8 = GFX_FIRE_V
+        love.graphics.newQuad(16, 32, 7, 6, tilesetW, tilesetH),  -- 9 = GFX_HEART_EMPTY
+        love.graphics.newQuad(25, 32, 7, 6, tilesetW, tilesetH),  -- 10 = GFX_HEART_FULL
+        love.graphics.newQuad(32, 0, TileW, TileW, tilesetW, tilesetH), -- 11 = GFX_BRICKSIDE
+        love.graphics.newQuad(16, 16, TileW, TileW, tilesetW, tilesetH), -- 12 = GFX_BALL
     }
     wallsHeight = 17
     stage = 0
@@ -110,12 +117,11 @@ function love.load()
     grid = math.floor(h/wallsHeight/2)*2
     gridHalf = grid/2
     pixel = math.floor(grid/TileW)
-    debug1 = pixel
+    --debug1 = pixel
     wallsWidth = math.floor(w/grid)
     love.graphics.setNewFont('res/I-pixel-u.ttf', gridHalf)
     actors = {}
 	walls = {}
-	bullets = {}
     particles = {}
     
     createFirstStage()
@@ -124,87 +130,108 @@ function love.load()
 end
 
 function love.keypressed(key)
-    if key == "escape" then
-        love.event.quit()
-    end
-    local actor = getActorById('p1')
-    if not(actor == NOTFOUND) then
-        if key == "left" then
-            actor.want = WEST
-        elseif key == "right" then
-            actor.want = EAST
-        elseif key == "up" then
-            actor.want = NORTH
-        elseif key == "down" then
-            actor.want = SOUTH
+    if state == STATE_TITLE then
+        if key == "escape" then
+            love.event.quit()
+        elseif key == "rctrl" or key == "lctrl" then
+           firePressed({})
         end
-        if key == "rctrl" then
-            firePressed(actor)
+    elseif state == STATE_INGAME then
+        local actor = getActorById('p1')
+        if not(actor == NOTFOUND) then
+            if key == "left" then
+                actor.want = WEST
+            elseif key == "right" then
+                actor.want = EAST
+            elseif key == "up" then
+                actor.want = NORTH
+            elseif key == "down" then
+                actor.want = SOUTH
+            end
+            if key == "rctrl" then
+                firePressed(actor)
+            end
         end
-    end
-    
-    local actor = getActorById('p2')
-    if not(actor == NOTFOUND) then
-        if key == "a" then
-            actor.want = WEST
-        elseif key == "d" then
-            actor.want = EAST
-        elseif key == "w" then
-            actor.want = NORTH
-        elseif key == "s" then
-            actor.want = SOUTH
+        
+        local actor = getActorById('p2')
+        if not(actor == NOTFOUND) then
+            if key == "a" then
+                actor.want = WEST
+            elseif key == "d" then
+                actor.want = EAST
+            elseif key == "w" then
+                actor.want = NORTH
+            elseif key == "s" then
+                actor.want = SOUTH
+            end
+            if key == "lctrl" then
+                firePressed(actor)
+            end
         end
-        if key == "lctrl" then
-            firePressed(actor)
+        
+        if key == "escape" then
+            state = STATE_TITLE
+        end
+    elseif state == STATE_NEXTSTAGE or state == STATE_GAMEOVER then
+        if key == "escape" then
+            state = STATE_TITLE
+        elseif key == "rctrl" or key == "lctrl" then
+           firePressed({})
         end
     end
 end
 
 function updateJoystick()
-    
-    local actor = getActorById('p1')
-    if joystick1 and not(actor == NOTFOUND) then
-        --debug2 = joystick1:getAxis(0)
-        if joystick1:getAxis(1) == -1 then
-            actor.want = WEST
-        elseif joystick1:getAxis(1) == 1 then
-            actor.want = EAST
-        elseif joystick1:getAxis(2) == -1 then
-            actor.want = NORTH
-        elseif joystick1:getAxis(2) == 1 then
-            actor.want = SOUTH
+    if state == STATE_INGAME then
+        local actor = getActorById('p1')
+        if joystick1 and not(actor == NOTFOUND) then
+            --debug2 = joystick1:getAxis(0)
+            if joystick1:getAxis(1) == -1 then
+                actor.want = WEST
+            elseif joystick1:getAxis(1) == 1 then
+                actor.want = EAST
+            elseif joystick1:getAxis(2) == -1 then
+                actor.want = NORTH
+            elseif joystick1:getAxis(2) == 1 then
+                actor.want = SOUTH
+            end
+            
         end
         
-    end
-    
-    local actor = getActorById('p2')
-    if joystick2 and not(actor == NOTFOUND) then
-        if joystick2:getAxis(1) == -1 then
-            actor.want = WEST
-        elseif joystick2:getAxis(1) == 1 then
-            actor.want = EAST
-        elseif joystick2:getAxis(2) == -1 then
-            actor.want = NORTH
-        elseif joystick2:getAxis(2) == 1 then
-            actor.want = SOUTH
+        local actor = getActorById('p2')
+        if joystick2 and not(actor == NOTFOUND) then
+            if joystick2:getAxis(1) == -1 then
+                actor.want = WEST
+            elseif joystick2:getAxis(1) == 1 then
+                actor.want = EAST
+            elseif joystick2:getAxis(2) == -1 then
+                actor.want = NORTH
+            elseif joystick2:getAxis(2) == 1 then
+                actor.want = SOUTH
+            end
+            
         end
-        
     end
 end
 
 function love.joystickpressed( joystick, button )
-    local actor = getActorById('p1')
-    if joystick1 and joystick1:isDown(1,2,3,4) and not(actor == NOTFOUND) then
-        firePressed(actor)
-    end
-    
-    local actor = getActorById('p2')
-    if joystick2 and joystick2:isDown(1,2,3,4) and not(actor == NOTFOUND) then
-        firePressed(actor)
+    if state == STATE_INGAME then
+        local actor = getActorById('p1')
+        if joystick1 and joystick1:isDown(1,2,3,4) and not(actor == NOTFOUND) then
+            firePressed(actor)
+        end
+        
+        local actor = getActorById('p2')
+        if joystick2 and joystick2:isDown(1,2,3,4) and not(actor == NOTFOUND) then
+            firePressed(actor)
+        end
+    else
+        firePressed({})
     end
 end
 
 function firePressed(actor)
+    sndShoot:play()
     if state == STATE_TITLE then
         inicStage()
     elseif state == STATE_NEXTSTAGE then
@@ -212,7 +239,7 @@ function firePressed(actor)
     elseif state == STATE_GAMEOVER then
         state = STATE_TITLE
     elseif state == STATE_INGAME then
-        createBullet(LASER, actor)
+        createBullet(actor)
     end
 end
 
@@ -221,10 +248,8 @@ function inicStage()
     stage = stage + 1
     actors = {}
 	walls = {}
-	bullets = {}
     particles = {}
     gems = 0
-    --debug1 = 'next'
     if stage == 1 then
         createFirstStage()
     elseif stage == 2 then
@@ -235,46 +260,57 @@ function inicStage()
     gemsAll = countGems()
 end
 
-function inicTitle()
-end
-
 function updateActors(dt)
     for k,v in pairs(actors) do
         local speed = v.speed * dt
-        if v.want == WEST and not(getWallPixel(v.x - speed - gridHalf, v.y) == WALL) then
-            v.v = -speed
-            v.axis = HORIZONTAL
-            v.y = math.floor(v.y / grid) * grid + gridHalf
-            v.mirrorx = 1
-            v.direction = WEST
-        elseif v.want == NORTH and not(getWallPixel(v.x, v.y - speed - gridHalf) == WALL) then
-            v.v = -speed
-            v.axis = VERTICAL
-            v.x = math.floor(v.x / grid) * grid + gridHalf
-            v.direction = NORTH
-        elseif v.want == SOUTH and not(getWallPixel(v.x, v.y + speed + gridHalf) == WALL) then
-            v.v = speed
-            v.axis = VERTICAL
-            v.x = math.floor(v.x / grid) * grid + gridHalf
-            v.direction = SOUTH
-        elseif v.want == EAST and not(getWallPixel(math.floor(v.x + speed) + gridHalf, v.y) == WALL) then
-            v.v = speed
-            v.axis = HORIZONTAL
-            v.y = math.floor(v.y / grid) * grid + gridHalf
-            v.mirrorx = -1
-            v.direction = EAST
-        elseif v.direction == WEST and  not(getWallPixel(v.x - speed - gridHalf, v.y) == WALL) then
-            --do nothing
-        elseif v.direction == NORTH and not(getWallPixel(v.x, v.y - speed - gridHalf) == WALL) then
-            --do nothing
-        elseif v.direction == SOUTH and not(getWallPixel(v.x, v.y + speed + gridHalf) == WALL) then
-            --do nothing
-        elseif v.direction == EAST and not(getWallPixel(math.floor(v.x + speed) + gridHalf, v.y) == WALL) then
-            --do nothing
-        else
-            v.v = 0
-            v.x = math.floor(v.x / grid) * grid + gridHalf
-            v.y = math.floor(v.y / grid) * grid + gridHalf
+        if v.typ == PLAYER or v.typ == ENEMY1 then
+            if v.want == WEST and not(getWallPixel(v.x - speed - gridHalf, v.y) == WALL) then
+                v.v = -speed
+                v.axis = HORIZONTAL
+                v.y = math.floor(v.y / grid) * grid + gridHalf
+                v.mirrorx = 1
+                v.direction = WEST
+            elseif v.want == NORTH and not(getWallPixel(v.x, v.y - speed - gridHalf) == WALL) then
+                v.v = -speed
+                v.axis = VERTICAL
+                v.x = math.floor(v.x / grid) * grid + gridHalf
+                v.direction = NORTH
+            elseif v.want == SOUTH and not(getWallPixel(v.x, v.y + speed + gridHalf) == WALL) then
+                v.v = speed
+                v.axis = VERTICAL
+                v.x = math.floor(v.x / grid) * grid + gridHalf
+                v.direction = SOUTH
+            elseif v.want == EAST and not(getWallPixel(math.floor(v.x + speed) + gridHalf, v.y) == WALL) then
+                v.v = speed
+                v.axis = HORIZONTAL
+                v.y = math.floor(v.y / grid) * grid + gridHalf
+                v.mirrorx = -1
+                v.direction = EAST
+            elseif v.direction == WEST and  not(getWallPixel(v.x - speed - gridHalf, v.y) == WALL) then
+                --do nothing
+            elseif v.direction == NORTH and not(getWallPixel(v.x, v.y - speed - gridHalf) == WALL) then
+                --do nothing
+            elseif v.direction == SOUTH and not(getWallPixel(v.x, v.y + speed + gridHalf) == WALL) then
+                --do nothing
+            elseif v.direction == EAST and not(getWallPixel(math.floor(v.x + speed) + gridHalf, v.y) == WALL) then
+                --do nothing
+            else
+                v.v = 0
+                v.x = math.floor(v.x / grid) * grid + gridHalf
+                v.y = math.floor(v.y / grid) * grid + gridHalf
+            end
+        elseif v.typ == FLAME then
+            if v.direction == NORTH or v.direction == WEST then
+                v.v = -speed
+            else
+                v.v = speed
+            end
+            
+            if v.direction == WEST then
+                v.mirrorx = 1
+            elseif v.direction == EAST then
+                v.mirrorx = -1
+            end
         end
         --checks whether gem collected by players
         if v.typ == PLAYER then
@@ -291,20 +327,8 @@ function updateActors(dt)
             end
             --checks collition with enemies
             for key,value in pairs(actors) do
-                if value.typ == ENEMY1 and isOverlap(v.x,v.y,value.x,value.y) and v.protected == 0 then
-                    v.hit = v.hit - 1
-                    if v.hit == 0 then
-                        --die
-                        table.remove(actors,k)
-                        createParticles(30,RED,100,v.x,v.y,8)
-                        createParticles(30,ORANGE,80,v.x,v.y,8)
-                        sndExplosion:play()
-                    else
-                        --hit
-                        v.protected = 200
-                        createParticles(30,YELLOW,60,v.x,v.y,8)
-                        sndHit:play()
-                    end
+                if value.typ == ENEMY1 and isOverlap(v,value) and v.protected == 0 then
+                    actorInjured(v,k)
                 end
             end
         end
@@ -312,47 +336,45 @@ function updateActors(dt)
         if v.protected > 0 then
             v.protected = v.protected - 1
         end
-        
+        --fire
+        if v.typ == FLAME then
+            --checks whether the fire hit the wall
+            if getWallPixel(v.x,v.y)==WALL then
+                createParticles(20,RED,60,v.x,v.y,10)
+                createParticles(10,WHITE,40,v.x,v.y,10)
+                sndExplosion:play()
+                table.remove(actors,k)
+            end
+            --checks collition with flames
+            for key,value in pairs(actors) do
+                if not(value.typ == FLAME) and not(v.owner == value.id) and isOverlap(value,v) and value.protected == 0 then
+                    --remove flame
+                    table.remove(actors,k)
+                    actorInjured(value,key)
+                end
+            end
+            
+        end
     end
 end
 
-function snapToHorizontalGrid(actor)
-    local mod = math.floor(actor.y)%grid
-    if mod <= grid/2 then
-        actor.y = math.floor(actor.y/grid) * grid
+function actorInjured(actor,key)
+    actor.hit = actor.hit - 1
+    if actor.hit == 0 then
+        --die
+        table.remove(actors,key)
+        createParticles(30,RED,100,actor.x,actor.y,8)
+        createParticles(30,ORANGE,80,actor.x,actor.y,8)
+        sndExplosion:play()
+        if allPlayersDied() then
+            state = STATE_GAMEOVER
+            stage = 0
+        end
     else
-        actor.y = math.ceil(actor.y/grid) * grid
-    end
-end
-
-function snapToVerticalGrid(actor)
-    local mod = math.floor(actor.x)%grid
-    if mod <= grid/2 then
-        actor.x = math.floor(actor.x/grid) * grid
-    else
-        actor.x = math.ceil(actor.x/grid) * grid
-    end
-end
-
-function onHorizontalGrid(actor)
-    local mod = math.floor(actor.y)%grid
-    if mod <= grid * 0.25 then
-        return true
-    elseif mod >= grid * 0.75 then
-        return true
-    else
-        return false
-    end
-end
-
-function onVerticalGrid(actor)
-    local mod = math.floor(actor.x)%grid
-    if mod <= grid * 0.25 then
-        return true
-    elseif mod >= grid * 0.75 then
-        return true
-    else
-        return false
+        --hit
+        actor.protected = 200
+        createParticles(30,YELLOW,60,actor.x,actor.y,8)
+        sndHit:play()
     end
 end
 
@@ -373,7 +395,8 @@ function aiEnemies()
     for k,v in pairs(actors) do
         if v.typ == ENEMY1 then
             --get nearest player
-            local p = getActorById('p1')
+            --local p = getActorById('p1')
+            local p = getNearestPlayer(v)
             if not(p == NOTFOUND) then
                 if v.x + gridHalf < p.x then
                     v.want = EAST
@@ -403,50 +426,37 @@ function updateParticles(dt)
     end
 end
 
-function updateBullets(dt)
-    for k,v in pairs(bullets) do
-        if v.axis == HORIZONTAL then
-            v.x = v.x + v.v * dt
-        else
-            v.y = v.y + v.v * dt
-        end
-        if getWallPixel(v.x,v.y)==WALL then
-            --(n,color,life,x,y,speed)
-            createParticles(20,RED,60,v.x,v.y,10)
-            createParticles(10,WHITE,40,v.x,v.y,10)
-            sndExplosion:play()
-            table.remove(bullets,k)
-        end
-        for key,value in pairs(actors) do
-            if not(v.owner == value.id) and isOverlap(value.x,value.y,v.x,v.y) and value.protected == 0 then
-                table.remove(bullets,k)
-                value.hit = value.hit - 1
-                if value.hit == 0 then
-                    --die
-                    table.remove(actors,key)
-                    createParticles(30,RED,100,v.x,v.y,8)
-                    createParticles(30,ORANGE,80,v.x,v.y,8)
-                    sndExplosion:play()
-                else
-                    --hit
-                    value.protected = 200
-                    createParticles(30,YELLOW,60,v.x,v.y,8)
-                    sndHit:play()
-                end
-                
-            end
+function allPlayersDied()
+    for k,v in pairs(actors) do
+        if v.typ == PLAYER then
+            return false
         end
     end
+    return true 
+end
+
+function countPlayers()
+    local n = 0
+    for k,v in pairs(actors) do
+        if v.typ == PLAYER then
+            n = n + 1
+        end
+    end
+    return n
 end
 
 function love.update(dt)
     updateJoystick()
-    aiEnemies()
-    updateActors(dt)
-    updateParticles(dt)
-    updateBullets(dt)
-    --updateBullets(dt)
-    moveActors()
+    if state == STATE_INGAME then
+        aiEnemies()
+        updateActors(dt)
+        updateParticles(dt)
+        moveActors()
+    elseif state == STATE_NEXTSTAGE then
+        updateParticles(dt)
+    elseif state == STATE_GAMEOVER then
+        updateParticles(dt)
+    end
 end
 
 function notWallAhead(actor)
@@ -484,13 +494,19 @@ function love.draw()
         drawPressFire()
     elseif state == STATE_NEXTSTAGE then
         drawWalls()
+        drawActors()
         drawNextStage()
         drawPressFire()
     elseif state == STATE_INGAME then
         drawWalls()
         drawActors()
         drawParticles()
-        drawBullets()
+    elseif state == STATE_GAMEOVER then
+        drawWalls()
+        drawActors()
+        drawParticles()
+        drawGameOver()
+        drawPressFire()
     end
     drawDebug()
 end
@@ -504,8 +520,12 @@ end
 
 function drawNextStage()
     setColor(WHITE)
-    --coloredtext = {{1,1,1},'PRESS',{1,0,0},' FIRE ',{1,1,1},'TO START'}
     love.graphics.printf('NEXT STAGE',0,h*0.5,w,"center")
+end
+
+function drawGameOver()
+    setColor(WHITE)
+    love.graphics.printf('GAME OVER',0,h*0.5,w,"center")
 end
 
 function drawPressFire()
@@ -515,7 +535,7 @@ function drawPressFire()
 end
 
 function drawActors()
-    setColor(WHITE)
+    --setColor(WHITE)
     for i,v in pairs(actors) do
         drawSprite(v)
     end
@@ -524,11 +544,29 @@ end
 function drawSprite(actor)
     if actor.protected%8 < 4 then
         if actor.mirrorx == -1 then
-            love.graphics.draw(Tileset, Quads[actor.gfx], actor.x - gridHalf, actor.y - gridHalf,0,grid/TileW,grid/TileW)
+            if actor.mirrory == 1 then
+                love.graphics.draw(Tileset, Quads[actor.gfx], actor.x - gridHalf, actor.y - gridHalf,0,grid/TileW,grid/TileW)
+            else
+                love.graphics.draw(Tileset, Quads[actor.gfx], actor.x - gridHalf, actor.y - gridHalf + grid,0,grid/TileW,-grid/TileW)
+            end
         else
-            love.graphics.draw(Tileset, Quads[actor.gfx], actor.x - gridHalf + grid, actor.y - gridHalf,0,-grid/TileW,grid/TileW)
+            if actor.mirrory == 1 then
+                love.graphics.draw(Tileset, Quads[actor.gfx], actor.x - gridHalf + grid, actor.y - gridHalf,0,-grid/TileW,grid/TileW)
+            else
+                love.graphics.draw(Tileset, Quads[actor.gfx], actor.x - gridHalf + grid, actor.y - gridHalf + grid,0,-grid/TileW,-grid/TileW)
+            end
+        end
+        if actor.protected > 0 then
+            for i=0,actor.hitmax-1 do
+                if i<actor.hit then
+                    love.graphics.draw(Tileset, Quads[GFX_HEART_FULL], actor.x - gridHalf + i*7*grid/TileW, actor.y - grid,0,grid/TileW,grid/TileW)
+                else
+                    love.graphics.draw(Tileset, Quads[GFX_HEART_EMPTY], actor.x - gridHalf + i*7*grid/TileW, actor.y - grid,0,grid/TileW,grid/TileW)
+                end
+            end
         end
     end
+    
 end
 
 function drawParticles()
@@ -536,34 +574,6 @@ function drawParticles()
         setColor(v.color)
         local size = math.floor(v.life/grid)*4+4
         love.graphics.rectangle("fill",v.x-size/2,v.y-size/2,size,size)
-    end
-end
-
-function drawBullets()
-    setColor(WHITE)
-    for i,v in pairs(bullets) do
-        if v.typ == LASER then
-            local rotate=0
-            if v.axis == HORIZONTAL then
-                if v.v > 0 then
-                    rotate = 0
-                else
-                    rotate = 3.14
-                end
-            else
-                if v.v > 0 then
-                    rotate = 3.14 * 0.5
-                else
-                    rotate = 3.14 * 1.5
-                end
-            end
-            --love.graphics.draw( drawable, x, y, r, sx, sy, ox, oy, kx, ky )
-            --love.graphics.draw( texture, quad, x, y, r, sx, sy, ox, oy, kx, ky )
-            love.graphics.draw(Tileset, Quads[GFX_FIRE], v.x, v.y, rotate,grid/TileW,grid/TileW, grid/4, grid/4)
-            --else
-            --    love.graphics.rectangle("fill",v.x-grid/8+grid/2,v.y,grid/4,grid)
-            --end
-        end
     end
 end
 
@@ -646,7 +656,9 @@ function createActor(id,typ,gfx,hit,speed,x,y)
         typ=typ,
         gfx=gfx,
         hit=hit,
+        hitmax=hit,
         mirrorx=1,
+        mirrory=1,
         protected=0,
         x=x*grid + gridHalf,
         y=y*grid + gridHalf,
@@ -656,7 +668,39 @@ function createActor(id,typ,gfx,hit,speed,x,y)
         axis=HORIZONTAL,
         want=NONE,
         direction=NONE}
-    --actors[id] = actor
+    table.insert(actors,actor)
+end
+
+function createBullet(shooter)
+    local gfx = 0
+    local mirrory = 0
+    if shooter.axis == HORIZONTAL then 
+        gfx = GFX_FIRE
+    else
+        gfx = GFX_FIRE_V
+        if shooter.direction == NORTH then 
+            mirrory = 1
+        else
+            mirrory = -1
+        end
+    end
+    
+    local actor={
+        id='',
+        typ=FLAME,
+        gfx=gfx,
+        owner=shooter.id,
+        mirrorx=1,
+        mirrory=mirrory,
+        protected=0,
+        x=shooter.x,
+        y=shooter.y,
+        speed=FAST * grid * 4,
+        v=0,
+        acc=0,
+        axis=shooter.axis,
+        want=shooter.direction,
+        direction=shooter.direction}
     table.insert(actors,actor)
 end
 
@@ -667,6 +711,24 @@ function getActorById(id)
         end
     end
     return NOTFOUND
+end
+
+function getNearestPlayer(actor)
+    local distance = 9999999
+    local p = NOTFOUND
+    for k,v in pairs(actors) do
+        if v.typ == PLAYER then
+            if distance > getDistance(actor,v) then
+                distance = getDistance(actor,v)
+                p = v
+            end
+        end
+    end
+    return p
+end
+
+function getDistance(actor1,actor2)
+    return math.abs(actor1.x - actor2.x) + math.abs(actor1.y - actor2.y)
 end
 
 function createParticles(n,color,life,x,y,speed)
@@ -680,8 +742,6 @@ function createParticles(n,color,life,x,y,speed)
             y=y,
             color=color,
             life=math.random(life),
-            --xd=math.random(-grid,grid)*speed,
-            --yd=math.random(-grid,grid)*speed
             xd=xv,
             yd=yv
         }
@@ -716,8 +776,8 @@ function createFirstStage()
     fillWalls(wallsWidth, wallsHeight, EMPTY)
     wallFrame(math.floor(wallsWidth/4),math.floor(wallsHeight/4),math.floor(wallsWidth/2),math.floor(wallsHeight/2),GEM)
     wallFrame(0,0,wallsWidth,wallsHeight,WALL)
-    createActor("p1",PLAYER,GFX_KNIGHT,10,FAST,2,2)
-    createActor("p2",PLAYER,GFX_KNIGHT,10,FAST,wallsWidth-3,wallsHeight-3)
+    createActor("p1",PLAYER,GFX_KNIGHT,3,FAST,2,2)
+    createActor("p2",PLAYER,GFX_KNIGHT_BLUE,3,FAST,wallsWidth-3,wallsHeight-3)
 end
 
 function createSecondStage()
@@ -728,8 +788,8 @@ function createSecondStage()
     wallHorizontal(1,math.floor(wallsHeight/2),wallsWidth-2,EMPTY)
     wallVertical(math.floor(wallsWidth/2),1,wallsHeight-2,EMPTY)
     
-    createActor("p1",PLAYER,GFX_KNIGHT,10,FAST,math.floor(wallsWidth/2)+2,math.floor(wallsHeight/2))
-    createActor("p2",PLAYER,GFX_KNIGHT,10,FAST,math.floor(wallsWidth/2)-2,math.floor(wallsHeight/2))
+    createActor("p1",PLAYER,GFX_KNIGHT,3,FAST,math.floor(wallsWidth/2)+2,math.floor(wallsHeight/2))
+    createActor("p2",PLAYER,GFX_KNIGHT_BLUE,3,FAST,math.floor(wallsWidth/2)-2,math.floor(wallsHeight/2))
     
     createActor("e1",ENEMY1,GFX_SKELETON,3,SLOW,1,1)
     createActor("e2",ENEMY1,GFX_SKELETON,3,SLOW,wallsWidth-2,wallsHeight-2)
@@ -745,8 +805,8 @@ function createThirdStage()
         end
     end
     
-    createActor("p1",PLAYER,GFX_KNIGHT,10,FAST,1,math.floor(wallsHeight/2))
-    createActor("p2",PLAYER,GFX_KNIGHT,10,FAST,wallsWidth-2,math.floor(wallsHeight/2))
+    createActor("p1",PLAYER,GFX_KNIGHT,3,FAST,1,math.floor(wallsHeight/2))
+    createActor("p2",PLAYER,GFX_KNIGHT_BLUE,3,FAST,wallsWidth-2,math.floor(wallsHeight/2))
 
     createActor("e1",ENEMY1,GFX_SKELETON,3,SLOW,1,1)
     createActor("e2",ENEMY1,GFX_SKELETON,3,SLOW,wallsWidth-2,wallsHeight-2)
@@ -766,35 +826,14 @@ end
 
 function notActorHere(actor)
     for k,v in pairs(actors) do
-        if not (actor.id == v.id) and isOverlap(actor.x, actor.y, v.x, v.y)then
+        if not (actor.id == v.id) and isOverlap(actor, v)then
             return false
         end
     end
     return true
 end
 
-function isOverlap(x1,y1,x2,y2)
-    return math.abs(x1-x2)<grid and math.abs(y1-y2)<grid
+function isOverlap(actor1,actor2)
+    return math.abs(actor1.x-actor2.x)<grid and math.abs(actor1.y-actor2.y)<grid
 end
     
-function createBullet(typ, actor)
-    sndShoot:play()
-    local speed = 0
-    if typ == LASER then
-        if actor.v>0 then
-            speed = grid * FAST * 4
-        else
-            speed = - grid * FAST * 4
-        end
-    end
-    
-    local bullet = {
-            x=actor.x,
-            y=actor.y,
-            typ=typ,
-            v=speed,
-            axis=actor.axis,
-            owner=actor.id
-        }
-    table.insert(bullets,bullet)
-end
