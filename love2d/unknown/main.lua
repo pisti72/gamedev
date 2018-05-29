@@ -23,18 +23,23 @@ function love.load()
     FLAME = 2
     NOBODY = 99
     
-    GFX_BRICK = 1
-    GFX_KNIGHT = 2
-    GFX_CASE = 3
-    GFX_FLOOR = 4
-    GFX_SKELETON = 5
-    GFX_FIRE = 6
-    GFX_KNIGHT_BLUE = 7
-    GFX_FIRE_V = 8
-    GFX_HEART_EMPTY = 9
-    GFX_HEART_FULL = 10
-    GFX_BRICKSIDE = 11
-    GFX_BALL = 12
+    GFX_BRICK_CYN       = 1
+    GFX_KNIGHT          = 2
+    GFX_CASE            = 3
+    GFX_FLOOR_YEL       = 4
+    GFX_SKELETON        = 5
+    GFX_FIRE            = 6
+    GFX_KNIGHT_BLUE     = 7
+    GFX_FIRE_V          = 8
+    GFX_HEART_EMPTY     = 9
+    GFX_HEART_FULL      = 10
+    GFX_BRICKSIDE_CYN   = 11
+    GFX_BALL            = 12
+    GFX_BRICK_MGN       = 13
+    GFX_BRICKSIDE_MGN   = 14
+    GFX_BRICK_WHT       = 15
+    GFX_BRICKSIDE_WHT   = 16
+    GFX_FLOOR_RED       = 17
     
     BULLET_SPEED = 18
     FAST = 6
@@ -89,18 +94,23 @@ function love.load()
     camera = {y=0,shaking=0}
   
     Quads = {
-        love.graphics.newQuad(16, 0, TileW, TileW, tilesetW, tilesetH), -- 1 = GFX_BRICK
-        love.graphics.newQuad(0, 0, TileW, TileW, tilesetW, tilesetH), -- 2 = GFX_KNIGHT
-        love.graphics.newQuad(48, 16, TileW, TileW, tilesetW, tilesetH), -- 3 = GFX_CASE
-        love.graphics.newQuad(48, 0, TileW, TileW, tilesetW, tilesetH),  -- 4 = GFX_FLOOR
-        love.graphics.newQuad(32, 16, TileW, TileW, tilesetW, tilesetH),  -- 5 = GFX_SKELETON
-        love.graphics.newQuad(0, 16, TileW, TileW, tilesetW, tilesetH),  -- 6 = GFX_FIRE
-        love.graphics.newQuad(32, 32, TileW, TileW, tilesetW, tilesetH),  -- 7 = GFX_KNIGHT_BLUE
-        love.graphics.newQuad(0, 32, TileW, TileW, tilesetW, tilesetH),  -- 8 = GFX_FIRE_V
-        love.graphics.newQuad(16, 32, 7, 6, tilesetW, tilesetH),  -- 9 = GFX_HEART_EMPTY
-        love.graphics.newQuad(25, 32, 7, 6, tilesetW, tilesetH),  -- 10 = GFX_HEART_FULL
-        love.graphics.newQuad(32, 0, TileW, TileW, tilesetW, tilesetH), -- 11 = GFX_BRICKSIDE
-        love.graphics.newQuad(16, 16, TileW, TileW, tilesetW, tilesetH), -- 12 = GFX_BALL
+        love.graphics.newQuad(16, 0, TileW, TileW, tilesetW, tilesetH), -- 1 = GFX_BRICK_CYN
+        love.graphics.newQuad(0, 0, TileW, TileW, tilesetW, tilesetH),  -- 2 = GFX_KNIGHT
+        love.graphics.newQuad(48, 16, TileW, TileW, tilesetW, tilesetH),-- 3 = GFX_CASE
+        love.graphics.newQuad(48, 0, TileW, TileW, tilesetW, tilesetH), -- 4 = GFX_FLOOR_YEL
+        love.graphics.newQuad(32, 16, TileW, TileW, tilesetW, tilesetH),-- 5 = GFX_SKELETON
+        love.graphics.newQuad(0, 16, TileW, TileW, tilesetW, tilesetH), -- 6 = GFX_FIRE
+        love.graphics.newQuad(32, 32, TileW, TileW, tilesetW, tilesetH),    -- 7 = GFX_KNIGHT_BLUE
+        love.graphics.newQuad(0, 32, TileW, TileW, tilesetW, tilesetH), -- 8 = GFX_FIRE_V
+        love.graphics.newQuad(16, 32, 7, 6, tilesetW, tilesetH),        -- 9 = GFX_HEART_EMPTY
+        love.graphics.newQuad(25, 32, 7, 6, tilesetW, tilesetH),        -- 10 = GFX_HEART_FULL
+        love.graphics.newQuad(32, 0, TileW, TileW, tilesetW, tilesetH), -- 11 = GFX_BRICKSIDE_CYN
+        love.graphics.newQuad(16, 16, TileW, TileW, tilesetW, tilesetH),    -- 12 = GFX_BALL
+        love.graphics.newQuad(16, 48, TileW, TileW, tilesetW, tilesetH),    -- 13 = GFX_BRICK_MGN
+        love.graphics.newQuad(32, 48, TileW, TileW, tilesetW, tilesetH),    -- 14 = GFX_BRICKSIDE_MGN
+        love.graphics.newQuad(48, 48, TileW, TileW, tilesetW, tilesetH),    -- 15 = GFX_BRICK_WHT
+        love.graphics.newQuad(64, 48, TileW, TileW, tilesetW, tilesetH),    -- 16 = GFX_BRICKSIDE_WHT
+        love.graphics.newQuad(64, 0, TileW, TileW, tilesetW, tilesetH),    -- 17 = GFX_FLOOR_RED
     }
     wallsHeight = 17
     stage = 0
@@ -119,7 +129,8 @@ function love.load()
     
     grid = math.floor(h/wallsHeight/2)*2
     gridHalf = grid/2
-    pixel = math.floor(grid/TileW)
+    sx = grid/TileW
+    pixel = math.floor(sx)
     --debug1 = pixel
     wallsWidth = math.floor(w/grid)
     love.graphics.setNewFont('res/I-pixel-u.ttf', gridHalf)
@@ -329,7 +340,7 @@ function updateActors(dt)
             --checks collition with enemies
             for key,value in pairs(actors) do
                 if value.typ == ENEMY1 and isOverlap(v,value) and v.protected == 0 then
-                    actorInjured(v,k)
+                    actorInjured(v,k,dt)
                 end
             end
         end
@@ -351,15 +362,16 @@ function updateActors(dt)
                 if not(value.typ == FLAME) and not(v.owner == value.id) and isOverlap(value,v) and value.protected == 0 then
                     --remove flame
                     table.remove(actors,k)
-                    actorInjured(value,key)
+                    actorInjured(value,key,dt)
                 end
             end
             
         end
     end
+    debug1 = dt
 end
 
-function actorInjured(actor,key)
+function actorInjured(actor,key,dt)
     actor.hit = actor.hit - 1
     if actor.hit == 0 then
         --die
@@ -373,7 +385,7 @@ function actorInjured(actor,key)
         end
     else
         --hit
-        actor.protected = 200
+        actor.protected = love.timer.getFPS() * 2
         createParticles(30,YELLOW,60,actor.x,actor.y,8)
         sndHit:play()
     end
@@ -516,7 +528,7 @@ function love.draw()
         drawGameOver()
         drawPressFire()
     end
-    --drawDebug()
+    drawDebug()
 end
 
 function drawTitle()
@@ -551,26 +563,26 @@ function drawActors()
 end
 
 function drawSprite(actor)
-    if actor.protected%8 < 4 then
+    if actor.protected%4 < 2 then
         if actor.mirrorx == -1 then
             if actor.mirrory == 1 then
-                love.graphics.draw(Tileset, Quads[actor.gfx], actor.x - gridHalf, actor.y - gridHalf,0,grid/TileW,grid/TileW)
+                love.graphics.draw(Tileset, Quads[actor.gfx], actor.x - gridHalf, actor.y - gridHalf,0,sx,sx)
             else
-                love.graphics.draw(Tileset, Quads[actor.gfx], actor.x - gridHalf, actor.y - gridHalf + grid,0,grid/TileW,-grid/TileW)
+                love.graphics.draw(Tileset, Quads[actor.gfx], actor.x - gridHalf, actor.y - gridHalf + grid,0,sx,-sx)
             end
         else
             if actor.mirrory == 1 then
-                love.graphics.draw(Tileset, Quads[actor.gfx], actor.x - gridHalf + grid, actor.y - gridHalf,0,-grid/TileW,grid/TileW)
+                love.graphics.draw(Tileset, Quads[actor.gfx], actor.x - gridHalf + grid, actor.y - gridHalf,0,-sx,sx)
             else
-                love.graphics.draw(Tileset, Quads[actor.gfx], actor.x - gridHalf + grid, actor.y - gridHalf + grid,0,-grid/TileW,-grid/TileW)
+                love.graphics.draw(Tileset, Quads[actor.gfx], actor.x - gridHalf + grid, actor.y - gridHalf + grid,0,-sx,-sx)
             end
         end
         if actor.protected > 0 then
             for i=0,actor.hitmax-1 do
                 if i<actor.hit then
-                    love.graphics.draw(Tileset, Quads[GFX_HEART_FULL], actor.x - gridHalf + i*7*grid/TileW, actor.y - grid,0,grid/TileW,grid/TileW)
+                    love.graphics.draw(Tileset, Quads[GFX_HEART_FULL], actor.x - gridHalf + i*7*sx, actor.y - grid,0,sx,sx)
                 else
-                    love.graphics.draw(Tileset, Quads[GFX_HEART_EMPTY], actor.x - gridHalf + i*7*grid/TileW, actor.y - grid,0,grid/TileW,grid/TileW)
+                    love.graphics.draw(Tileset, Quads[GFX_HEART_EMPTY], actor.x - gridHalf + i*7*sx, actor.y - grid,0,sx,sx)
                 end
             end
         end
@@ -588,8 +600,9 @@ end
 
 function drawDebug()
     setColor(WHITE)
-    love.graphics.print("DEBUG 1 : " .. debug1, 10, gridHalf)
-    love.graphics.print("DEBUG 2 : " .. debug2, 10, grid)
+    love.graphics.print("FPS : " .. love.timer.getFPS(), 10, gridHalf)
+    love.graphics.print("DEBUG 1 : " .. debug1, 10, grid)
+    love.graphics.print("DEBUG 2 : " .. debug2, 10, grid + gridHalf)
 end
 
 function fillWalls(w,h,n)
@@ -599,20 +612,49 @@ function fillWalls(w,h,n)
 end
 
 function drawWalls()
-    setColor(WHITE)
+    debug2 = sx
     for i=1,#walls do
         local x = ((i-1)%wallsWidth)*grid
         local y = math.floor((i-1)/wallsWidth)*grid
             
         if walls[i] == EMPTY or walls[i] == GEM then
-            love.graphics.draw(Tileset, Quads[GFX_FLOOR], x, y,0,grid/TileW,grid/TileW)
+            if stage%2 == 0 then
+                love.graphics.draw(Tileset, Quads[GFX_FLOOR_YEL], x, y,0,sx,sx)
+            else
+                love.graphics.draw(Tileset, Quads[GFX_FLOOR_RED], x, y,0,sx,sx)
+            end
         end
         
         if walls[i] == WALL then
-            love.graphics.draw(Tileset, Quads[GFX_BRICK], x, y,0,grid/TileW,grid/TileW)
+            if getWallSouth(i) == WALL then
+                if stage%3 == 0 then
+                    love.graphics.draw(Tileset, Quads[GFX_BRICK_CYN], x, y,0,sx,sx)
+                elseif stage%3 == 1 then
+                    love.graphics.draw(Tileset, Quads[GFX_BRICK_MGN], x, y,0,sx,sx)
+                else
+                    love.graphics.draw(Tileset, Quads[GFX_BRICK_WHT], x, y,0,sx,sx)
+                end
+            else
+                if stage%3 == 0 then
+                    love.graphics.draw(Tileset, Quads[GFX_BRICKSIDE_CYN], x, y,0,sx,sx)
+                elseif stage%3 == 1 then
+                    love.graphics.draw(Tileset, Quads[GFX_BRICKSIDE_MGN], x, y,0,sx,sx)
+                else
+                    love.graphics.draw(Tileset, Quads[GFX_BRICKSIDE_WHT], x, y,0,sx,sx)
+                end
+            end
         elseif walls[i] == GEM then
-            love.graphics.draw(Tileset, Quads[GFX_CASE], x, y,0,grid/TileW,grid/TileW)
+            love.graphics.draw(Tileset, Quads[GFX_CASE], x, y,0,sx,sx)
         end
+    end
+end
+
+function getWallSouth(i)
+    local j = i + wallsWidth
+    if j <= #walls then
+        return walls[j]
+    else
+        return WALL
     end
 end
 
