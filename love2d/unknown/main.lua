@@ -8,6 +8,7 @@ function love.load()
     EMPTY = 0
     WALL = 1
     GEM = 2
+    DOOR = 3
     
     NONE = 0
     VERTICAL = 1
@@ -40,10 +41,18 @@ function love.load()
     GFX_BRICK_WHT       = 15
     GFX_BRICKSIDE_WHT   = 16
     GFX_FLOOR_RED       = 17
+    GFX_DOOR_CLOSED     = 18
+    GFX_DOOR_OPEN       = 19
+    GFX_STAIRS_CLOSED   = 20
+    GFX_STAIRS_OPEN     = 21
+    GFX_BRICK_RED       = 22
+    GFX_BRICKSIDE_RED   = 23
+    GFX_FLOOR_BLU       = 24
     
     BULLET_SPEED = 18
     FAST = 6
     SLOW = 4
+    VERYSLOW = 1
     
     NOTFOUND = 'notfound'
     
@@ -70,6 +79,7 @@ function love.load()
     sndHit = love.audio.newSource('snd/Hit_Hurt4.wav','static')
     sndShoot = love.audio.newSource('snd/Laser_Shoot2.wav','static')
     sndPowerup = love.audio.newSource('snd/Powerup4.wav','static')
+    sndGems = love.audio.newSource('snd/Powerup4.wav','static')
     music:play()
     if SILENT then
         music:setVolume(0) 
@@ -86,11 +96,13 @@ function love.load()
     end
     
     love.graphics.setDefaultFilter( 'nearest', 'nearest',1)
-    
-    love.graphics.setNewFont('res/I-pixel-u.ttf', 80)
+    local font = love.graphics.newImageFont( 'res/zxfont_8x8.png', ' ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789:.,!?@' )
+    love.graphics.setFont(font)
     Tileset = love.graphics.newImage('res/tiles16x16zx.png')
     local tilesetW, tilesetH = Tileset:getWidth(), Tileset:getHeight()
     TileW = 16
+    HeartW = 7
+    HeartH = 6
     camera = {y=0,shaking=0}
   
     Quads = {
@@ -102,18 +114,25 @@ function love.load()
         love.graphics.newQuad(0, 16, TileW, TileW, tilesetW, tilesetH), -- 6 = GFX_FIRE
         love.graphics.newQuad(32, 32, TileW, TileW, tilesetW, tilesetH),    -- 7 = GFX_KNIGHT_BLUE
         love.graphics.newQuad(0, 32, TileW, TileW, tilesetW, tilesetH), -- 8 = GFX_FIRE_V
-        love.graphics.newQuad(16, 32, 7, 6, tilesetW, tilesetH),        -- 9 = GFX_HEART_EMPTY
-        love.graphics.newQuad(25, 32, 7, 6, tilesetW, tilesetH),        -- 10 = GFX_HEART_FULL
-        love.graphics.newQuad(32, 0, TileW, TileW, tilesetW, tilesetH), -- 11 = GFX_BRICKSIDE_CYN
+        love.graphics.newQuad(16, 32, HeartW, HeartH, tilesetW, tilesetH),        -- 9 = GFX_HEART_EMPTY
+        love.graphics.newQuad(25, 32, HeartW, HeartH, tilesetW, tilesetH),        -- 10 = GFX_HEART_FULL
+        love.graphics.newQuad(32,  0, TileW, TileW, tilesetW, tilesetH), -- 11 = GFX_BRICKSIDE_CYN
         love.graphics.newQuad(16, 16, TileW, TileW, tilesetW, tilesetH),    -- 12 = GFX_BALL
         love.graphics.newQuad(16, 48, TileW, TileW, tilesetW, tilesetH),    -- 13 = GFX_BRICK_MGN
         love.graphics.newQuad(32, 48, TileW, TileW, tilesetW, tilesetH),    -- 14 = GFX_BRICKSIDE_MGN
         love.graphics.newQuad(48, 48, TileW, TileW, tilesetW, tilesetH),    -- 15 = GFX_BRICK_WHT
         love.graphics.newQuad(64, 48, TileW, TileW, tilesetW, tilesetH),    -- 16 = GFX_BRICKSIDE_WHT
-        love.graphics.newQuad(64, 0, TileW, TileW, tilesetW, tilesetH),    -- 17 = GFX_FLOOR_RED
+        love.graphics.newQuad(64,  0, TileW, TileW, tilesetW, tilesetH),    -- 17 = GFX_FLOOR_RED
+        love.graphics.newQuad(64, 16, TileW, TileW, tilesetW, tilesetH),    -- 18 = GFX_DOOR_CLOSED
+        love.graphics.newQuad(80, 16, TileW, TileW, tilesetW, tilesetH),    -- 19 = GFX_DOOR_OPEN
+        love.graphics.newQuad(64, 32, TileW, TileW, tilesetW, tilesetH),    -- 20 = GFX_STAIRS_CLOSED
+        love.graphics.newQuad(80, 32, TileW, TileW, tilesetW, tilesetH),    -- 21 = GFX_STAIRS_OPEN
+        love.graphics.newQuad(80, 48, TileW, TileW, tilesetW, tilesetH),    -- 22 = GFX_BRICK_RED
+        love.graphics.newQuad(96, 48, TileW, TileW, tilesetW, tilesetH),    -- 23 = GFX_BRICKSIDE_RED
+        love.graphics.newQuad(80,  0, TileW, TileW, tilesetW, tilesetH),    -- 24 = GFX_FLOOR_BLU
     }
     wallsHeight = 17
-    stage = 0
+    stage = 1
     gemsAll = 0
     gems = 0
     
@@ -133,11 +152,13 @@ function love.load()
     pixel = math.floor(sx)
     --debug1 = pixel
     wallsWidth = math.floor(w/grid)
-    love.graphics.setNewFont('res/I-pixel-u.ttf', gridHalf)
+    --love.graphics.setNewFont('res/I-pixel-u.ttf', gridHalf)
     actors = {}
 	walls = {}
     particles = {}
     
+    --createFourthStage()
+    --createFifthStage()
     createFirstStage()
 end
 
@@ -257,7 +278,7 @@ end
 
 function inicStage()
     state = STATE_NEXTSTAGE
-    stage = stage + 1
+    --stage = stage + 1
     actors = {}
 	walls = {}
     particles = {}
@@ -268,6 +289,13 @@ function inicStage()
         createSecondStage()
     elseif stage == 3 then
         createThirdStage()
+    elseif stage == 4 then
+        createFourthStage()
+    elseif stage == 5 then
+        createFifthStage()
+    else
+        stage = 1
+        createFirstStage()
     end
     gemsAll = countGems()
 end
@@ -333,9 +361,11 @@ function updateActors(dt)
                 createParticles(5,YELLOW,10,v.x+grid/2,v.y+grid/2,1)
                 createParticles(5,WHITE,10,v.x+grid/2,v.y+grid/2,1)
                 gems = gems + 1
-                if gems == gemsAll then
-                    inicStage()
-                end
+            end
+            --checks collition with door
+            if gems == gemsAll and getWallPixel(v.x, v.y) == DOOR then
+                stage = stage + 1
+                inicStage()
             end
             --checks collition with enemies
             for key,value in pairs(actors) do
@@ -381,7 +411,7 @@ function actorInjured(actor,key,dt)
         sndExplosion:play()
         if allPlayersDied() then
             state = STATE_GAMEOVER
-            stage = 0
+            stage = 1
         end
     else
         --hit
@@ -394,7 +424,9 @@ end
 function moveActors()
     for k,v in pairs(actors) do
         if not(v.v == 0) then
-            createParticles(1, BLACK, 20, v.x,v.y + gridHalf,1)
+            if not(v.typ == FLAME) then
+                createParticles(1, BLACK, 20, v.x,v.y + gridHalf,1)
+            end
             if v.axis == HORIZONTAL then
                 v.x = v.x + v.v
             else
@@ -532,31 +564,24 @@ function love.draw()
 end
 
 function drawTitle()
-    setColor(BLACK)
-    local title = 'Game Of Thrones'
-    love.graphics.printf(title,0,h*0.4,w/4,"center",0,4)
-    setColor(RED)
-    love.graphics.printf(title,0,h*0.4-pixel*4,w/4,"center",0,4)
+    love.graphics.printf('GAME OF THRONES',0,h*0.4,w/6,"center",0,6)
+    love.graphics.printf('PROGRAMMED BY ISTVAN.SZALONTAI12@GMAIL.COM 2018',0,h*0.8,w/2,"center",0,2)
 end
 
 function drawNextStage()
-    setColor(WHITE)
-    love.graphics.printf('NEXT STAGE',0,h*0.5,w,"center")
+    love.graphics.printf('NEXT STAGE',0,h*0.5,w/2,"center",0,2)
 end
 
 function drawGameOver()
-    setColor(WHITE)
-    love.graphics.printf('GAME OVER',0,h*0.5,w,"center")
+    love.graphics.printf('GAME OVER',0,h*0.5,w/2,"center",0,2)
 end
 
 function drawPressFire()
-    setColor(WHITE)
-    coloredtext = {{1,1,1},'PRESS',{1,0,0},' FIRE ',{1,1,1},'TO START'}
-    love.graphics.printf(coloredtext,0,h*0.60,w,"center")
+    coloredtext = {'PRESS FIRE TO START'}
+    love.graphics.printf(coloredtext,0,h*0.60,w/2,"center",0,2)
 end
 
 function drawActors()
-    --setColor(WHITE)
     for i,v in pairs(actors) do
         drawSprite(v)
     end
@@ -580,9 +605,9 @@ function drawSprite(actor)
         if actor.protected > 0 then
             for i=0,actor.hitmax-1 do
                 if i<actor.hit then
-                    love.graphics.draw(Tileset, Quads[GFX_HEART_FULL], actor.x - gridHalf + i*7*sx, actor.y - grid,0,sx,sx)
+                    love.graphics.draw(Tileset, Quads[GFX_HEART_FULL], actor.x - gridHalf + i*HeartW*sx, actor.y - grid,0,sx,sx)
                 else
-                    love.graphics.draw(Tileset, Quads[GFX_HEART_EMPTY], actor.x - gridHalf + i*7*sx, actor.y - grid,0,sx,sx)
+                    love.graphics.draw(Tileset, Quads[GFX_HEART_EMPTY], actor.x - gridHalf + i*HeartW*sx, actor.y - grid,0,sx,sx)
                 end
             end
         end
@@ -592,14 +617,12 @@ end
 
 function drawParticles()
     for i,v in pairs(particles) do
-        setColor(v.color)
         local size = math.floor(v.life/grid)*4+4
         love.graphics.rectangle("fill",v.x-size/2,v.y-size/2,size,size)
     end
 end
 
 function drawDebug()
-    setColor(WHITE)
     love.graphics.print("FPS : " .. love.timer.getFPS(), 10, gridHalf)
     love.graphics.print("DEBUG 1 : " .. debug1, 10, grid)
     love.graphics.print("DEBUG 2 : " .. debug2, 10, grid + gridHalf)
@@ -611,40 +634,66 @@ function fillWalls(w,h,n)
     end
 end
 
+function fillWallsNM(w,h,n,a,b)
+    for i=1,w*h do
+        if i%a == 0 or i%b==0 then walls[i]=n end
+    end
+end
+
 function drawWalls()
     debug2 = sx
     for i=1,#walls do
         local x = ((i-1)%wallsWidth)*grid
         local y = math.floor((i-1)/wallsWidth)*grid
             
-        if walls[i] == EMPTY or walls[i] == GEM then
-            if stage%2 == 0 then
+        if not (walls[i] == WALL) then
+            if stage%3 == 0 then
                 love.graphics.draw(Tileset, Quads[GFX_FLOOR_YEL], x, y,0,sx,sx)
-            else
+            elseif stage%3 == 1 then
                 love.graphics.draw(Tileset, Quads[GFX_FLOOR_RED], x, y,0,sx,sx)
+            else
+                love.graphics.draw(Tileset, Quads[GFX_FLOOR_BLU], x, y,0,sx,sx)
             end
         end
         
         if walls[i] == WALL then
             if getWallSouth(i) == WALL then
-                if stage%3 == 0 then
+                if stage%4 == 0 then
                     love.graphics.draw(Tileset, Quads[GFX_BRICK_CYN], x, y,0,sx,sx)
-                elseif stage%3 == 1 then
+                elseif stage%4 == 1 then
                     love.graphics.draw(Tileset, Quads[GFX_BRICK_MGN], x, y,0,sx,sx)
-                else
+                elseif stage%4 == 2 then
                     love.graphics.draw(Tileset, Quads[GFX_BRICK_WHT], x, y,0,sx,sx)
+                else
+                    love.graphics.draw(Tileset, Quads[GFX_BRICK_RED], x, y,0,sx,sx)
                 end
             else
-                if stage%3 == 0 then
+                if stage%4 == 0 then
                     love.graphics.draw(Tileset, Quads[GFX_BRICKSIDE_CYN], x, y,0,sx,sx)
-                elseif stage%3 == 1 then
+                elseif stage%4 == 1 then
                     love.graphics.draw(Tileset, Quads[GFX_BRICKSIDE_MGN], x, y,0,sx,sx)
-                else
+                elseif stage%4 == 2 then
                     love.graphics.draw(Tileset, Quads[GFX_BRICKSIDE_WHT], x, y,0,sx,sx)
+                else
+                    love.graphics.draw(Tileset, Quads[GFX_BRICKSIDE_RED], x, y,0,sx,sx)
                 end
             end
         elseif walls[i] == GEM then
             love.graphics.draw(Tileset, Quads[GFX_CASE], x, y,0,sx,sx)
+        elseif walls[i] == DOOR then
+            if gems == gemsAll then
+                if stage%3 <2 then
+                    love.graphics.draw(Tileset, Quads[GFX_DOOR_OPEN], x, y,0,sx,sx)
+                else
+                    love.graphics.draw(Tileset, Quads[GFX_STAIRS_OPEN], x, y,0,sx,sx)
+                end
+            else
+                if stage%3 <2 then
+                    love.graphics.draw(Tileset, Quads[GFX_DOOR_CLOSED], x, y,0,sx,sx)
+                else
+                    love.graphics.draw(Tileset, Quads[GFX_STAIRS_CLOSED], x, y,0,sx,sx)
+                end
+            end
         end
     end
 end
@@ -681,7 +730,7 @@ end
 
 function wallVertical(x,y,h,n)
     for i=y,y+h-1 do
-        setWall(x,i,n,n)
+        setWall(x,i,n)
     end
 end
 
@@ -801,45 +850,26 @@ function createParticles(n,color,life,x,y,speed)
 end
 
 --https://www.romanzolotarev.com/pico-8-color-palette/
-function setColor(color)
-    local r,g,b=0,0,0
-    if color==WHITE then
-        r,g,b = 1,241/255,232/255
-    elseif color==BLACK then
-        r,g,b = 0,0,0
-    elseif color==YELLOW then
-        r,g,b = 1,236/255,39/255
-    elseif color==ORANGE then
-        r,g,b = 1,163/255,0
-    elseif color==GREEN then
-        r,g,b = 0,228/255,54/255
-    elseif color==RED then
-        r,g,b = 1,0,77/255
-    elseif color==BLUE then
-        r,g,b = 41/255,173/255,1
-    elseif color==DARKGRAY then
-        r,g,b = 95/255,87/255,79/255
-    end
-    love.graphics.setColor(r,g,b)
-    --In versions prior to 11.0, color component values were within the range of 0 to 255 instead of 0 to 1
-    love.graphics.setColor(255,255,255)
-end
 
 function createFirstStage()
     fillWalls(wallsWidth, wallsHeight, EMPTY)
     wallFrame(math.floor(wallsWidth/4),math.floor(wallsHeight/4),math.floor(wallsWidth/2),math.floor(wallsHeight/2),GEM)
+    fillWallsNM(wallsWidth, wallsHeight, EMPTY,7,3)
     wallFrame(0,0,wallsWidth,wallsHeight,WALL)
     createActor("p1",PLAYER,GFX_KNIGHT,3,FAST,2,2)
     createActor("p2",PLAYER,GFX_KNIGHT_BLUE,3,FAST,wallsWidth-3,wallsHeight-3)
+    setWall(math.floor(wallsWidth/2),math.floor(wallsHeight/2),DOOR)
 end
 
 function createSecondStage()
-    fillWalls(wallsWidth, wallsHeight, GEM)
+    fillWalls(wallsWidth, wallsHeight, EMPTY)
+    fillWallsNM(wallsWidth, wallsHeight, GEM,7,9)
     for i=0,math.floor(wallsHeight/4)-1 do
         wallFrame(i*2,i*2,wallsWidth-i*4,wallsHeight-i*4,WALL)
     end
     wallHorizontal(1,math.floor(wallsHeight/2),wallsWidth-2,EMPTY)
     wallVertical(math.floor(wallsWidth/2),1,wallsHeight-2,EMPTY)
+    setWall(wallsWidth-3,math.floor(wallsHeight/2),DOOR)
     
     createActor("p1",PLAYER,GFX_KNIGHT,3,FAST,math.floor(wallsWidth/2)+2,math.floor(wallsHeight/2))
     createActor("p2",PLAYER,GFX_KNIGHT_BLUE,3,FAST,math.floor(wallsWidth/2)-2,math.floor(wallsHeight/2))
@@ -849,7 +879,8 @@ function createSecondStage()
 end
 
 function createThirdStage()
-    fillWalls(wallsWidth,wallsHeight,GEM)
+    fillWalls(wallsWidth, wallsHeight, EMPTY)
+    fillWallsNM(wallsWidth,wallsHeight,GEM,11,13)
     wallFrame(0,0,wallsWidth,wallsHeight,WALL)
     
     for i=2,wallsHeight-2 do
@@ -858,6 +889,8 @@ function createThirdStage()
         end
     end
     
+    setWall(wallsWidth-2,2,DOOR)
+    
     createActor("p1",PLAYER,GFX_KNIGHT,3,FAST,1,math.floor(wallsHeight/2))
     createActor("p2",PLAYER,GFX_KNIGHT_BLUE,3,FAST,wallsWidth-2,math.floor(wallsHeight/2))
 
@@ -865,6 +898,57 @@ function createThirdStage()
     createActor("e2",ENEMY1,GFX_SKELETON,3,SLOW,wallsWidth-2,wallsHeight-2)
     createActor("e3",ENEMY1,GFX_SKELETON,3,SLOW,1,wallsHeight-2)
     createActor("e4",ENEMY1,GFX_SKELETON,3,SLOW,wallsWidth-2,1)
+end
+
+function createFourthStage()
+    fillWalls(wallsWidth, wallsHeight, EMPTY)
+    for i=0, wallsWidth-1 do
+        for j=0,wallsHeight-1 do
+            if i==0 or j==0 or i==wallsWidth-1 or j==wallsHeight-1 or i%6<2 or j%4==0 then
+                setWall(i,j,WALL)
+            else
+                if (i*j)%10 == 0 then
+                    setWall(i,j,GEM)
+                elseif (i+j)%21 == 0 then
+                    createActor("oh",ENEMY1,GFX_SKELETON,2,VERYSLOW,i,j)                    
+                    setWall(i,j,DOOR)
+                else
+                    setWall(i,j,EMPTY)
+                end
+            end
+        end
+    end
+    for i=1,#walls do
+        if (i%wallsWidth)%6==4 and i/wallsWidth>2 and i/wallsHeight<wallsWidth-2 then
+            walls[i]=EMPTY
+        end
+    end
+    wallHorizontal(2,math.floor(wallsHeight/3),wallsWidth-2,EMPTY)
+    createActor("p1",PLAYER,GFX_KNIGHT,3,FAST,2,1)
+    createActor("p2",PLAYER,GFX_KNIGHT_BLUE,3,FAST,3,1)
+
+end
+
+function createFifthStage()
+    fillWalls(wallsWidth, wallsHeight, EMPTY)
+    for i=1,#walls do
+        local x = (i-1)%wallsWidth
+        local y = math.floor(i/wallsWidth)
+        if x == 0 or x == wallsWidth-1 or y == 0 or y == wallsHeight-1 or (x*y)%4 == 3 then
+            walls[i]=WALL
+        elseif (x*y)%4 == 2 then
+            walls[i]=GEM
+        elseif (x*y)%6 == 3 then
+            walls[i]=DOOR
+        else
+            if (x*y)%17 == 3 then
+                createActor("oh",ENEMY1,GFX_SKELETON,1,VERYSLOW,x,y)  
+            end
+            walls[i]=EMPTY
+        end
+    end
+    createActor("p1",PLAYER,GFX_KNIGHT,3,FAST,1,1)
+    createActor("p2",PLAYER,GFX_KNIGHT_BLUE,3,FAST,2,1)
 end
 
 function countGems()

@@ -46,4 +46,5 @@
 2018/05/26 Sat - 
 2018/05/27 Sun - fixed movement, 2nd player added, protected added, 
 2018/05/28 Mon - game states added
-2018/05/29 Tue - bullets merged to actors, bugfixes
+2018/05/29 Tue - bullets merged to actors, bugfixes, 3 walls, 2 floors
+2018/05/30 Wed - bitmap fonts, doors and stairs, rock wall, 4th stage added
