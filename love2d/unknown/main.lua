@@ -4,6 +4,7 @@ This is my lua game
 
 function love.load()
     SILENT = false
+    DEBUG = false
 
     EMPTY = 0
     WALL = 1
@@ -136,13 +137,13 @@ function love.load()
     gemsAll = 0
     gems = 0
     
-	joysticks = love.joystick.getJoysticks()
+    joysticks = love.joystick.getJoysticks()
     joystick1 = joysticks[1]
     joystick2 = joysticks[2]
     debug1 = ""
     debug2 = ""
     
-	local flags = {fullscreen=false, resizable=true, vsync=false, minwidth=400, minheight=300}
+    local flags = {fullscreen=false, resizable=true, vsync=false, minwidth=400, minheight=300}
     w, h = love.window.getDesktopDimensions(flags.display)
     local success = love.window.setMode( w, h, flags )
     
@@ -154,7 +155,7 @@ function love.load()
     wallsWidth = math.floor(w/grid)
     --love.graphics.setNewFont('res/I-pixel-u.ttf', gridHalf)
     actors = {}
-	walls = {}
+    walls = {}
     particles = {}
     
     --createFourthStage()
@@ -560,25 +561,27 @@ function love.draw()
         drawGameOver()
         drawPressFire()
     end
-    drawDebug()
+    if DEBUG then 
+        drawDebug()
+    end
 end
 
 function drawTitle()
-    love.graphics.printf('GAME OF THRONES',0,h*0.4,w/6,"center",0,6)
-    love.graphics.printf('PROGRAMMED BY ISTVAN.SZALONTAI12@GMAIL.COM 2018',0,h*0.8,w/2,"center",0,2)
+    love.graphics.printf('GAME OF THRONES',0,h*0.4,w/sx/3,"center",0,sx*3)
+    love.graphics.printf('PROGRAMMED BY ISTVAN.SZALONTAI12@GMAIL.COM 2018',0,h*0.8,w/sx,"center",0,sx)
 end
 
 function drawNextStage()
-    love.graphics.printf('NEXT STAGE',0,h*0.5,w/2,"center",0,2)
+    love.graphics.printf('NEXT STAGE',0,h*0.5,w/sx,"center",0,sx)
 end
 
 function drawGameOver()
-    love.graphics.printf('GAME OVER',0,h*0.5,w/2,"center",0,2)
+    love.graphics.printf('GAME OVER',0,h*0.5,w/sx,"center",0,sx)
 end
 
 function drawPressFire()
     coloredtext = {'PRESS FIRE TO START'}
-    love.graphics.printf(coloredtext,0,h*0.60,w/2,"center",0,2)
+    love.graphics.printf(coloredtext,0,h*0.60,w/sx,"center",0,sx)
 end
 
 function drawActors()
@@ -923,7 +926,7 @@ function createFourthStage()
             walls[i]=EMPTY
         end
     end
-    wallHorizontal(2,math.floor(wallsHeight/3),wallsWidth-2,EMPTY)
+    wallHorizontal(2,math.floor(wallsHeight/3),wallsWidth-3,EMPTY)
     createActor("p1",PLAYER,GFX_KNIGHT,3,FAST,2,1)
     createActor("p2",PLAYER,GFX_KNIGHT_BLUE,3,FAST,3,1)
 
