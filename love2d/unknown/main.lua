@@ -414,7 +414,7 @@ function actorInjured(actor,key,dt)
         createParticles(30,RED,100,actor.x,actor.y,8)
         createParticles(30,ORANGE,80,actor.x,actor.y,8)
         sndExplosion:play()
-        camera.t = camera.t + 50 * dt
+        camera.t = camera.t + 60
         if allPlayersDied() then
             state = STATE_GAMEOVER
             stage = 1
@@ -485,11 +485,14 @@ function updateParticles(dt)
 end
 
 function updateCamera(dt)
-    camera.t = camera.t - dt
+    --camera.t = camera.t - dt
+    camera.t = camera.t - 1
     if camera.t < 0 then
         camera.t = 0
     end
-    camera.y = math.sin(camera.t*32)*grid*camera.t
+    local amplitud = grid*camera.t/60
+    amplitud = amplitud % grid
+    camera.y = math.sin(camera.t)*amplitud
 end
 
 function allPlayersDied()
