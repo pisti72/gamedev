@@ -104,7 +104,7 @@ function love.load()
     TileW = 16
     HeartW = 7
     HeartH = 6
-    camera = {y=0,shaking=0}
+    camera = {y=0,t=0}
   
     Quads = {
         love.graphics.newQuad(16, 0, TileW, TileW, tilesetW, tilesetH), -- 1 = GFX_BRICK_CYN
@@ -133,6 +133,7 @@ function love.load()
         love.graphics.newQuad(80,  0, TileW, TileW, tilesetW, tilesetH),    -- 24 = GFX_FLOOR_BLU
     }
     wallsHeight = 17
+    --stage = 6
     stage = 1
     gemsAll = 0
     gems = 0
@@ -160,6 +161,7 @@ function love.load()
     
     --createFourthStage()
     --createFifthStage()
+    --createSixthStage()
     createFirstStage()
 end
 
@@ -294,6 +296,8 @@ function inicStage()
         createFourthStage()
     elseif stage == 5 then
         createFifthStage()
+    elseif stage == 6 then
+        createSixthStage()
     else
         stage = 1
         createFirstStage()
@@ -410,6 +414,7 @@ function actorInjured(actor,key,dt)
         createParticles(30,RED,100,actor.x,actor.y,8)
         createParticles(30,ORANGE,80,actor.x,actor.y,8)
         sndExplosion:play()
+        camera.t = camera.t + 50 * dt
         if allPlayersDied() then
             state = STATE_GAMEOVER
             stage = 1
@@ -479,6 +484,14 @@ function updateParticles(dt)
     end
 end
 
+function updateCamera(dt)
+    camera.t = camera.t - dt
+    if camera.t < 0 then
+        camera.t = 0
+    end
+    camera.y = math.sin(camera.t*32)*grid*camera.t
+end
+
 function allPlayersDied()
     for k,v in pairs(actors) do
         if v.typ == PLAYER then
@@ -504,11 +517,13 @@ function love.update(dt)
         aiEnemies()
         updateActors(dt)
         updateParticles(dt)
+        updateCamera(dt)
         moveActors()
     elseif state == STATE_NEXTSTAGE then
         updateParticles(dt)
     elseif state == STATE_GAMEOVER then
         updateParticles(dt)
+        updateCamera(dt)
     end
 end
 
@@ -572,11 +587,11 @@ function drawTitle()
 end
 
 function drawNextStage()
-    love.graphics.printf('NEXT STAGE',0,h*0.5,w/sx,"center",0,sx)
+    love.graphics.printf('NEXT STAGE',0,h*0.5,w/sx/2,"center",0,sx*2)
 end
 
 function drawGameOver()
-    love.graphics.printf('GAME OVER',0,h*0.5,w/sx,"center",0,sx)
+    love.graphics.printf('GAME OVER',0,h*0.5,w/sx/2,"center",0,sx*2)
 end
 
 function drawPressFire()
@@ -620,7 +635,7 @@ end
 
 function drawParticles()
     for i,v in pairs(particles) do
-        local size = math.floor(v.life/grid)*4+4
+        local size = math.floor(v.life*sx/8)+pixel
         love.graphics.rectangle("fill",v.x-size/2,v.y-size/2,size,size)
     end
 end
@@ -651,54 +666,58 @@ function drawWalls()
             
         if not (walls[i] == WALL) then
             if stage%3 == 0 then
-                love.graphics.draw(Tileset, Quads[GFX_FLOOR_YEL], x, y,0,sx,sx)
+                drawTile(GFX_FLOOR_YEL,x,y)
             elseif stage%3 == 1 then
-                love.graphics.draw(Tileset, Quads[GFX_FLOOR_RED], x, y,0,sx,sx)
+                drawTile(GFX_FLOOR_RED,x,y)
             else
-                love.graphics.draw(Tileset, Quads[GFX_FLOOR_BLU], x, y,0,sx,sx)
+                drawTile(GFX_FLOOR_BLU,x,y)
             end
         end
         
         if walls[i] == WALL then
             if getWallSouth(i) == WALL then
                 if stage%4 == 0 then
-                    love.graphics.draw(Tileset, Quads[GFX_BRICK_CYN], x, y,0,sx,sx)
+                    drawTile(GFX_BRICK_CYN,x,y)
                 elseif stage%4 == 1 then
-                    love.graphics.draw(Tileset, Quads[GFX_BRICK_MGN], x, y,0,sx,sx)
+                    drawTile(GFX_BRICK_MGN,x,y)
                 elseif stage%4 == 2 then
-                    love.graphics.draw(Tileset, Quads[GFX_BRICK_WHT], x, y,0,sx,sx)
+                    drawTile(GFX_BRICK_WHT,x,y)
                 else
-                    love.graphics.draw(Tileset, Quads[GFX_BRICK_RED], x, y,0,sx,sx)
+                    drawTile(GFX_BRICK_RED,x,y)
                 end
             else
                 if stage%4 == 0 then
-                    love.graphics.draw(Tileset, Quads[GFX_BRICKSIDE_CYN], x, y,0,sx,sx)
+                    drawTile(GFX_BRICKSIDE_CYN,x,y)
                 elseif stage%4 == 1 then
-                    love.graphics.draw(Tileset, Quads[GFX_BRICKSIDE_MGN], x, y,0,sx,sx)
+                    drawTile(GFX_BRICKSIDE_MGN,x,y)
                 elseif stage%4 == 2 then
-                    love.graphics.draw(Tileset, Quads[GFX_BRICKSIDE_WHT], x, y,0,sx,sx)
+                    drawTile(GFX_BRICKSIDE_WHT,x,y)
                 else
-                    love.graphics.draw(Tileset, Quads[GFX_BRICKSIDE_RED], x, y,0,sx,sx)
+                    drawTile(GFX_BRICKSIDE_RED,x,y)
                 end
             end
         elseif walls[i] == GEM then
-            love.graphics.draw(Tileset, Quads[GFX_CASE], x, y,0,sx,sx)
+            drawTile(GFX_CASE,x,y)
         elseif walls[i] == DOOR then
             if gems == gemsAll then
                 if stage%3 <2 then
-                    love.graphics.draw(Tileset, Quads[GFX_DOOR_OPEN], x, y,0,sx,sx)
+                    drawTile(GFX_DOOR_OPEN,x,y)
                 else
-                    love.graphics.draw(Tileset, Quads[GFX_STAIRS_OPEN], x, y,0,sx,sx)
+                    drawTile(GFX_STAIRS_OPEN,x,y)
                 end
             else
                 if stage%3 <2 then
-                    love.graphics.draw(Tileset, Quads[GFX_DOOR_CLOSED], x, y,0,sx,sx)
+                    drawTile(GFX_DOOR_CLOSED,x,y)
                 else
-                    love.graphics.draw(Tileset, Quads[GFX_STAIRS_CLOSED], x, y,0,sx,sx)
+                    drawTile(GFX_STAIRS_CLOSED,x,y)
                 end
             end
         end
     end
+end
+
+function drawTile(gfx,x,y)
+    love.graphics.draw(Tileset, Quads[gfx], x, y + camera.y,0,sx,sx)
 end
 
 function getWallSouth(i)
@@ -950,8 +969,32 @@ function createFifthStage()
             walls[i]=EMPTY
         end
     end
-    createActor("p1",PLAYER,GFX_KNIGHT,3,FAST,1,1)
-    createActor("p2",PLAYER,GFX_KNIGHT_BLUE,3,FAST,2,1)
+    createActor("p1",PLAYER,GFX_KNIGHT,5,FAST,1,1)
+    createActor("p2",PLAYER,GFX_KNIGHT_BLUE,5,FAST,2,1)
+end
+
+function createSixthStage()
+    fillWalls(wallsWidth, wallsHeight, EMPTY)
+    for i=1,#walls do
+        local x = (i-1)%wallsWidth
+        local y = math.floor(i/wallsWidth)
+        if x == 0 or x == wallsWidth-1 or y == 0 or y == wallsHeight-1 then
+            walls[i]=WALL
+        elseif math.floor(654/x+789/y)%4 == 0 then
+            walls[i]=WALL
+        elseif math.floor(654/x+78/y)%7 == 1 then
+            walls[i]=GEM
+        elseif math.floor(5600/x+7800/y)%67 == 0 then
+            walls[i]=DOOR
+        else
+            if (x*y)%17 == 3 then
+                createActor("oh",ENEMY1,GFX_SKELETON,1,VERYSLOW,x,y)  
+            end
+            walls[i]=EMPTY
+        end
+    end
+    createActor("p1",PLAYER,GFX_KNIGHT,4,FAST,5,1)
+    createActor("p2",PLAYER,GFX_KNIGHT_BLUE,4,FAST,wallsWidth-5,1)
 end
 
 function countGems()
