@@ -3,7 +3,7 @@ This is my lua game
 ]]--
 
 function love.load()
-    SILENT = false
+    SILENT = true
     DEBUG = false
 
     EMPTY = 0
@@ -132,7 +132,7 @@ function love.load()
         love.graphics.newQuad(96, 48, TileW, TileW, tilesetW, tilesetH),    -- 23 = GFX_BRICKSIDE_RED
         love.graphics.newQuad(80,  0, TileW, TileW, tilesetW, tilesetH),    -- 24 = GFX_FLOOR_BLU
     }
-    wallsHeight = 17
+    wallsHeight = 30
     --stage = 6
     stage = 1
     gemsAll = 0
