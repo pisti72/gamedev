@@ -1,7 +1,5 @@
-import invaders.Alien;
-import invaders.Commons;
-import invaders.Player;
-import invaders.Shot;
+package invaders;
+
 import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Font;
