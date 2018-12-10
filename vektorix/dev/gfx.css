@@ -1,0 +1,34 @@
+/* ----------------------------------------------------
+   created with http://www.codeandweb.com/texturepacker 
+   ----------------------------------------------------
+   $TexturePacker:SmartUpdate:714b30d1991ca76dfa67304a327363c9$
+   ----------------------------------------------------
+
+   usage: <span class="{-spritename-} sprite"></span>
+
+   replace {-spritename-} with the sprite you like to use
+
+*/
+
+.sprite {display:inline-block; overflow:hidden; background-repeat: no-repeat;background-image:url(gfx.png);}
+
+.btn_exit {width:60px; height:60px; background-position: -2px -2px}
+.btn_home {width:60px; height:60px; background-position: -64px -2px}
+.btn_pause {width:60px; height:60px; background-position: -126px -2px}
+.btn_play {width:128px; height:128px; background-position: -188px -2px}
+.btn_soundno {width:60px; height:60px; background-position: -318px -2px}
+.btn_soundyes {width:60px; height:60px; background-position: -380px -2px}
+.btn_tweet {width:56px; height:56px; background-position: -442px -2px}
+.created_by {width:304px; height:10px; background-position: -2px -132px}
+.hand {width:78px; height:130px; background-position: -308px -132px}
+.lvl_1_free {width:82px; height:62px; background-position: -388px -132px}
+.lvl_2_free {width:82px; height:62px; background-position: -2px -264px}
+.lvl_2_lock {width:82px; height:62px; background-position: -86px -264px}
+.lvl_3_free {width:82px; height:62px; background-position: -170px -264px}
+.lvl_3_lock {width:82px; height:62px; background-position: -254px -264px}
+.lvl_4_free {width:82px; height:62px; background-position: -338px -264px}
+.lvl_4_lock {width:82px; height:62px; background-position: -422px -264px}
+.lvl_5_free {width:82px; height:62px; background-position: -2px -328px}
+.lvl_5_lock {width:82px; height:62px; background-position: -86px -328px}
+.lvl_6_free {width:82px; height:62px; background-position: -170px -328px}
+.lvl_6_lock {width:82px; height:62px; background-position: -254px -328px}

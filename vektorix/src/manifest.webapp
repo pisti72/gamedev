@@ -1,0 +1,17 @@
+{
+  "version": "0.1",
+  "name": "Vektorix",
+  "description": "3D speeding game",
+  "launch_path": "/index.html",
+  "orientation": "portrait",
+  "fullscreen": "true",
+  "icons": {
+    "30": "/gfx/icon-30.png",
+    "60": "/gfx/icon-60.png",
+    "128": "/gfx/icon-128.png"
+  },
+  "developer": {
+    "name": "Istvan Szalontai"
+  },
+  "default_locale": "en"
+}

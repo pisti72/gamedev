@@ -1,0 +1,38 @@
+/* ----------------------------------------------------
+   created with http://www.codeandweb.com/texturepacker 
+   ----------------------------------------------------
+   $TexturePacker:SmartUpdate:f042440a4156e9ca1ba0b46a750d7134$
+   ----------------------------------------------------
+
+   usage: <span class="{-spritename-} sprite"></span>
+
+   replace {-spritename-} with the sprite you like to use
+
+*/
+
+.sprite {position:absolute;display:inline-block; overflow:hidden; background-repeat: no-repeat;background-image:url(gfx/gui.png);}
+.wrapper {position:absolute;left:50%;top:55%;width:0px;text-align:center;}
+
+#btn_exit {cursor:pointer;right:20px;top:20px;                     width:60px; height:60px; background-position: -2px -2px}
+#btn_home {cursor:pointer;visibility:hidden;right:20px;top:20px;   width:60px; height:60px; background-position: -64px -2px}
+#btn_pause {cursor:pointer;visibility:hidden;right:90px;top:20px;  width:60px; height:60px; background-position: -126px -2px}
+#created_by {position:pointer;right:5px;bottom:5px;              width:304px; height:10px; background-position: -2px -132px}
+#btn_play {cursor:pointer;position:absolute;left:-64px;top:0%;  width:128px; height:128px; background-position: -188px -2px}
+#btn_soundno {cursor:pointer;visibility:hidden;right:90px;top:20px;width:60px; height:60px; background-position: -318px -2px}
+#btn_soundyes {cursor:pointer;right:90px;top:20px;                 width:60px; height:60px; background-position: -380px -2px}
+#btn_tweet {cursor:pointer;left:20px;bottom:30px;                  width:56px; height:56px; background-position: -442px -2px}
+#hand_left {visibility:hidden;left:20%;top:50%;                   width:78px; height:130px; background-position: -308px -132px}
+#hand_right {visibility:hidden;right:20%;top:50%;                 width:78px; height:130px; background-position: -308px -132px}
+#lvl_1_free {visibility:hidden;cursor:pointer;position:absolute;left:-126px;top:-82px;   width:82px; height:62px; background-position: -388px -132px}
+#lvl_2_free {visibility:hidden;cursor:pointer;position:absolute;left:-42px;top:-82px;   width:82px; height:62px; background-position: -2px -264px}
+#lvl_2_lock {visibility:hidden;cursor:default;position:absolute;left:-42px;top:-82px;      width:82px; height:62px; background-position: -86px -264px}
+#lvl_3_free {visibility:hidden;cursor:pointer;position:absolute;left:42px;top:-82px;  width:82px; height:62px; background-position: -170px -264px}
+#lvl_3_lock {visibility:hidden;cursor:default;position:absolute;left:42px;top:-82px;     width:82px; height:62px; background-position: -254px -264px}
+#lvl_4_free {visibility:hidden;cursor:pointer;position:absolute;left:-126px;top:0px;  width:82px; height:62px; background-position: -338px -264px}
+#lvl_4_lock {visibility:hidden;cursor:default;position:absolute;left:-126px;top:0px; width:82px; height:62px; background-position: -422px -264px}
+#lvl_5_free {visibility:hidden;cursor:pointer;position:absolute;left:-42px;top:0px;     width:82px; height:62px; background-position: -2px -328px}
+#lvl_5_lock {visibility:hidden;cursor:default;position:absolute;left:-42px;top:0px;     width:82px; height:62px; background-position: -86px -328px}
+#lvl_6_free {visibility:hidden;cursor:pointer;position:absolute;left:42px;top:0px;   width:82px; height:62px; background-position: -170px -328px}
+#lvl_6_lock {visibility:hidden;cursor:default;position:absolute;left:42px;top:0px;    width:82px; height:62px; background-position: -254px -328px}
+
+
