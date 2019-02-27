@@ -1,210 +1,227 @@
 <!DOCTYPE html>
 <html>
+
 <head>
-    <meta charset="UTF-8">
+	<meta charset="UTF-8">
 	<title>Asteroids</title>
 	<style>
-html,body {
-	height:100%;
-	width:100%;
-	margin:0px;
-}	
-@font-face {
-  font-family: pressstart;
-  src: url("assets/PressStart2P.ttf");
-}
-body{
-	background-image: url("assets/beautiful-blue-stars-fill.jpg");
-	color: white;
-	font-size:20px;
-	font-weight: bold;
-	font-family: pressstart;
-	text-transform: uppercase;
-	overflow: hidden;
-}
-#shield{
-	position:absolute;
-	top:20px;
-	left:20px;
-}
-#ship{
-	position:absolute;
-	width:60px;
-	height:60px;
-	top:0px;
-	left:0px;
-    background: url('assets/actors.png') 0 0;
-}
-#asteroid0,#asteroid1,#asteroid2,#asteroid3,#asteroid4{
-	position:absolute;
-	width:60px;
-	height:60px;
-	top:0px;
-	left:0px;
-	background: url('assets/actors.png') -60px 0;
-}
-#title, #gameover{
-    position:absolute;
-    width:100%;
-    padding: 200px 0;
-    text-align:center;
-    display:none;
-}
-#score{
-    position:absolute;
-	top:20px;
-	right:20px;
-    text-align:center;
-}
-h2{
-    letter-spacing: 20px;
-}
+		html,
+		body {
+			height: 100%;
+			width: 100%;
+			margin: 0px;
+		}
+
+		@font-face {
+			font-family: pressstart;
+			src: url("assets/PressStart2P.ttf");
+		}
+
+		body {
+			background-image: url("assets/beautiful-blue-stars-fill.jpg");
+			color: white;
+			font-size: 20px;
+			font-weight: bold;
+			font-family: pressstart;
+			text-transform: uppercase;
+			overflow: hidden;
+		}
+
+		#shield {
+			position: absolute;
+			top: 20px;
+			left: 20px;
+		}
+
+		#ship {
+			position: absolute;
+			width: 60px;
+			height: 60px;
+			top: 0px;
+			left: 0px;
+			background: url('assets/actors.png') 0 0;
+		}
+
+		#asteroid0,
+		#asteroid1,
+		#asteroid2,
+		#asteroid3,
+		#asteroid4 {
+			position: absolute;
+			width: 60px;
+			height: 60px;
+			top: 0px;
+			left: 0px;
+			background: url('assets/actors.png') -60px 0;
+		}
+
+		#title,
+		#gameover {
+			position: absolute;
+			width: 100%;
+			padding: 200px 0;
+			text-align: center;
+			display: none;
+		}
+
+		#score {
+			position: absolute;
+			top: 20px;
+			right: 20px;
+			text-align: center;
+		}
+
+		h2 {
+			letter-spacing: 20px;
+		}
 	</style>
 </head>
+
 <body onkeydown="keyPressed(event)" onkeyup="keyReleased(event)" onload="init()">
 
-<div id="ship"></div>
-<div id="asteroid0"></div>
-<div id="asteroid1"></div>
-<div id="asteroid2"></div>
-<div id="asteroid3"></div>
-<div id="asteroid4"></div>
+	<div id="ship"></div>
+	<div id="asteroid0"></div>
+	<div id="asteroid1"></div>
+	<div id="asteroid2"></div>
+	<div id="asteroid3"></div>
+	<div id="asteroid4"></div>
 
-<div id="shield"></div>
-<div id="score">000000</div>
-<div id="title">
-    <h2>asteroids</h2>
-    <p>(2019) small game ltd.</p>
-    <p>press space to play</p>
-</div>
-<div id="gameover">game over</div>
-<script>
-/**
-https://opengameart.org/
-*/
-const GAME = 0;
-const GAMEOVER = 1;
-const START = 2;
+	<div id="shield"></div>
+	<div id="score">000000</div>
+	<div id="title">
+		<h2>asteroids</h2>
+		<p>(2019) small game ltd.</p>
+		<p>press space to play</p>
+	</div>
+	<div id="gameover">game over</div>
+	<script>
+		/**
+		https://opengameart.org/
+		*/
+		const GAME = 0;
+		const GAMEOVER = 1;
+		const START = 2;
 
-var shield = 30;
-var score = 0;
-var speed = 10;
-var n = 5;
-var spaceship = {x:100,y:100,xd:0,yd:0}
-var asteroids = [];
-var asteroid = {}
-var w,h=0;
-var size = 60;
-var state = START;
+		var shield = 30;
+		var score = 0;
+		var speed = 10;
+		var n = 5;
+		var spaceship = { x: 100, y: 100, xd: 0, yd: 0 }
+		var asteroids = [];
+		var asteroid = {}
+		var w, h = 0;
+		var size = 60;
+		var state = START;
 
-function init() {
-	w = document.body.clientWidth;
-	h = document.body.clientHeight;
-	
-	spaceship.x = Math.floor((w - size) / 2);
-	spaceship.y = Math.floor((h - size) * .85);
+		function init() {
+			w = document.body.clientWidth;
+			h = document.body.clientHeight;
 
-	for(var i=0;i<n;i++){
-		asteroids.push(
-		{
-			x:rand(w),
-			y:Math.floor(i / 5 * h) - h - size
-		});
-	}
-    show('title');
-}
+			spaceship.x = Math.floor((w - size) / 2);
+			spaceship.y = Math.floor((h - size) * .85);
 
-function keyPressed(event){
-	if(event.key == 'z' || event.key == 'y'){
-		spaceship.xd = -speed;
-	}
-	if(event.key == 'x' || event.key == 'c'){
-		spaceship.xd = speed;
-	}
-    if(state == START && event.key == ' '){
-        state = GAME;
-        initGame();
-    }
-    if(state == GAMEOVER && event.key == ' '){
-        state = START;
-        show('title');
-        hide('gameover');
-    }
-}
-function initGame(){
-    for(var i=0;i<n;i++){
-		asteroids[i].x = rand(w);
-		asteroids[i].y = Math.floor(i / 5 * h) - h - size;
-	}
-    hide('title');
-    score = 0;
-    shield = 30;
-}
-function keyReleased(event){
-	spaceship.xd = 0;
-}
-function update(){
-	f('ship').style.left = spaceship.x + 'px';
-	f('ship').style.top = spaceship.y + 'px';
-    if(state == GAME){
-        spaceship.x += spaceship.xd;
-        if(spaceship.x < 0){
-            spaceship.x = 0;
-        }
-        if(spaceship.x + size > w){
-            spaceship.x = w - size;
-        }
-    }
-    var s = 'shield:<font color=red face=arial>';
-    for(var i=0;i<shield;i++){
-        s += 'i';
-    }
-    s += '</font>';
-    f('shield').innerHTML = s;
-	
-	for(var i=0;i<n;i++){
-		//move asteroids
-		f('asteroid' + i).style.left = asteroids[i].x + 'px';
-		f('asteroid' + i).style.top = asteroids[i].y + 'px';
-		asteroids[i].y += speed;
-		if(asteroids[i].y > h){
-			asteroids[i].y = 0 - size;
-			asteroids[i].x = rand(w);
-            if(state == GAME){
-                score += 10;
-                f('score').innerHTML = score;
-            }
+			for (var i = 0; i < n; i++) {
+				asteroids.push(
+					{
+						x: rand(w),
+						y: Math.floor(i / 5 * h) - h - size
+					});
+			}
+			show('title');
 		}
-		//check collition
-        if(state == GAME){
-            if(isOverlapped(asteroids[i],spaceship)){
-                shield--;
-                if(shield <= 0){
-                    state = GAMEOVER;
-                    show('gameover');
-                    score = 0;
-                }
-            }
-        }
-	}
-}
-function isOverlapped(obj1,obj2) {
-	//console.log(obj1.x - obj2.x);
-	return (Math.abs(obj1.x - obj2.x) < size) && (Math.abs(obj1.y - obj2.y) < size);
-}
-function rand(n){
-	return Math.floor(Math.random() * n);
-}
-function show(n){
-    f(n).style.display = 'block';
-}
-function hide(n){
-    f(n).style.display = 'none';
-}
-function f(i) {
-	return document.getElementById(i);
-}
-setInterval('update()',20);
-</script>
+
+		function keyPressed(event) {
+			if (event.key == 'z' || event.key == 'y') {
+				spaceship.xd = -speed;
+			}
+			if (event.key == 'x' || event.key == 'c') {
+				spaceship.xd = speed;
+			}
+			if (state == START && event.key == ' ') {
+				state = GAME;
+				initGame();
+			}
+			if (state == GAMEOVER && event.key == ' ') {
+				state = START;
+				show('title');
+				hide('gameover');
+			}
+		}
+		function initGame() {
+			for (var i = 0; i < n; i++) {
+				asteroids[i].x = rand(w);
+				asteroids[i].y = Math.floor(i / 5 * h) - h - size;
+			}
+			hide('title');
+			score = 0;
+			shield = 30;
+		}
+		function keyReleased(event) {
+			spaceship.xd = 0;
+		}
+		function update() {
+			f('ship').style.left = spaceship.x + 'px';
+			f('ship').style.top = spaceship.y + 'px';
+			if (state == GAME) {
+				spaceship.x += spaceship.xd;
+				if (spaceship.x < 0) {
+					spaceship.x = 0;
+				}
+				if (spaceship.x + size > w) {
+					spaceship.x = w - size;
+				}
+			}
+			var s = 'shield:<font color=red face=arial>';
+			for (var i = 0; i < shield; i++) {
+				s += 'i';
+			}
+			s += '</font>';
+			f('shield').innerHTML = s;
+
+			for (var i = 0; i < n; i++) {
+				//move asteroids
+				f('asteroid' + i).style.left = asteroids[i].x + 'px';
+				f('asteroid' + i).style.top = asteroids[i].y + 'px';
+				asteroids[i].y += speed;
+				if (asteroids[i].y > h) {
+					asteroids[i].y = 0 - size;
+					asteroids[i].x = rand(w);
+					if (state == GAME) {
+						score += 10;
+						f('score').innerHTML = score;
+					}
+				}
+				//check collition
+				if (state == GAME) {
+					if (isOverlapped(asteroids[i], spaceship)) {
+						shield--;
+						if (shield <= 0) {
+							state = GAMEOVER;
+							show('gameover');
+							score = 0;
+						}
+					}
+				}
+			}
+		}
+		function isOverlapped(obj1, obj2) {
+			//console.log(obj1.x - obj2.x);
+			return (Math.abs(obj1.x - obj2.x) < size) && (Math.abs(obj1.y - obj2.y) < size);
+		}
+		function rand(n) {
+			return Math.floor(Math.random() * n);
+		}
+		function show(n) {
+			f(n).style.display = 'block';
+		}
+		function hide(n) {
+			f(n).style.display = 'none';
+		}
+		function f(i) {
+			return document.getElementById(i);
+		}
+		setInterval('update()', 20);
+	</script>
 </body>
+
 </html>
