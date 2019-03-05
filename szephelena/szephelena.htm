@@ -1,0 +1,398 @@
+<!--
+K�sz�tette: Szalontai Istv�n
+Projekt neve: Sz�p Hel�na
+Fejleszt�s: 2011-05-20 - 2011-05-23
+
+Mitol�giai alap
+P�risz elrabolja a Tr�jai Menel�osz sp�rtai kir�ly sz�p Hel�na feles�g�t
+http://hu.wikipedia.org/wiki/Tr%C3%B3jai_h%C3%A1bor%C3%BA
+
+js csomagolo:
+http://www.iteral.com/jscrush/
+
+-->
+<style>
+	#container {
+		text-align: center;
+	}
+
+	#title {
+		margin-left: auto;
+		margin-right: auto;
+		margin-bottom: 30px;
+		width: 570px;
+		height: 65px;
+		background: url(gfx/title.png);
+	}
+
+	#button {
+		margin-left: auto;
+		margin-right: auto;
+		width: 100px;
+		height: 120px;
+		background: url(gfx/button.png);
+		cursor: pointer;
+	}
+
+	#b {
+		margin-left: auto;
+		margin-right: auto;
+		text-align: left;
+		width: 550px;
+		height: 400px;
+		background-color: ddd;
+		border-style: solid;
+		border-width: 1px;
+		border-color: ccc;
+		overflow: hidden;
+		/* clipping */
+	}
+
+	#r {
+		text-align: left;
+		color: aaa;
+		font-family: courier;
+		font-weight: bold;
+	}
+
+	a:hover {
+		background-color: cfc;
+	}
+</style>
+
+<body>
+
+	<div id="container"><br>
+		<div id="title"></div>
+		<div id="b"></div>
+		<div id="button" onMouseDown="clicked()"></div>
+<!--
+		<a href="http://istvanszalontai.atw.hu/games.html" target="_blank"><img src="gfx/bitboy_small_grey.png"
+				border="0" alt="BITBOY"></a>
+		<img src="gfx/readme.png" border="0" alt="LE�R�S" onclick="readme()" style="cursor:pointer">
+		<a href="szephelena.zip"><img src="gfx/download.png" border="0" alt="LET�LT�S"></a>
+		<a href="http://yscik.com/jf/index.php" target="_blank"><img src="gfx/jf.png" border="0"
+				alt="www.jatekfejlesztes.hu"></a>
+		<a href="http://www.w3schools.com/" target="_blank"><img src="gfx/w3s.png" border="0"
+				alt="www.w3schools.com"></a>
+		<a href="http://www.blender3d.org/" target="_blank"><img src="gfx/blender.png" border="0"
+				alt="www.blender3d.org"></a>
+		<a href="http://www.gimp.org/" target="_blank"><img src="gfx/gimp.png" border="0" alt="www.gimp.org"></a>
+-->
+	</div>
+	<div id="r"></div>
+</body>
+<script>
+	document.title = 'Sz�p Hel�na';
+	var tw = 60, hw = 40;//tile width 12*5=60px  , hero width 8*5=40px
+	//egy sorba csak egy x-et lehet tenni!!!
+	//48x100-as p�lya
+	var map = [
+		'                                                ',
+		'                                                ',//14
+		'                                                ',//15
+		'GG                                            GG',//16
+		'     GGG                                GGG     ',//17
+		'GG                                            GG',//18
+		'     GGGG                               GGG     ',//19
+		'GG                                            GG',//20
+		'                        L                       ',//21
+		'   GGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGG    ',//22
+		'   G                                    G       ',//23
+		'GGGG     GGGG     GGGG     GGGG     GGGGG    GGG',//24
+		'   G                                    G  X    ',//25 X=72
+		'   GGGGGG    GGGGG    GGGGG    GGGGG    GGGG    ',//26
+		'-  X                                          - ',//27 X=71 71 72
+		'GGGG -     GG     GGGG     GGGG     GGGG     GGG',//28 70
+		'GGGGGG   GGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGG',//29
+		'        G                                       ',//30
+		'       G                                        ',//31
+		'   GGGGG    -        GGGGGGGG    G              ',//32 69
+		'         GGGGGGGGGGGGG       GGGGGGGGGG         ',//33
+		'GG           GGGGGGGG                GGGGGGGGG  ',//34
+		'GGGGG        GGGGGG                  G         -',//35 68
+		'GGGGG        G              GGGG GG GG        GG',//36
+		'GGGGGGGGGGGGGG GGGGGGGG     G-    G  G   GGGG  G',//37 46
+		'GGGGGGGGGGGGG  G -   G      GGGGGGGG G-         ',//38 45 67
+		'GGGGGGGGGGGGG GGGGGG G               GGGGGGGG   ',//39
+		'GGGGGGGGGGGGG G -    G      GGG  GGGG          -',//40 44 66
+		'GGGGGGGGGGGGG GGGGGG GGG   GGGGGGG          GGGG',//41
+		'GGGGGGGGGGGGG GGGGGG-     -G          -     GGGG',//42 42 43 65
+		'GGGGGGGGGGGGG GG   GGGGG  GG           GG    GGG',//43
+		'GGGGGGGGGG     G       G  G                  GGG',//44
+		'GGGGGGGGGG G  GG         GG       GG         GGG',//45
+		'         G-G -GGGGG   G -G    GG             GGG',//46 41 47 48
+		'            GGG       GGGG  -               -GGG',//47 63 64
+		'                 G -GGGGGGGGGGGGGGG       GGGGGG',//48 40
+		'   -     G G     GGGGGGGGGG           -GGGG    G',//49 39 62
+		'     GGGGGXG  GGGGG      GG        GGGGGGGG    G',//50 X=48
+		'GG       G-GGGGGGGG      GG  -  G     -        G',//51 49 60 61
+		'         G-GGGGG         GGGGGGGGGGGGGGGGGGG    ',//52 50
+		'   GG    G-GGG                      -     G    G',//53 51 55
+		'        -G-G       GGGGGGGGGGGGGGGGGGGGG  G  -  ',//54 38 52 59
+		'-      GGG-GGGGG -  G       GGGGGGGGG     GG    ',//55 37 53 54
+		'GG    -G            G -GG                    -  ',//56 36 57 58
+		'     GGG     GGGGGGGGGGGGGGGGGGGGGGGGGG        G',//57 56
+		'     GGG     GG   GGG -                   G    G',//58 
+		'XGGGGGGGGGGGGGG - GGGGGGGGGGGGGGGGGGGGGGGGGGGGGG',//59 X=35 35
+		'                                  -    -      -G',//60 31 32 34
+		'GGGGGGGGGGGGGGGGGGGGGGGG      -G    G    G-    G',//61 30 33
+		'                          GGGGGGGGGGGGGGGGGGGGGG',//62
+		'           GGGGGGGGGGG      -G                  ',//63 29
+		'   -  GGG            GGGGGGGGG                  ',//64 28
+		'GGG    -                                        ',//65 27
+		'           -                                    ',//66 26
+		'     GG      -                        GGGGGGGGGG',//67 25
+		'         GG   -                      GG        G',//68 24
+		'              GG   -          GGGGGGGG    -    G',//69 20 23
+		'GGGGG              GG         GG G G G   GG  GGG',//70
+		'                       GG     G           G     ',//71
+		'  G       G                   X           GGG   ',//72 X=22
+		'  GGGGGGGGGGGGGGGGGGGGGGGGGGGGG GGGGG G   G     ',//73
+		'          G-                  X       G   G    G',//74 X=20 22
+		'          GGGG            GGGGGG-GGGG G  -G     ',//75 17 18
+		'          GGGGGGG       GGGGGGG       G   GGGG  ',//76
+		'          GGGGGGGGGG-GGGGGGGGGG-GGGGG G        -',//77 16 19 21
+		'                  GGGGG       G       G        G',//78
+		'                              G-GGGGG G      GGG',//79 15
+		'                              G       G    GGGGG',//80
+		'                              G GGGGG G  GGGGGGG',//81
+		'                        G             GGGGGGGGGG',//82
+		'            GGGGGGGGGGGGGGGGGGGGGGGGGGG-        ',//83 8
+		'     GGGG            G        -      GGGGGG     ',//84 14
+		'G                    X               G G        ',//85 X=8+6=14
+		'                 G   G               G-X      GG',//86 X=2+6=8 9
+		'    GGG   GGGGG  GGGGGGGG    GGG     G-G        ',//87 10
+		'GGGGGGG   GGGGG                      G-GGGGG -  ',//88 7 11
+		'GGGGGGGGGGGGGGG                  GGG G-GG       ',//89 12
+		'                            G        G-GG    - G',//90 6 13
+		'                  -         GGG        GG       ',//91 2
+		'                                 GGGGGGGGGGG    ',//92
+		'     GGG    GGG                      GGG--     G',//93 4 5
+		'                                      GGGGGG    ',//94
+		'GGG                                    G-       ',//95 3
+		'    G     GG                           G       G',//96
+		'    -     GG  GG        P         G    X        ',//97 X=2 1
+		'GGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGG',//98
+		'GGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGG',//99
+		'GGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGGG'];//100
+	var rqstars = [2, 8, 14, 20, 22, 35, 48, 71, 72];
+	var minstar = 0;
+	var mw = map[0].length, mh = map.length, ww = 550, wh = 400, wt = 150;
+	var rm = 0;//readme state
+	var counter = 0;//counter;
+	var pressed = 0;//timer for button image
+	var ox = oy = 0;//scroll offset
+	var introy = -tw - 50, introx = 360;
+	var hx, hy, hxv = 0, hyv = 0, ms = 6, star = 0;
+	var anim = [0, 1, 2, 1, 3, 4, 5, 4];
+	var d = .25;
+	var x = -40;
+
+	function redraw() {
+		var offset;
+		var f = 0;//korrekci�s faktor
+		var a = '';
+		//draw tiles
+		var y = Math.floor(-oy / tw);
+		for (var j = y; j < y + 8; j++) {
+			var x = Math.floor(-ox / tw);
+			for (var i = x; i < x + 10; i++) {
+				var tile = map[j].charAt(i);
+				if (tile == 'G')//solid
+				{
+					var tileabove = map[j - 1].charAt(i);
+					var level = Math.floor((mh - j) / (mh / 4));
+					if (tileabove != 'G') { offset = 0 + level * 2; } else { offset = level * 2 + 1; }//0-1,2-3,4-5,6-7
+				}
+				if (tile == '-') offset = 8;//star
+				if (tile == 'X') offset = 9;//gate
+				if (tile == 'L') offset = 12;//lady
+				if (tile != ' ' && tile != 'P') {
+					a += '<div style="position:relative;left:' + (ox + i * tw) + 'px;top:' + (oy + j * tw - f) + 'px;width:' + tw + 'px;height:' + tw + 'px;background:url(gfx/tiles.png) -' + (offset * tw) + 'px 0px;" ></div>';
+					f += tw;
+				}
+			}
+		}
+		//draw me/hero
+		var k = 0;
+		if (d > 0) k = 4;
+		offset = anim[Math.floor(counter / 4) % 4 + k];
+		hy += ms;//are we in the air?
+		if (!isHit()) {
+			if (d > 0) { offset = 7; } else { offset = 6; }
+		}
+		hy -= ms;
+		if (counter < 200) offset = 3;
+		a += '<div style="position:relative;left:' + (ox + hx) + 'px;top:' + (oy + hy - f) + 'px;width:' + hw + 'px;height:' + hw + 'px;background:url(gfx/hero.png) -' + (offset * hw) + 'px 0px;" ></div>';
+		f += hw;
+		//intro animation
+		if (counter < 120) {
+			offset = 10 + Math.floor(counter / 8) % 2;//�rd�g
+			a += '<div style="position:relative;left:' + introx + 'px;top:' + (introy - f) + 'px;width:' + tw + 'px;height:' + tw + 'px;background:url(gfx/tiles.png) -' + (offset * tw) + 'px 0px;" ></div>';
+			f += tw;
+			offset = 12;//csajszi
+			a += '<div style="position:relative;left:' + introx + 'px;top:' + (190 - f) + 'px;width:' + tw + 'px;height:' + tw + 'px;background:url(gfx/tiles.png) -' + (offset * tw) + 'px 0px;" ></div>';
+			introy += 2;
+		}
+		if (counter > 120 && counter < 250) {
+			offset = 10 + Math.floor(counter / 8) % 2;//�rd�g
+			a += '<div style="position:relative;left:' + introx + 'px;top:' + (introy - f) + 'px;width:' + tw + 'px;height:' + tw + 'px;background:url(gfx/tiles.png) -' + (offset * tw) + 'px 0px;" ></div>';
+			f += tw;
+			offset = 12 + Math.floor(counter / 8) % 2;;//csajszi
+			a += '<div style="position:relative;left:' + introx + 'px;top:' + (introy + tw - f) + 'px;width:' + tw + 'px;height:' + tw + 'px;background:url(gfx/tiles.png) -' + (offset * tw) + 'px 0px;" ></div>';
+			introy -= 3;
+		}
+		//update display
+		document.getElementById('b').innerHTML = a;
+		//update button
+		if (pressed == 1) document.getElementById('button').style.backgroundImage = 'url(gfx/button.png)';
+	}
+
+	function counterUpdater() {
+		counter++;
+		pressed--;
+		if (pressed < 0) pressed = 0;
+	}
+
+	function clicked() {
+		document.getElementById('button').style.backgroundImage = 'url(gfx/button_pressed.png)';
+		pressed = 10;
+		hy += ms;
+		if (isHit()) hyv = -15;
+		hy -= ms;
+	}
+
+	function moveHero() {
+		//gravity
+		hyv += .7;
+		if (hyv > ms * 3) hyv = ms * 3;//maxim�ljuk
+		hy += hyv;
+		if (isHit()) { hy -= hyv; hyv = 0; }//m�g pattog is!!!
+		//oldal mozg�s
+		hxv += d;
+		if (hxv > ms) hxv = ms;//maxim�ljuk
+		if (hxv < -ms) hxv = -ms;
+		hx += hxv;
+		if (isHit()) { hx -= hxv; hxv = 0; d = -d; }
+	}
+
+	function starHero() {
+		//left-bottom corner
+		var j = Math.floor((hy + hw / 2) / tw);
+		var i = Math.floor((hx + hw / 2) / tw);
+		if (map[j].charAt(i) == '-') {
+			map[j] = map[j].substr(0, i) + ' ' + map[j].substr(i + 1);
+			star++;
+			gateOpener();
+		}
+	}
+
+	function gateOpener() {
+		//find first Gate from bottom
+		if (star >= rqstars[minstar]) {
+			minstar++;
+			var i = mh;
+			do {
+				i--;
+				//alert(i);
+			} while (i > 0 && map[i].search('X') == -1)
+			if (map[i].search('X') != -1) { map[i] = map[i].replace('X', ' '); }
+		}
+	}
+
+	function followHero() {
+		if (hx + hw + ox > ww - wt) ox -= ms;
+		if (hx + ox < wt) ox += ms;
+		if (hy + hw + oy > wh - wt) oy -= ms;
+		if (hy + oy < wt) oy += ms;
+		if (ox > 0) ox = 0;
+		if (ox < -tw * mw + ww) ox = -tw * mw + ww;
+		if (oy > 0) oy = 0;
+		if (oy < -tw * mh + wh) oy = -tw * mh + wh;
+	}
+
+	function isHit() {
+		var hit = false;
+		//p�ly�n bel�l vagyunk?
+		if (Math.floor((hy + hw - 1) / tw) < 0 || Math.floor((hy + hw - 1) / tw) > mh - 1) hit = true;
+		if (Math.floor(hx / tw) < 0 || Math.floor(hx / tw) > mw - 1) hit = true;
+		if (Math.floor((hx + hw - 1) / tw) < 0 || Math.floor((hx + hw - 1) / tw) > mw - 1) hit = true;
+		if (hit == false) {
+			//bal als� pontja
+			var t = map[Math.floor((hy + hw - 1) / tw)].charAt(Math.floor(hx / tw));
+			if (isSolid(t)) hit = true;//not empty
+			//jobb als� pontja
+			var t = map[Math.floor((hy + hw - 1) / tw)].charAt(Math.floor((hx + hw - 1) / tw));
+			if (isSolid(t)) hit = true;//not empty
+		}
+		return hit;
+	}
+	function isSolid(p) {
+		var i = false;
+		if (p == 'G' || p == 'X') i = true;
+		return i;
+	}
+	function readme() {
+		var a = '';
+		if (rm == 0) {
+			a = 'SZ�P HEL�NA<br>===========<br><br>';
+			a += '<br>J�t�kmenet<br>==========<br>';
+			a += 'A sp�rtai kir�lyt csak �s kiz�r�lag a piros gombbal kell ir�ny�tani.<br>';
+			a += 'Ezzel a gombbal pedig csak ugrani tudunk :-)<br>';
+			a += 'C�lunk, hogy el�rj�k a p�lya tetej�t, ahol v�rja h�s�nket feles�ge, Helen�.<br>';
+			a += 'A kapuk csak a megfelel� sz�m� csillag �sszeszed�s�vel ny�lnak ki.<br>';
+			a += '<br>T�rt�net<br>========<br>';
+			a += 'A tr�jai h�bor� fegyveres konfliktus volt az �korban az akh�jok �s a kis�zsiai<br>';
+			a += 'Tr�ja k�z�tt. A t�rt�net szerint a h�bor� azut�n t�rt ki, miut�n P�risz, Tr�ja<br>';
+			a += 'hercege elrabolta a vil�gsz�p Helen�t, Menel�osz sp�rtai kir�ly feles�g�t.<br>';
+			a += '<br>K�sz�t�<br>=======<br>';
+			a += 'Programoz�s �s pixelgrafika: Szalontai Istv�n (C)2011 Bitboy<br>';
+			a += 'P�lyaszerkeszt�s: Szalontai �gi �s Szalontai Tam�s<br>';
+			a += 'A j�t�kot a www.jatekfejlesztes.hu II.Vill�mverseny�re �rtam.<br>';
+			a += 'A t�ma a Mitol�gia.<br>';
+			a += 'A fejleszt�s 2011.m�jus 20-t�l 23-ig tartott.<br>';
+			a += 'A j�t�k teljes m�rt�kben Java Scriptben �r�dott.<br>';
+			a += 'Haszn�lt programok: Blender, Gimp, Notepad++, Mozilla, IE7<br>';
+			a += 'Minden jog fenntartva!<br>';
+			a += 'Verzi�: 1.0<br>';
+			a += '<br>Javasolt b�ng�sz�<br>=================<br>';
+			a += 'A j�t�k futtat�s�ra a Mozill�t javaslom.<br>';
+			a += 'Internet Explorern�l jelentkezik a flickering effektus, ami zavar�.<br>';
+			a += 'M�s b�ng�sz�vel nem teszteltem.<br>';
+			a += '<br>J� j�t�kot, ments�tek meg Sz�p Helen�t!!!<br>';
+			rm = 1;
+		} else { rm = 0; }
+		document.getElementById('r').innerHTML = a;
+	}
+	function setPlayer() {
+		var i = 0;
+		do {
+			i++;
+		} while (i < mh && map[i].search('P') == -1)
+		//alert(i);
+		hx = map[i].search('P') * tw;
+		hy = i * tw + tw - hw;
+		ox = -hx + ww - 300;
+		oy = -hy + wh - 100;
+	}
+	function winHero() {
+		var j = Math.floor((hy + hw / 2) / tw);
+		var i = Math.floor((hx + hw / 2) / tw);
+		if (map[j].charAt(i) == 'L') {
+			alert('GRATUL�LOK!!! Megmentetted Hel�n�t!!!');
+			map[j] = map[j].replace('L', ' ');
+		}
+	}
+	function gameLoop() {
+		counterUpdater();
+		if (counter > 200) moveHero();//ide 200 kell
+		starHero();
+		winHero();
+		followHero();
+		redraw();
+		window.setTimeout("gameLoop();", 20);//friss�t�s 1sec=1000 30frame/sec = 33
+	}
+	setPlayer();
+	gameLoop();
+</script>
