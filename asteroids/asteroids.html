@@ -74,6 +74,26 @@
 		h2 {
 			letter-spacing: 20px;
 		}
+        
+        #lefttouch{
+            position: absolute;
+            top:0px;
+            left:0px;
+            width:50%;
+            height:100%;
+            background-color:white;
+            opacity:0;
+        }
+        
+        #righttouch{
+            position: absolute;
+            top:0px;
+            right:0px;
+            width:50%;
+            height:100%;
+            background-color:white;
+            opacity:0;
+        }
 	</style>
 </head>
 
@@ -94,6 +114,8 @@
 		<p>press space to play</p>
 	</div>
 	<div id="gameover">game over</div>
+    <div id="lefttouch"></div>
+    <div id="righttouch"></div>
 	<script>
 		/**
 		https://opengameart.org/
@@ -104,9 +126,17 @@
 
 		var shield = 30;
 		var score = 0;
-		var speed = 10;
 		var n = 5;
-		var spaceship = { x: 100, y: 100, xd: 0, yd: 0 }
+		var spaceship = { 
+            x: 100,
+            y: 100,
+            xd: 0,
+            yd: 0,
+            speed:10,
+            moveleft: function(){this.xd = -this.speed;},
+            moveright: function(){this.xd = this.speed;},
+            stop: function(){this.xd = 0;},
+            update: function(){this.x += this.xd;}}
 		var asteroids = [];
 		var asteroid = {}
 		var w, h = 0;
@@ -123,31 +153,84 @@
 			for (var i = 0; i < n; i++) {
 				asteroids.push(
 					{
-						x: rand(w),
-						y: Math.floor(i / 5 * h) - h - size
+						x: 0,
+						y:0,
+                        speed: 10,
+                        movedown: function() {this.y += this.speed;}
 					});
 			}
-			show('title');
+            
+            initTitle();
+            
+            f('lefttouch').addEventListener("touchstart", leftTouched, false);
+            f('lefttouch').addEventListener("touchend", bothReleased, false);
+            f('righttouch').addEventListener("touchstart", rightTouched, false);
+            f('righttouch').addEventListener("touchend", bothReleased, false);
 		}
 
 		function keyPressed(event) {
-			if (event.key == 'z' || event.key == 'y') {
-				spaceship.xd = -speed;
+			if (event.key == 'z' || event.key == 'y' || event.keyCode == 37) {
+				moveleft();
 			}
-			if (event.key == 'x' || event.key == 'c') {
-				spaceship.xd = speed;
+			if (event.key == 'x' || event.key == 'c' || event.keyCode == 39) {
+				moveright();
 			}
 			if (state == START && event.key == ' ') {
-				state = GAME;
 				initGame();
 			}
 			if (state == GAMEOVER && event.key == ' ') {
-				state = START;
-				show('title');
-				hide('gameover');
+                initTitle();
 			}
 		}
+        
+        function initTitle(){
+            state = START;
+			show('title');
+			hide('gameover');
+        }
+        
+        function moveleft() {
+            spaceship.moveleft();
+        }
+        
+        function moveright() {
+            spaceship.moveright();
+        }
+        
+        function spaceshipstop() {
+            spaceship.stop();
+        }
+        
+        function leftTouched(){
+            f('lefttouch').style.opacity = 0.2;
+            if (state == START) {
+				initGame();
+			}
+			if (state == GAMEOVER) {
+                initTitle();
+			}
+            moveleft();
+        }
+        
+        function rightTouched(){
+            f('righttouch').style.opacity = 0.2;
+            if (state == START) {
+				initGame();
+			}
+			if (state == GAMEOVER) {
+                initTitle();
+			}
+            moveright();
+        }
+        
+        function bothReleased(){
+            f('lefttouch').style.opacity = 0;
+            f('righttouch').style.opacity = 0;
+            spaceshipstop();
+        }
+        
 		function initGame() {
+            state = GAME;
 			for (var i = 0; i < n; i++) {
 				asteroids[i].x = rand(w);
 				asteroids[i].y = Math.floor(i / 5 * h) - h - size;
@@ -157,13 +240,13 @@
 			shield = 30;
 		}
 		function keyReleased(event) {
-			spaceship.xd = 0;
+			spaceshipstop();
 		}
 		function update() {
 			f('ship').style.left = spaceship.x + 'px';
 			f('ship').style.top = spaceship.y + 'px';
 			if (state == GAME) {
-				spaceship.x += spaceship.xd;
+				spaceship.update();
 				if (spaceship.x < 0) {
 					spaceship.x = 0;
 				}
@@ -182,7 +265,7 @@
 				//move asteroids
 				f('asteroid' + i).style.left = asteroids[i].x + 'px';
 				f('asteroid' + i).style.top = asteroids[i].y + 'px';
-				asteroids[i].y += speed;
+				asteroids[i].movedown();
 				if (asteroids[i].y > h) {
 					asteroids[i].y = 0 - size;
 					asteroids[i].x = rand(w);
