@@ -123,6 +123,7 @@
 		const GAME = 0;
 		const GAMEOVER = 1;
 		const START = 2;
+		const TOUCHED = 0.1;
 
 		var shield = 30;
 		var score = 0;
@@ -202,7 +203,7 @@
         }
         
         function leftTouched(){
-            f('lefttouch').style.opacity = 0.2;
+            f('lefttouch').style.opacity = TOUCHED;
             if (state == START) {
 				initGame();
 			}
@@ -213,7 +214,7 @@
         }
         
         function rightTouched(){
-            f('righttouch').style.opacity = 0.2;
+            f('righttouch').style.opacity = TOUCHED;
             if (state == START) {
 				initGame();
 			}

@@ -1,0 +1,50 @@
+html,
+body {
+    height: 100%;
+    width: 100%;
+    margin: 0px;
+}
+body {
+    /*background-image: url("assets/beautiful-blue-stars-fill.jpg");*/
+    color: white;
+    font-size: 20px;
+    font-weight: bold;
+    font-family: pressstart;
+    text-transform: uppercase;
+    overflow: hidden;
+}
+#container {
+    text-align: center;
+}
+
+#title {
+    margin-left: auto;
+    margin-right: auto;
+    margin-bottom: 30px;
+    width: 570px;
+    height: 65px;
+    background: url(gfx/title.png);
+}
+
+#button {
+    margin-left: auto;
+    margin-right: auto;
+    width: 100px;
+    height: 120px;
+    background: url(gfx/button.png);
+    cursor: pointer;
+}
+
+#b {
+    margin-left: auto;
+    margin-right: auto;
+    text-align: left;
+    width: 550px;
+    height: 400px;
+    background-color: #ddd;
+    border-style: solid;
+    border-width: 1px;
+    border-color: #ccc;
+    overflow: hidden;
+    /* clipping */
+}
