@@ -11,62 +11,71 @@ js csomagolo:
 http://www.iteral.com/jscrush/
 
 -->
-<style>
-	#container {
-		text-align: center;
-	}
 
-	#title {
-		margin-left: auto;
-		margin-right: auto;
-		margin-bottom: 30px;
-		width: 570px;
-		height: 65px;
-		background: url(gfx/title.png);
-	}
+<!DOCTYPE html>
 
-	#button {
-		margin-left: auto;
-		margin-right: auto;
-		width: 100px;
-		height: 120px;
-		background: url(gfx/button.png);
-		cursor: pointer;
-	}
+<html>
 
-	#b {
-		margin-left: auto;
-		margin-right: auto;
-		text-align: left;
-		width: 550px;
-		height: 400px;
-		background-color: ddd;
-		border-style: solid;
-		border-width: 1px;
-		border-color: ccc;
-		overflow: hidden;
-		/* clipping */
-	}
+<head>
+		<meta charset="UTF-8">
+	<title>Szép heléna</title>
+	<style>
+		#container {
+			text-align: center;
+		}
 
-	#r {
-		text-align: left;
-		color: aaa;
-		font-family: courier;
-		font-weight: bold;
-	}
+		#title {
+			margin-left: auto;
+			margin-right: auto;
+			margin-bottom: 30px;
+			width: 570px;
+			height: 65px;
+			background: url(gfx/title.png);
+		}
 
-	a:hover {
-		background-color: cfc;
-	}
-</style>
+		#button {
+			margin-left: auto;
+			margin-right: auto;
+			width: 100px;
+			height: 120px;
+			background: url(gfx/button.png);
+			cursor: pointer;
+		}
 
-<body>
+		#b {
+			margin-left: auto;
+			margin-right: auto;
+			text-align: left;
+			width: 550px;
+			height: 400px;
+			background-color: ddd;
+			border-style: solid;
+			border-width: 1px;
+			border-color: ccc;
+			overflow: hidden;
+			/* clipping */
+		}
+
+		#r {
+			text-align: left;
+			color: aaa;
+			font-family: courier;
+			font-weight: bold;
+		}
+
+		a:hover {
+			background-color: cfc;
+		}
+	</style>
+</head>
+
+<body onkeydown="keyPressed(event)">
 
 	<div id="container"><br>
 		<div id="title"></div>
 		<div id="b"></div>
 		<div id="button" onMouseDown="clicked()"></div>
-<!--
+		<!--
 		<a href="http://istvanszalontai.atw.hu/games.html" target="_blank"><img src="gfx/bitboy_small_grey.png"
 				border="0" alt="BITBOY"></a>
 		<img src="gfx/readme.png" border="0" alt="LE�R�S" onclick="readme()" style="cursor:pointer">
@@ -83,7 +92,10 @@ http://www.iteral.com/jscrush/
 	<div id="r"></div>
 </body>
 <script>
-	document.title = 'Sz�p Hel�na';
+	const TITLE = 0;
+	const GAME = 1;
+	const GAMEOVER = 2;
+	const START = 3;
 	var tw = 60, hw = 40;//tile width 12*5=60px  , hero width 8*5=40px
 	//egy sorba csak egy x-et lehet tenni!!!
 	//48x100-as p�lya
@@ -188,6 +200,8 @@ http://www.iteral.com/jscrush/
 	var anim = [0, 1, 2, 1, 3, 4, 5, 4];
 	var d = .25;
 	var x = -40;
+	var hero = { x: 0, y: 0, xv: 0, yv: 0 }
+	var state = TITLE;
 
 	function redraw() {
 		var offset;
@@ -218,13 +232,13 @@ http://www.iteral.com/jscrush/
 		var k = 0;
 		if (d > 0) k = 4;
 		offset = anim[Math.floor(counter / 4) % 4 + k];
-		hy += ms;//are we in the air?
+		hero.y += ms;//are we in the air?
 		if (!isHit()) {
 			if (d > 0) { offset = 7; } else { offset = 6; }
 		}
-		hy -= ms;
+		hero.y -= ms;
 		if (counter < 200) offset = 3;
-		a += '<div style="position:relative;left:' + (ox + hx) + 'px;top:' + (oy + hy - f) + 'px;width:' + hw + 'px;height:' + hw + 'px;background:url(gfx/hero.png) -' + (offset * hw) + 'px 0px;" ></div>';
+		a += '<div style="position:relative;left:' + (ox + hero.x) + 'px;top:' + (oy + hero.y - f) + 'px;width:' + hw + 'px;height:' + hw + 'px;background:url(gfx/hero.png) -' + (offset * hw) + 'px 0px;" ></div>';
 		f += hw;
 		//intro animation
 		if (counter < 120) {
@@ -258,29 +272,47 @@ http://www.iteral.com/jscrush/
 	function clicked() {
 		document.getElementById('button').style.backgroundImage = 'url(gfx/button_pressed.png)';
 		pressed = 10;
-		hy += ms;
-		if (isHit()) hyv = -15;
-		hy -= ms;
+		hero.y += ms;
+		if (isHit()) hero.yv = -15;
+		hero.y -= ms;
+	}
+
+	function keyPressed(event) {
+		if (event.key == 'z' || event.key == 'y' || event.keyCode == 37) {
+			//moveleft();
+		}
+		if (event.key == 'x' || event.key == 'c' || event.keyCode == 39) {
+			//moveright();
+		}
+		//if (state == START && event.key == ' ') {
+			//initGame();
+		//}
+		//if (state == GAMEOVER && event.key == ' ') {
+			//initTitle();
+		//}
+		if(event.key == ' '){
+			clicked();
+		}
 	}
 
 	function moveHero() {
 		//gravity
-		hyv += .7;
-		if (hyv > ms * 3) hyv = ms * 3;//maxim�ljuk
-		hy += hyv;
-		if (isHit()) { hy -= hyv; hyv = 0; }//m�g pattog is!!!
+		hero.yv += .7;
+		if (hero.yv > ms * 3) hero.yv = ms * 3;//maxim�ljuk
+		hero.y += hero.yv;
+		if (isHit()) { hero.y -= hero.yv; hero.yv = 0; }//m�g pattog is!!!
 		//oldal mozg�s
-		hxv += d;
-		if (hxv > ms) hxv = ms;//maxim�ljuk
-		if (hxv < -ms) hxv = -ms;
-		hx += hxv;
-		if (isHit()) { hx -= hxv; hxv = 0; d = -d; }
+		hero.xv += d;
+		if (hero.xv > ms) hero.xv = ms;//maxim�ljuk
+		if (hero.xv < -ms) hero.xv = -ms;
+		hero.x += hero.xv;
+		if (isHit()) { hero.x -= hero.xv; hero.xv = 0; d = -d; }
 	}
 
 	function starHero() {
 		//left-bottom corner
-		var j = Math.floor((hy + hw / 2) / tw);
-		var i = Math.floor((hx + hw / 2) / tw);
+		var j = Math.floor((hero.y + hw / 2) / tw);
+		var i = Math.floor((hero.x + hw / 2) / tw);
 		if (map[j].charAt(i) == '-') {
 			map[j] = map[j].substr(0, i) + ' ' + map[j].substr(i + 1);
 			star++;
@@ -302,10 +334,10 @@ http://www.iteral.com/jscrush/
 	}
 
 	function followHero() {
-		if (hx + hw + ox > ww - wt) ox -= ms;
-		if (hx + ox < wt) ox += ms;
-		if (hy + hw + oy > wh - wt) oy -= ms;
-		if (hy + oy < wt) oy += ms;
+		if (hero.x + hw + ox > ww - wt) ox -= ms;
+		if (hero.x + ox < wt) ox += ms;
+		if (hero.y + hw + oy > wh - wt) oy -= ms;
+		if (hero.y + oy < wt) oy += ms;
 		if (ox > 0) ox = 0;
 		if (ox < -tw * mw + ww) ox = -tw * mw + ww;
 		if (oy > 0) oy = 0;
@@ -315,15 +347,15 @@ http://www.iteral.com/jscrush/
 	function isHit() {
 		var hit = false;
 		//p�ly�n bel�l vagyunk?
-		if (Math.floor((hy + hw - 1) / tw) < 0 || Math.floor((hy + hw - 1) / tw) > mh - 1) hit = true;
-		if (Math.floor(hx / tw) < 0 || Math.floor(hx / tw) > mw - 1) hit = true;
-		if (Math.floor((hx + hw - 1) / tw) < 0 || Math.floor((hx + hw - 1) / tw) > mw - 1) hit = true;
+		if (Math.floor((hero.y + hw - 1) / tw) < 0 || Math.floor((hero.y + hw - 1) / tw) > mh - 1) hit = true;
+		if (Math.floor(hero.x / tw) < 0 || Math.floor(hero.x / tw) > mw - 1) hit = true;
+		if (Math.floor((hero.x + hw - 1) / tw) < 0 || Math.floor((hero.x + hw - 1) / tw) > mw - 1) hit = true;
 		if (hit == false) {
 			//bal als� pontja
-			var t = map[Math.floor((hy + hw - 1) / tw)].charAt(Math.floor(hx / tw));
+			var t = map[Math.floor((hero.y + hw - 1) / tw)].charAt(Math.floor(hero.x / tw));
 			if (isSolid(t)) hit = true;//not empty
 			//jobb als� pontja
-			var t = map[Math.floor((hy + hw - 1) / tw)].charAt(Math.floor((hx + hw - 1) / tw));
+			var t = map[Math.floor((hero.y + hw - 1) / tw)].charAt(Math.floor((hero.x + hw - 1) / tw));
 			if (isSolid(t)) hit = true;//not empty
 		}
 		return hit;
@@ -371,14 +403,14 @@ http://www.iteral.com/jscrush/
 			i++;
 		} while (i < mh && map[i].search('P') == -1)
 		//alert(i);
-		hx = map[i].search('P') * tw;
-		hy = i * tw + tw - hw;
-		ox = -hx + ww - 300;
-		oy = -hy + wh - 100;
+		hero.x = map[i].search('P') * tw;
+		hero.y = i * tw + tw - hw;
+		ox = -hero.x + ww - 300;
+		oy = -hero.y + wh - 100;
 	}
 	function winHero() {
-		var j = Math.floor((hy + hw / 2) / tw);
-		var i = Math.floor((hx + hw / 2) / tw);
+		var j = Math.floor((hero.y + hw / 2) / tw);
+		var i = Math.floor((hero.x + hw / 2) / tw);
 		if (map[j].charAt(i) == 'L') {
 			alert('GRATUL�LOK!!! Megmentetted Hel�n�t!!!');
 			map[j] = map[j].replace('L', ' ');
@@ -396,3 +428,5 @@ http://www.iteral.com/jscrush/
 	setPlayer();
 	gameLoop();
 </script>
+
+</html>
