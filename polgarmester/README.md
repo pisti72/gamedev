@@ -1,8 +1,8 @@
 # Polgármester a pácban
 
-This game is written for 
+This game is written for http://jatekfejlesztes.hu/page.php?id=376
 
-It was finished on 3rd place.
+It was finished on the last place at 9th :-)
 
 # How to play
 
@@ -10,7 +10,7 @@ Build as much houses as you can.
 
 # Controls
 
-With mouse
+Click with mouse to build.
 
 # Play it here
 
