@@ -61,18 +61,19 @@
 		
 		2012 Janu�r 23., h�tf� d�l
 		*/
-		console.log('started');
+		console.log('Started');
 		document.onmousemove = onMouseMove;
 		document.onmousedown = onMousePressed;
 		document.onmouseup = onMouseReleased;
 		document.body.onload = function (e) {
 			init();
-			gameLoop();
+			update();
 		}
 		const version = '1.5';
 		const tilew = 64;
 		const tileh = 32;
 		const gravity = 16;
+		var debugValue;
 		var mouse_x = 0, mouse_y = 0;
 		var snd_explosion = [];
 		snd_explosion[0] = f("explosion0");
@@ -183,12 +184,12 @@
 			if (c2 > 500 && house == 0 && state == 'GAME') state = 'OVER';
 			//map
 			for (var i = 0; i < mapsize; i++) {
-				//robban�s
+				//explosion
 				if (map[i] > 11) {
 					drawTile(9 + Math.floor(map[i] / 2) % 2, i, shake);
 					map[i]--;
 				}
-				//h�zak,f�k,rom
+				//houses, trees, ruins
 				if (map[i] == 1) {
 					drawTile(1 + map2[i], i, shake);
 					if (c2 % 100 == 0) {
@@ -206,7 +207,6 @@
 					ast[i] -= gravity;
 					if (ast[i] < 0) {
 						if (c4 > 7) c4 = 0;
-						//if(snd_explosion[c4].ended==true)
 						snd_explosion[c4++].play();
 						map[i] = 50;
 						ast[i] = 9999;
@@ -239,26 +239,21 @@
 			if (state == 'OVER') {
 				localStorage.hiscore2 = Number(hi);
 			}
-			//debug
-			ctx.fillStyle = '#FFF';
-			//ctx.fillText(c5,10,200);
-			//ctx.fillText(snd_build[0].ended,10,200);
-			//ctx.fillText(house, 10, 40);
-			//ctx.fillText(c2, 10, 40);
-			//ctx.fillText((Math.sin(c2/400)+1)/2,10, 80);
-			debug();
-
+			//debug();
+			window.requestAnimationFrame(update);
 		}
 
 		function debug() {
 			ctx.fillStyle = '#000';
-			ctx.fillText(c2, 10, 200);
+			ctx.font = "30px Arial";
+			ctx.fillText(debugValue, 10, 200);
 		}
 
 		function meteorGenerator() {
-			//meteor generator
-			if (c2 > 500 && c2 % 4 == 0) {
-				if ((Math.sin(c2 / 400) + 1) / 2 < Math.random()) asteroid();
+			var p = (Math.sin(c2 / 400) + 1) / 2;
+			debugValue = p;
+			if (c2 > 500 && c2 % 8 == 0) {
+				if (p < Math.random()) asteroid();
 			}
 		}
 
@@ -295,11 +290,6 @@
 
 		function f(i) {
 			return document.getElementById(i);
-		}
-
-		function gameLoop() {
-			update();
-			window.setTimeout("gameLoop();", 30);//friss�t�s 1sec=1000 30frame/sec = 33
 		}
 	</script>
 </body>
