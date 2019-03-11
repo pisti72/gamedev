@@ -1,0 +1,13 @@
+html, body {
+    height: 100%;
+    width: 100%;
+    margin: 0px;
+}
+
+#display {
+    cursor: default;
+    position: absolute;
+    background: PaleGreen;
+    left: 0px;
+    top: 0px;
+}
