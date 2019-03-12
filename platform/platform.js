@@ -1,25 +1,34 @@
 console.log('Started');
-//document.onmousemove = onMouseMove;
+document.onmousemove = onMouseMove;
 //document.onmousedown = onMousePressed;
 //document.onmouseup = onMouseReleased;
 document.body.onload = function (e) {
     init();
-    gameLoop();
+    gameloop();
 }
 var img_pointer = new Image();
 var img_tiles = new Image();
-var mouse = {x:0, y:0}
+var mouse = { x: 0, y: 0 }
 var ctx = f('display').getContext('2d');
 var w = f('display').width = document.body.clientWidth;
 var h = f('display').height = document.body.clientHeight;
 console.log('Display: ' + w + ' x ' + h);
 
 function init() {
-    img_pointer.src = 'gfx/hand.png';
-	img_tiles.src = 'gfx/tiles.png';
+    //img_pointer.src = 'gfx/hand.png';
+    img_tiles.src = 'gfx/tileset_32x32.png';
+    map.test();
+    map.init();
+    console.log('map: ' + map.width + ' x ' + map.height);
 }
 
 function gameloop() {
+    ctx.clearRect(0, 0, w, h);
+    map.x = mouse.x;
+    map.y = mouse.y;
+    map.draw(ctx);
+
+    //console.log('gameloop');
     requestAnimationFrame(gameloop);
 }
 
