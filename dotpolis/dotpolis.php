@@ -1,0 +1,655 @@
+<!--
+Készítette: Szalontai István
+Projekt neve: Dotpolis
+Fejlesztés: 2011-08-25 - 2011-08-26
+Beküldési határidõ: augusztus 29, hétfõ 20 óra.
+
+Metropolisz + rejtély (+ idõutazás)
+
+js csomagolo:
+http://javascriptcompressor.com/
+http://jscompress.com/
+
+html5:
+http://diveintohtml5.info/
+http://billmill.org/static/canvastutorial/index.html
+
+kell még:
+- vonalas összekötése az objektumoknak
+	-kiszámoljuk az összes pont 2d helyét és betesszük egy tömbbe.
+- több objektum megjelenítése
+- színpad kitalálása, egyszerû játékmenet
+- objektumok elkészítése
+- színpad felépítése
+
+játékmenet:
+- az elején elküldenek egy helyre
+- egyszerre csak egyféle lehet nálam
+- ott megmondják, hogy vigyek 1 darab csomagot egy másikra
+- ott megmondják, hogy vigyek egy csomagot autóval amoda
+- ott megmondják, hogy vigyek egy másikat emide
+- ott megmondják, hogy egyet amarra, de repülövel
+- ott szedejek össze még 20-at és amoda kell vinnem
+
+csomag adatstruktúra:
+- gratula/címzõ szöveg száma, mit száma, mennyit, mivel vihetõ, hová,
+
+csomagok:
+- mobil radar
+- vöröskeresztes autó
+- léghajós csomag
+
+haladás:
+- 2011-11-14 repülõvel menés 
+- 2011-11-15 autóval menés, magyarítás, P-tábla, torony, data.js
+- 2011-11-16 ûrhajóval menés, bugfixes-clipping
+- 2011-11-17 horizont, küldetés manager, toronyház, bounding box
+- 2011-11-18 vöröskeresztes pótkocsi, raktár, kórház
+
+-->
+<style>
+
+@font-face {
+	font-family: Kremlin;
+	src: url('gfx/Kremlin Bolshevik Bold.ttf');
+}
+
+body{
+	background-color:#ffdddd;
+	text-align:left;
+	color:#606060;
+	font-family:courier;
+	font-weight:bold;
+}
+#container{
+	text-align:center;
+}
+#title{
+	margin-left:auto;
+	margin-right:auto;
+	margin-bottom:10px;
+	width:271px;
+	height:67px;
+	background:url(gfx/title.png);
+}
+#a{
+	margin-left:auto;
+	margin-right:auto;
+	text-align:center;
+	border-style:solid;
+	border-width:1px;
+	border-color:ccc;
+}
+#r{
+	text-align:left;
+	color:#606060;
+	font-family:courier;
+	font-weight:bold;
+}
+</style>
+<head>
+	<link rel="icon" type="image/png" href="gfx/favicon.ico">
+	<link rel="shortcut icon" href="gfx/favicon.ico">
+	<script type="text/javascript" src="data.js"></script>
+	<title>---== D O T P O L I S ==---</title>
+</head>
+<body>
+	<div id="container">
+		<div id="title"></div>
+		<canvas id="a" width="750" height="400">Your browser does not support the canvas element.</canvas><br><br>
+		<a href="http://istvanszalontai.atw.hu/games.html" target="_blank"><img src="gfx/bitboy.png" border="0" alt="BITBOY"></a>
+		<img src="gfx/readme.png" border="0" alt="LEÍRÁS" onclick="readme()" style="cursor:pointer">
+		<!--
+		<a href="dotpolis.zip"><img src="gfx/download.png" border="0" alt="LETÖLTÉS"></a>
+		-->
+		<a href="http://yscik.com/jf/index.php" target="_blank"><img src="gfx/jf.png" border="0" alt="www.jatekfejlesztes.hu"></a>
+		<a href="http://www.w3schools.com/" target="_blank"><img src="gfx/w3s.png" border="0" alt="www.w3schools.com"></a>
+		<a href="http://www.blender.org/" target="_blank"><img src="gfx/blender.png" border="0" alt="www.blender.org"></a>
+	<div id="r"></div>
+	Látogatók száma:&nbsp;
+<?php
+$count_my_page = ("hitcounter.txt");
+$hits = file($count_my_page);
+$hits[0] ++;
+$fp = fopen($count_my_page , "w");
+fputs($fp , "$hits[0]");
+fclose($fp);
+echo $hits[0];
+?>
+	</div>
+</body>
+<script>
+//document.title='---== D O T P O L I S ==---';
+document.onmousemove=onMouseMove;
+//get a reference to the canvas
+var ctx = document.getElementById("a").getContext("2d");
+var canvasMinX;
+var canvasMaxX;
+
+var canvasLeft=document.getElementById('a').offsetLeft;
+var canvasTop=document.getElementById('a').offsetTop;
+
+const w=750;
+const h=400;
+const mag=200;
+const fog=40000;
+const smallsize=5;
+const behind=-2000;
+const margin=1000;
+const rmax=50;
+const tall=280;
+const spaceship_speed=50;
+const flight_speed=100;
+const car_speed=50;
+const walk_speed=20;
+var lang=0;
+var message=0;
+var counter1=100, counter2=200;
+var flight=0;//0-walk, 2-plane, 3-car, 6-spaceship
+var vehicle=0;
+var rm=0;
+var v=new Array(500);//vertex array: x,y,on screen?
+var vt=new Array(500);//vertex array: x,y,z?
+var objpointer=new Array(500);
+var bbox=new Array(500);//bounding boxes w,h
+var focus=w/2;
+var mouse_x=0, mouse_y=0;
+var cx,sx,cy,sy,cz,sz;//sinuses and cosinuses for all axes
+var my_pos_x=-412*mag,my_pos_y=-112*mag,my_pos_z=tall;
+var my_vel=0,my_vel_x=0,my_vel_y=0,my_vel_z=0;
+var my_way=0;
+var my_rot_x=0,my_rot_y=0,my_rot_z=123;
+
+function onMouseMove(e)
+{
+	mouse_x=e.pageX-canvasLeft;
+	mouse_y=e.pageY-canvasTop;
+	if(mouse_x<0)mouse_x=0;
+	if(mouse_x>w)mouse_x=w;
+	if(mouse_y<0)mouse_y=0;
+	if(mouse_y>h)mouse_y=h;
+}
+
+function drawObject(j,xg,yg,zg)
+{
+    
+	//pontok 3D-->2D
+	var x,y,z,x2,y2,z2,yout,xp,yp;
+	var p0x,p1x,p2x,p3x;
+	var p0y,p1y,p2y,p3y;
+	var p0e,p1e,p2e,p3e;
+	var small;
+	var xmin=w,xmax=0,ymin=h,ymax=0;
+	var offset=objpointer[j];
+	var i=0;
+	do
+	{
+		//translate
+		x=-obj[i*3+0+offset]*mag-my_pos_x+xg*mag;
+		y=obj[i*3+2+offset]*mag-my_pos_y+yg*mag;
+		z=obj[i*3+1+offset]*mag-my_pos_z+zg*mag;
+		//rotate axis-z
+		x2=x*cz-y*sz;
+		y2=x*sz+y*cz;
+		z2=z;
+		//pitch axis-x
+		x=x2;
+		y=y2*cx-z2*sx;
+		z=y2*sx+z2*cx;
+		//roll axis-y
+		x2=x*cy-z*sy;
+		y2=y;
+		z2=x*sy+z*cy;
+		//eltesszük a transzformált 3d pontokat
+		vt[i*3+0]=x2;
+		vt[i*3+1]=y2;
+		vt[i*3+2]=z2;
+		yout=y2;
+		small=100000;
+		v[i*3+2]=0;//on screen
+		if(y2+focus<=0){
+			y2=-y2;
+			x2=100*x2;
+			z2=100*z2;
+			v[i*3+2]=1;//hide
+		}else{
+			small=(bbox[j*2+0]*mag*focus)/(y2+focus);
+			x=(bbox[j*2+1]*mag*focus)/(y2+focus);
+			if(x>small)small=x;
+		}
+		//projection
+		xp=(x2*focus)/(y2+focus)+w/2;
+		yp=h/2-(z2*focus)/(y2+focus);
+
+		v[i*3+0]=xp;
+		v[i*3+1]=yp;
+		
+		if(xp<-margin || xp>w+margin || yp<-margin || yp>h+margin)v[i*3+2]=1;//hide
+		
+		//mask
+		if(xp<xmin)xmin=xp;
+		if(xp>xmax)xmax=xp;
+		if(yp<ymin)ymin=yp;
+		if(yp>ymax)ymax=yp;
+		if(xmin<0)xmin=0;
+		if(xmax>w)xmax=w;
+		if(ymin<0)ymin=0;
+		if(ymax>h)ymax=h;
+		
+		
+		
+		i++;
+	}while(obj[i*3+0+offset]!=88888 && small>smallsize && yout>behind);//yout<fog
+	//white mask
+	//ctx.fillStyle = '#fff';
+	//if(xmin<xmax && ymin<ymax)ctx.fillRect(xmin,ymin,xmax-xmin,ymax-ymin);
+	
+	ctx.lineWidth = 2;
+	ctx.lineJoin = 'bevel';
+	ctx.strokeStyle = "#000";
+	ctx.beginPath();
+	
+	if(yout>4000 && yout<8000)ctx.lineWidth = 1.6;
+	if(yout>=8000 && yout<16000)ctx.lineWidth = 1.3;
+	if(yout>=16000)ctx.lineWidth = 1;
+	//élek
+	var p0p1x,p0p1y,p0p1z;
+	var p0p3x,p0p3y,p0p3z;
+	var nx,ny,nz,nabs;
+	var bx,by,bz,babs;
+	var axb;
+	if(small>smallsize && yout>behind)
+	{
+		i=i*3+1;
+		do
+		{
+			//lap normálisa
+			//a
+			p0p1x=vt[(obj[i+offset+1]-1)*3+0]-vt[(obj[i+offset+0]-1)*3+0];
+			p0p1y=vt[(obj[i+offset+1]-1)*3+1]-vt[(obj[i+offset+0]-1)*3+1];
+			p0p1z=vt[(obj[i+offset+1]-1)*3+2]-vt[(obj[i+offset+0]-1)*3+2];
+			//b
+			p0p3x=vt[(obj[i+offset+3]-1)*3+0]-vt[(obj[i+offset+0]-1)*3+0];
+			p0p3y=vt[(obj[i+offset+3]-1)*3+1]-vt[(obj[i+offset+0]-1)*3+1];
+			p0p3z=vt[(obj[i+offset+3]-1)*3+2]-vt[(obj[i+offset+0]-1)*3+2];
+			//normál vektor
+			nx=p0p1y*p0p3z-p0p1z*p0p3y;//ay*bz-az*by
+			ny=p0p1z*p0p3x-p0p1x*p0p3z;//az*bx-ax*bz
+			nz=p0p1x*p0p3y-p0p1y*p0p3x;//ax*by-ay*bx
+			//nabs=Math.sqrt(nx*nx+ny*ny+nz*nz);
+			//vektor szorzata
+			bx=vt[(obj[i+offset+0]-1)*3+0];
+			by=vt[(obj[i+offset+0]-1)*3+1];
+			bz=vt[(obj[i+offset+0]-1)*3+2];
+			//babs=Math.sqrt(bx*bx+by*by+bz*bz)
+			axb=(nx*bx+ny*by+nz*bz);
+			
+			//axb=axb/(nabs*babs);
+			
+			//ctx.strokeStyle = "#000";
+			//if(uu%2==0)ctx.strokeStyle = '#666';
+			//uu++;
+			/*
+			if(axb>=-1 && axb<=-0.8)ctx.fillStyle = '#666';
+			if(axb>-0.8 && axb<=-0.6)ctx.fillStyle = '#888';
+			if(axb>-0.6 && axb<=-0.4)ctx.fillStyle = '#aaa';
+			if(axb>-0.2 && axb<=0.0)ctx.fillStyle = '#ddd';
+			*/
+			if(axb<0)
+			{
+				//éleket alkotó 2D pontok
+				/*
+				(obj[i+offset+0]-1)
+				(obj[i+offset+él1-4]-1)
+				*/
+				p0x=v[(obj[i+offset+0]-1)*3+0];
+				p0y=v[(obj[i+offset+0]-1)*3+1];
+				p0e=v[(obj[i+offset+0]-1)*3+2];
+			
+				p1x=v[(obj[i+offset+1]-1)*3+0];
+				p1y=v[(obj[i+offset+1]-1)*3+1];
+				p1e=v[(obj[i+offset+1]-1)*3+2];
+			
+				p2x=v[(obj[i+offset+2]-1)*3+0];
+				p2y=v[(obj[i+offset+2]-1)*3+1];
+				p2e=v[(obj[i+offset+2]-1)*3+2];
+			
+				p3x=v[(obj[i+offset+3]-1)*3+0];
+				p3y=v[(obj[i+offset+3]-1)*3+1];
+				p3e=v[(obj[i+offset+3]-1)*3+2];
+			
+				if(p0e==0 && p1e==0 && p2e==0 && p3e==0)
+				{
+					ctx.moveTo(p0x,p0y);ctx.lineTo(p1x,p1y);
+					ctx.lineTo(p2x,p2y);
+					ctx.lineTo(p3x,p3y);
+					ctx.lineTo(p0x,p0y);
+				}
+			}
+			i+=4;
+		}while(obj[i+offset]!=99999)
+	}else
+	{
+		if(small>0.5 && small<=smallsize)ctx.rect(xp,yp,small,small);
+	}
+	
+	ctx.stroke();
+	//ctx.closePath();
+	//ctx.fill();
+}
+
+function drawHorizon()
+{
+	var x,y,z,x2,y2,z2,yp1,yp2;
+	//0=(x2*focus)/(y2+focus)+w/2;
+	y2=10000;
+	z2=0;
+	x2=(-w/2)*(y2+focus)/focus;
+	//pitch axis-x
+	x=x2;
+	y=y2*cx-z2*sx;
+	z=y2*sx+z2*cx;
+	//roll axis-y
+	y2=y;
+	z2=x*sy+z*cy;
+	//projection
+	yp1=h/2-(z2*focus)/(y2+focus);
+	//w=(x2*focus)/(y2+focus)+w/2;
+	y2=10000;
+	z2=0;
+	x2=(w/2)*(y2+focus)/focus;
+	//pitch axis-x
+	x=x2;
+	y=y2*cx-z2*sx;
+	z=y2*sx+z2*cx;
+	//roll axis-y
+	y2=y;
+	z2=x*sy+z*cy;
+	//projection
+	yp2=h/2-(z2*focus)/(y2+focus);
+	ctx.strokeStyle = "#666";
+	ctx.lineWidth = .5;
+	ctx.beginPath();
+	ctx.moveTo(0,yp1);
+	ctx.lineTo(w,yp2);
+	ctx.stroke();
+	ctx.closePath();
+}
+
+function drawGauge()
+{
+	//compass
+    ctx.strokeStyle = "#000";
+	ctx.lineWidth = 2;
+	ctx.beginPath();
+	ctx.arc(50, 50, 40, 0, 2 * Math.PI, false);
+	ctx.moveTo(50,50);
+	ctx.lineTo(50+Math.sin(my_rot_z)*40,50-Math.cos(my_rot_z)*40);
+	//speed
+	ctx.moveTo(1,h/2);
+	ctx.lineTo(1,mouse_y);
+	//rotation
+	ctx.moveTo(w/2,1);
+	ctx.lineTo(mouse_x,1);
+	//draw them!
+    ctx.stroke();
+	ctx.closePath();
+}
+
+function drawObjects()
+{
+	var i=0;
+	do
+	{
+		if(world[i]<200)drawObject(world[i],world[i+1],world[i+2],world[i+3]);
+		i+=4;
+	}while(world[i]!=88888);
+}
+
+function drawText()
+{
+	ctx.strokeStyle = '#000';
+	ctx.lineWidth = 1;
+	ctx.font = 'italic bold 30px serif';
+	ctx.textBaseline = 'bottom';
+	if(counter1>0)
+	{
+		ctx.strokeText(text[message*4+lang*2], 10, h-10);
+		counter1--;
+	}
+	if(counter1<=0 && counter2>0)
+	{
+		ctx.strokeText(text[message*4+1+lang*2], 10, h-10);
+		counter2--;
+	}
+}
+
+function sendMessage(m,c1,c2)
+{
+	if(counter1==0 && counter2==0)
+	{
+		counter1=c1;
+		counter2=c2;
+		message=m;
+	}
+}
+
+function createBoundingBoxes()
+{
+	var i=0,j=0,k=0;
+	var xmax=0,zmax=0;
+	objpointer[k]=0;
+	do
+	{
+		if(obj[i+0]==88888)
+		{
+			bbox[j*2+0]=xmax;
+			bbox[j*2+1]=zmax;
+			j++;
+			xmax=0;
+			zmax=0;
+			do{}while(obj[++i]!=99999);
+			i++;
+			objpointer[++k]=i;
+		}
+		if(obj[i+0]>xmax)xmax=obj[i+0];
+		if(obj[i+1]>zmax)zmax=obj[i+1];
+		i+=3;
+	}while(i<=obj.length);
+}
+
+function update()
+{
+	ctx.fillStyle = "white";
+	ctx.fillRect (0, 0,  w, h);
+	//rotate axis
+	cx=Math.cos(my_rot_x);
+	sx=Math.sin(my_rot_x);
+	cy=Math.cos(my_rot_y);
+	sy=Math.sin(my_rot_y);
+	cz=Math.cos(my_rot_z);
+	sz=Math.sin(my_rot_z);
+	//draw them
+	drawHorizon();
+	drawObjects();
+	drawGauge();
+	drawText();
+}
+
+function readme()
+{
+	var a='';
+	if(rm==0)
+	{
+		a='DOTPOLIS<br>===========<br>';
+		a+='<br>Játékmenet<br>==========<br>';
+		a+='Segíts a város lakosainak, hogy el tudj menni az ûrhajóval!<br>';
+		a+='Csomagokat kell elvinned egyik helyrõl a másikra.<br>';
+		a+='Ha teljesítetted a küldetéseket, akkor a csészaljal<br>';
+		a+='elhagyhatod a bolygót.<br>';
+		a+='<br>Irányítás<br>==========<br>';
+		a+='Csak és kizárólag egérrel.<br>';
+		a+='<br>Készítõ<br>=======<br>';
+		a+='Programozás: Szalontai István (C)2011 Bitboy<br>';
+		a+='A játék teljes mértékben Java Scriptben íródott.<br>';
+		a+='Használt programok: Blender, Gimp, Notepad++, Mozilla, Chrome<br>';
+		a+='Minden jog fenntartva!<br>';
+		a+='Verzió: 1.0<br>';
+		a+='<br>Jó játékot!!!<br>';
+		rm=1;
+	}else{rm=0;}
+	document.getElementById('r').innerHTML=a;
+}
+
+function playerControl()
+{
+	//0-walk, 2-plane, 3-car, 6-spaceship
+	//turning
+	my_rot_z+=(mouse_x-w/2)/4000;
+	//rolling
+	if(flight==2)my_rot_y=(mouse_x-w/2)/1000;
+	if(flight==3)my_rot_y=-(mouse_x-w/2)/4000;
+	if(flight==6)my_rot_y=(mouse_x-w/2)/2000;
+	//speed
+	if(flight==0)my_vel=(h/2-mouse_y)/200*walk_speed;
+	if(flight==2)my_vel=flight_speed;
+	if(flight==3)my_vel=(h/2-mouse_y)/200*car_speed;
+	//pitch
+	if(flight==2)my_rot_x=(h/2-mouse_y)/500;
+	if(flight==6)my_rot_x=-(h/2-mouse_y)/100;
+	my_vel_y=Math.cos(my_rot_z)*my_vel;
+	my_vel_x=Math.sin(my_rot_z)*my_vel;
+	if(flight==0)my_pos_z=tall+Math.sin(my_way*6)*10;
+	if(flight==2)my_vel_z=-Math.sin(my_rot_x)*my_vel;
+	if(flight==3)my_pos_z=tall+Math.sin(my_pos_x*my_pos_y)*my_vel;
+	my_pos_x+=my_vel_x;
+	my_pos_y+=my_vel_y;
+	my_pos_z+=my_vel_z;
+	my_way+=Math.abs(my_vel)/mag;
+	if(my_pos_z<=0)
+	{
+		my_rot_x=0;
+		my_rot_y=0;
+		my_vel_z=0;
+		my_pos_z=tall;
+		world[vehicle+0]=flight;
+		world[vehicle+1]=(my_pos_x-5*my_vel_x)/mag;
+		world[vehicle+2]=(my_pos_y-5*my_vel_y)/mag;
+		world[vehicle+3]=0;
+		flight=0;
+		sendMessage(2,100,0);//landed
+	}
+}
+
+function playerCollition()
+{
+	var i=0;
+	var found=0;
+	var bw;
+	do
+	{
+		bw=bbox[world[i]*2+0];
+		if(my_pos_x>(world[i+1]-bw)*mag && my_pos_x<(world[i+1]+bw)*mag &&
+		my_pos_y>(world[i+2]-bw)*mag && my_pos_y<(world[i+2]+bw)*mag &&
+		my_pos_z>(world[i+3])*mag && my_pos_z<(world[i+3]+2)*mag)
+		{
+			found=1;
+		}
+		i+=4;
+	}while(found==0 && world[i]!=88888);
+	
+	if(found==1)
+	{
+		i-=4;
+		//by plane
+		if(world[i+0]==2 && flight==0)
+		{
+			sendMessage(1,50,0);
+			world[i]=200;
+			flight=2;
+			vehicle=i;
+		}
+		//by car
+		if(world[i+0]==3 && flight==0)
+		{
+			sendMessage(3,50,0);
+			world[i]=200;
+			flight=3;
+			vehicle=i;
+		}
+		//by spaceship
+		if(world[i+0]==6 && flight==0)
+		{
+			if(mission[6]==1 && mission[6+7]==1 && mission[6+7*2]==1 && mission[6+7*3]==1)
+			{
+				sendMessage(5,200,200);
+				world[i]=200;
+				//world[i+3]=10000;
+				flight=6;
+				my_vel=0;
+				my_vel_x=0;
+				my_vel_y=0;
+				my_vel_z=spaceship_speed;
+			}else{sendMessage(9,100,100);}
+		}
+		//out of car at P-plate
+		if(world[i+0]==4 && flight==3)
+		{
+			my_rot_x=0;
+			my_rot_y=0;
+			my_vel_z=0;
+			my_pos_z=tall;
+			world[vehicle+0]=flight;
+			world[vehicle+1]=world[i+1];
+			world[vehicle+2]=world[i+2]+2;//put it close to P
+			world[vehicle+3]=world[i+3];
+			flight=0;
+			sendMessage(4,100,0);
+		}
+/*mission manager
+		
+hova		0
+mit			1
+mivel		2
+mennyit		3
+feladat		4
+gratula-txt	5
+teljesitve	6
+*/
+		var j=0;
+		do
+		{
+			if(world[i+0]==mission[j+1] && flight==mission[j+2])//mit és mivel
+			{
+				world[i+0]=200;//eltüntettük
+				sendMessage(6,50,0);//csomag elkapva
+				mission[j+3]--;//csomaggyûjtõ
+			}
+			if(world[i+0]==mission[j+0])//hova
+			{
+				if(mission[j+3]==0)
+				{
+					sendMessage(mission[j+5],50,50);//gratula
+					mission[j+6]=1;//teljesítve
+				}else
+				{
+					sendMessage(mission[j+4],100,100);//feladat
+				}
+			}
+			j+=7;
+		}while(j<mission.length);
+	}
+}
+
+function gameLoop()
+{
+	playerControl();
+	playerCollition();
+	//document.getElementById('r').innerHTML=Math.floor(my_pos_x/mag)+','+Math.floor(my_pos_y/mag)+','+my_rot_z;
+	update();
+	window.setTimeout("gameLoop();",20);//frissítés 1sec=1000 30frame/sec = 33
+}
+var u=-3;
+createBoundingBoxes();
+gameLoop();
+</script>
