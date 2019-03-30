@@ -25,7 +25,7 @@ ld (spr_x),a
 ld a,(pl_y)
 ld (spr_y),a
 call sprite
-;call sprite2
+call sprite2
 
 ;http://www.breakintoprogram.co.uk/computers/zx-spectrum/keyboard
 ld bc,row_qwert 
@@ -189,8 +189,14 @@ ld a,(spr_attr)
 ld (hl),a
 ret
 
+spr2_y:
+db 3
 
 sprite2:
+ld hl,screen
+ld (hl),255
+
+ret
 
 
 
