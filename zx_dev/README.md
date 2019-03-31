@@ -1,18 +1,22 @@
 # ZX Maschine Code Game
 
-It is just a fun Z80 game in assembly language. Let us see...
+It is just a fun Z80 game in assembly language. Tribute to Speccy
 
 # Development tools
 
-ZX Spin 0.666
+Compiler: http://pasmo.speccy.org/
 
-SevenUp http://metalbrain.speccy.org/
+IDE: https://code.visualstudio.com/
 
+Emulator: fuse-gtk   http://fuse-emulator.sourceforge.net/
 
-# TODO
+Z80 instructions: http://clrhome.org/table/
 
-* Learn op codes
-* Do some practices
+# Dev diary
+
+2019-04-01: pixel precise 8x8 sprite with ASWD keys control
+
+YYYY-MM-DD: TODO
 
 
 
