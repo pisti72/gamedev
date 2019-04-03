@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="UTF-8">
+    <title>ZX Paint</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+    <table>
+        <tr>
+            <td>
+                <canvas id="display">Your browser does not support the canvas element.</canvas>
+            </td>
+            <td>
+                <div id="export"></div>
+            </td>
+        </tr>
+    </table>
+    <div id="legend">
+        <div>Legend:</div>
+        <div>arrows - move cursor</div>
+        <div>space - draw</div>
+        <div>c - pick a block</div>
+        <div>e - export as text</div>
+    </div>
+    <script src="bitmap.js"></script>
+    <script src="zxpaint.js"></script>
+</body>
+
+</html>

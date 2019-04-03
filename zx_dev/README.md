@@ -12,11 +12,17 @@ Emulator: fuse-gtk   http://fuse-emulator.sourceforge.net/
 
 Z80 instructions: http://clrhome.org/table/
 
+# TODO
+
+* game idea
+* writing text 6x6 fonts
+* develop javascript pixel editor to export defb
+
 # Dev diary
 
 2019-04-01: pixel precise 8x8 sprite with ASWD keys control
 
-YYYY-MM-DD: TODO
+2019-04-02: spr2 height added
 
 
 

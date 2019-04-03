@@ -30,29 +30,29 @@ gameloop:
 
 ;http://www.breakintoprogram.co.uk/computers/zx-spectrum/keyboard
     ;ld bc,row_qwert
-    ld bc,row_asdfg     ;A 
-    in a,(c)        
-    ;and %00000001    ; check key Q 
-    and %00000001    ; check key W 
-    call z,pl_left 
-    ;ld bc,row_qwert 
+    ld bc,row_asdfg     ;A
+    in a,(c)
+    ;and %00000001    ; check key Q
+    and %00000001    ; check key W
+    call z,pl_left
+    ;ld bc,row_qwert
     ld bc,row_asdfg
     in a,(c)
-    and %00000100     ;D       
-    ;and %00000010    ; check key W 
-    call z,pl_right 
+    and %00000100     ;D
+    ;and %00000010    ; check key W
+    call z,pl_right
     ;ld bc,row_yuiop
-    ld bc,row_qwert 
+    ld bc,row_qwert
     in a,(c)
-    and %00000010     ;W   
-    ;and %00000001    ; check key P 
+    and %00000010     ;W
+    ;and %00000001    ; check key P
     call z,pl_up
     ld bc,row_asdfg  
     ;ld bc,row_hjkle
-    in a,(c)        
+    in a,(c)
     ;and %00000010    ; check key L
     and %00000010   ;S
-    call z,pl_down 
+    call z,pl_down
 
     ld a,1
     ld (spr_idx),a
@@ -65,7 +65,7 @@ gameloop:
     halt
 
     ld bc,row_bnmss
-    in a,(c)        
+    in a,(c)
     and %00000001    ; check key SPACE
     jp nz,gameloop
     ret
@@ -74,41 +74,41 @@ pl_x: db 16
 pl_y: db 12
 
 pl_left:
-    ld hl,pl_x       ; remember, y is the horizontal coord! 
-    ld a,(hl)       ; what's the current value? 
-    cp 0           ; is it zero? 
-    ret z           ; yes - we can't go any further left. 
-    dec (hl)        ; subtract 1 from y coordinate. 
-    ret 
+    ld hl,pl_x       ; remember, y is the horizontal coord!
+    ld a,(hl)       ; what's the current value?
+    cp 0           ; is it zero?
+    ret z           ; yes - we can't go any further left.
+    dec (hl)        ; subtract 1 from y coordinate.
+    ret
 
-pl_right:     
-    ld hl,pl_x      ; remember, y is the horizontal coord! 
-    ld a,(hl)       ; what's the current value? 
-    cp 240           ; is it at the right edge (31)? 
-    ret z           ; yes - we can't go any further left. 
-    inc (hl)        ; add 1 to y coordinate. 
-    ret 
-                ; Move player up. 
+pl_right:
+    ld hl,pl_x      ; remember, y is the horizontal coord!
+    ld a,(hl)       ; what's the current value?
+    cp 240           ; is it at the right edge (31)?
+    ret z           ; yes - we can't go any further left.
+    inc (hl)        ; add 1 to y coordinate.
+    ret
+                ; Move player up.
 pl_up:
-    ld hl,pl_y      ; remember, x is the vertical coord! 
-    ld a,(hl)       ; what's the current value? 
-    cp 0            ; is it at upper limit (4)? 
-    ret z           ; yes - we can go no further then. 
-    dec (hl)        ; subtract 1 from x coordinate. 
-    ret 
-                ; Move player down. 
-pl_down:     
-    ld hl,pl_y      ; remember, x is the vertical coord! 
-    ld a,(hl)       ; what's the current value? 
-    cp 183           ; is it already at the bottom (21)? 
-    ret z           ; yes - we can't go down any more. 
-    inc (hl)        ; add 1 to x coordinate. 
-    ret 
+    ld hl,pl_y      ; remember, x is the vertical coord!
+    ld a,(hl)       ; what's the current value?
+    cp 0            ; is it at upper limit (4)?
+    ret z           ; yes - we can go no further then.
+    dec (hl)        ; subtract 1 from x coordinate.
+    ret
+                ; Move player down.
+pl_down:
+    ld hl,pl_y      ; remember, x is the vertical coord!
+    ld a,(hl)       ; what's the current value?
+    cp 183           ; is it already at the bottom (21)?
+    ret z           ; yes - we can't go down any more.
+    inc (hl)        ; add 1 to x coordinate.
+    ret
 
 ;change attr
 paper_color:
     db 0
-paper: 
+paper:
     ld bc,768
     ld hl,attr
     push hl
@@ -195,7 +195,7 @@ loop2:
     ret
 
 spr2_y:
-    db 3
+    db 3 ;not used
 
 
 spr2_calc:
@@ -230,7 +230,8 @@ sprite2:
     ld a,(spr_y)
     ld (ix + scr_y),a
     ld (ix + bmp_y),0
-    ld b,8
+    ld a,(spr2_height)
+    ld b,a
 spr2_loop:
     push bc
     call spr2_calc
@@ -260,7 +261,7 @@ spr2_skip:
     ld a,e
     ld hl,(spr2_addr)
     ld (hl),a
-    inc hl
+    inc hl; can be skipped too
     ld a,d
     ld (hl),a
     inc (ix+scr_y);
@@ -269,7 +270,9 @@ spr2_skip:
     djnz spr2_loop
     ret
 spr2_addr:
-    dw 0  
+    dw 0
+spr2_height:
+    db 8
 
 scr_y: equ 0
 bmp_y: equ 1
@@ -307,5 +310,39 @@ db %01111110
 db %00111100
 db %00011000
 
-
-
+fonts 6x6:
+;a
+db %01110000
+db %11011000
+db %11011000
+db %11111000
+db %11011000
+db %00000000
+;b
+db %11110000
+db %11011000
+db %11110000
+db %11011000
+db %11110000
+db %00000000
+;c
+db %01110000
+db %11011000
+db %11000000
+db %11011000
+db %01110000
+db %00000000
+;m
+db %10001000
+db %11011000
+db %11111000
+db %11111000
+db %11011000
+db %00000000
+;w
+db %11011000
+db %11011000
+db %11111000
+db %11111000
+db %01010000
+db %00000000
