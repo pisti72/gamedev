@@ -14,10 +14,15 @@ row_bnmss: equ $7ffe
 
 
 main:
-    ld ix, vars
     ld a,%01111000
     ld(paper_color),a
     call paper
+    ld hl,txt_abc
+    call pixel_txt
+    ld hl,txt_hello
+    call pixel_txt
+    ld hl,txt_digits
+    call pixel_txt
 gameloop:
     ld a,0
     ld (spr_idx),a
@@ -71,7 +76,7 @@ gameloop:
     ret
 
 pl_x: db 16
-pl_y: db 12
+pl_y: db 100
 
 pl_left:
     ld hl,pl_x       ; remember, y is the horizontal coord!
@@ -200,7 +205,7 @@ spr2_y:
 
 spr2_calc:
     ld hl,screen ;calculate y first
-    ld a,(ix+scr_y)
+    ld a,(spr2_ytemp)
     ld b,a
     and %00000111 ;lower 3 bits go to D
     ld d,a
@@ -211,7 +216,7 @@ spr2_calc:
     srl a
     or d
     ld d,a
-    ld a,(ix+scr_y)
+    ld a,(spr2_ytemp)
     and %00111000
     sla a
     sla a
@@ -228,13 +233,9 @@ spr2_calc:
     ret
 sprite2:
     ld a,(spr_y)
-    ld (ix + scr_y),a
-    ld (ix + bmp_y),0
-    ld a,(spr2_height)
-    ld b,a
-spr2_loop:
-    push bc
-    call spr2_calc
+    ld (spr2_ytemp),a
+    ld a,0
+    ld (spr2_bmp_y),a
     ld hl,spr_bmp
     ld a,(spr_idx)
     sla a ;x8
@@ -243,7 +244,15 @@ spr2_loop:
     ld e,a
     ld d,0
     add hl,de
-    ld e,(ix + bmp_y)
+    ld (spr2_bmp_addr),hl
+    ld a,(spr2_height)
+    ld b,a
+spr2_loop:
+    push bc
+    call spr2_calc
+    ld hl,(spr2_bmp_addr)
+    ld a,(spr2_bmp_y)
+    ld e,a
     ld d,0
     add hl,de
     ld a,(hl)
@@ -258,14 +267,18 @@ spr2_loop2:
     rr d
     djnz spr2_loop2
 spr2_skip:
-    ld a,e
     ld hl,(spr2_addr)
+    ld a,(hl)
+    or e
     ld (hl),a
     inc hl; can be skipped too
-    ld a,d
+    ld a,(hl)
+    or d
     ld (hl),a
-    inc (ix+scr_y);
-    inc (ix+bmp_y);
+    ld hl,spr2_ytemp
+    inc (hl)
+    ld hl,spr2_bmp_y
+    inc (hl)
     pop bc
     djnz spr2_loop
     ret
@@ -273,13 +286,124 @@ spr2_addr:
     dw 0
 spr2_height:
     db 8
+spr2_ytemp:
+    db 0
+spr2_bmp_y:
+    db 0
+spr2_bmp_addr:
+    dw 0
 
-scr_y: equ 0
-bmp_y: equ 1
+txt_hello:
+db 100
+db 80
+db "HELLO WORLD 2019@"
+txt_abc:
+db 10
+db 10
+db "HELLO WORLD ABCDEFGHIJKLMNOPQRSTUVWXYZ@"
+txt_digits:
+db 10
+db 20
+db "THESE ARE THE DIGITS 0123456789@"
 
-vars:
-    db 0 ;0 scr_y
-    db 0 ;1 bmp_y
+pixel_txt:
+    ld a,(hl)
+    ld (spr_x),a
+    inc hl
+    ld a,(hl)
+    ld (spr_y),a
+    inc hl
+pxltxt_loop4:
+    ld a,(hl)
+    push hl
+    call pixel_letter
+    pop hl
+    ld a,(spr_x)
+    ld c,a
+    ld a,(pxltxt_width)
+    add a,c
+    ld (spr_x),a
+    inc hl
+    ld a,64
+    cp (hl)
+    jr nz, pxltxt_loop4
+    ret
+pixel_letter:
+    cp 32
+    jr nz,pxltxt_chk_digits
+    ld a,6
+    ld (pxltxt_width),a
+    ret
+pxltxt_chk_digits:
+    cp 60
+    jr c,pxltxt_digits
+pxltxt_atoz:
+    ld hl,fonts
+    sub 65
+    jr z,pxltxt_if_a
+    jr pxltxt_skip2
+pxltxt_digits:
+    ld hl,digits
+    sub 48
+    jr z,pxltxt_if_a
+pxltxt_skip2:      
+    ld b,a
+    ld de,7
+pxltxt_loop3:
+    add hl,de
+    djnz pxltxt_loop3
+pxltxt_if_a:
+    ld (spr2_bmp_addr),hl
+    ld a,(spr_y)
+    ld (spr2_ytemp),a
+    ld a,0
+    ld (spr2_bmp_y),a
+    ld b,6
+pxltxt_loop:
+    push bc
+    call spr2_calc
+    ld hl,(spr2_bmp_addr)
+    ld a,(hl)
+    ld (pxltxt_width),a
+    inc hl
+    ld a,(spr2_bmp_y)
+    ld e,a
+    ld d,0
+    add hl,de
+    ld a,(hl)
+    ld e,a
+    ld d,0
+    ld a,(spr_x)
+    and %00000111
+    jr z,pxltxt_skip
+    ld b,a
+pxltxt_loop2:
+    srl e
+    rr d
+    djnz pxltxt_loop2
+pxltxt_skip:
+    ld a,e
+    ld hl,(spr2_addr)
+    ld a,(hl)
+    or e
+    ld (hl),a
+    inc hl; can be skipped too
+    ld a,(hl)
+    or d
+    ld (hl),a
+    ld hl,spr2_ytemp
+    inc (hl)
+    ld hl,spr2_bmp_y
+    inc (hl)
+    pop bc
+    djnz pxltxt_loop
+    ret
+pxltxt_x:
+    db 0
+pxltxt_width:
+    db 0
+
+
 
 ;graphics
 spr_bmp:
@@ -310,39 +434,300 @@ db %01111110
 db %00111100
 db %00011000
 
-fonts 6x6:
-;a
+fonts:
+;A-65
+db 6
 db %01110000
 db %11011000
 db %11011000
 db %11111000
 db %11011000
-db %00000000
-;b
+db %11011000
+;B
+db 6
 db %11110000
 db %11011000
 db %11110000
 db %11011000
+db %11011000
 db %11110000
-db %00000000
-;c
+;C
+db 6
+db %01110000
+db %11011000
+db %11000000
+db %11000000
+db %11011000
+db %01110000
+;D
+db 6
+db %11110000
+db %11011000
+db %11011000
+db %11011000
+db %11011000
+db %11110000
+;E
+db 6
+db %11111000
+db %11000000
+db %11110000
+db %11000000
+db %11000000
+db %11111000
+;F
+db 6
+db %11111000
+db %11000000
+db %11110000
+db %11000000
+db %11000000
+db %11000000
+;G
+db 6
 db %01110000
 db %11011000
 db %11000000
 db %11011000
+db %11011000
+db %01111000
+;H
+db 6
+db %11011000
+db %11011000
+db %11111000
+db %11011000
+db %11011000
+db %11011000
+;I
+db 3
+db %11000000
+db %11000000
+db %11000000
+db %11000000
+db %11000000
+db %11000000
+;J
+db 5
+db %00110000
+db %00110000
+db %00110000
+db %00110000
+db %00110000
+db %11100000
+;K
+db 6
+db %11011000
+db %11011000
+db %11110000
+db %11011000
+db %11011000
+db %11011000
+;L
+db 6
+db %11000000
+db %11000000
+db %11000000
+db %11000000
+db %11000000
+db %11111000
+;M
+db 8
+db %11000110
+db %11101110
+db %11111110
+db %11010110
+db %11000110
+db %11000110
+;N
+db 7
+db %11001100
+db %11101100
+db %11111100
+db %11011100
+db %11001100
+db %11001100
+;O
+db 6
 db %01110000
-db %00000000
-;m
-db %10001000
-db %11011000
-db %11111000
-db %11111000
-db %11011000
-db %00000000
-;w
 db %11011000
 db %11011000
+db %11011000
+db %11011000
+db %01110000
+;P
+db 6
+db %11110000
+db %11011000
+db %11011000
+db %11110000
+db %11000000
+db %11000000
+;Q
+db 6
+db %01110000
+db %11011000
+db %11011000
+db %11011000
+db %10110000
+db %01011000
+;R
+db 6
+db %11110000
+db %11011000
+db %11011000
+db %11110000
+db %11011000
+db %11011000
+;S
+db 6
+db %01110000
+db %11000000
+db %01110000
+db %00011000
+db %11011000
+db %01110000
+;T
+db 7
+db %11111100
+db %00110000
+db %00110000
+db %00110000
+db %00110000
+db %00110000
+;U
+db 6
+db %11011000
+db %11011000
+db %11011000
+db %11011000
+db %11011000
+db %01110000
+;V
+db 6
+db %11011000
+db %11011000
+db %11011000
 db %11111000
+db %01110000
+db %00100000
+;W
+db 8
+db %11000110
+db %11010110
+db %11010110
+db %11111110
+db %01101100
+db %01101100
+;X
+db 6
+db %11011000
+db %11011000
+db %01110000
+db %11011000
+db %11011000
+db %11011000
+;Y
+db 7
+db %11001100
+db %11001100
+db %01111000
+db %00110000
+db %00110000
+db %00110000
+;Z
+db 6
 db %11111000
-db %01010000
-db %00000000
+db %00011000
+db %00110000
+db %01100000
+db %11000000
+db %11111000
+digits:
+;0-48
+db 6
+db %01110000
+db %11011000
+db %11011000
+db %11011000
+db %11011000
+db %01110000
+;1
+db 4
+db %01100000
+db %11100000
+db %01100000
+db %01100000
+db %01100000
+db %01100000
+;2
+db 6
+db %01110000
+db %11011000
+db %00011000
+db %00110000
+db %01100000
+db %11111000
+;3
+db 6
+db %01110000
+db %11011000
+db %00110000
+db %00011000
+db %11011000
+db %01110000
+;4
+db 6
+db %00011000
+db %00111000
+db %01011000
+db %11011000
+db %11111000
+db %00011000
+;5
+db 6
+db %11111000
+db %11000000
+db %11110000
+db %00011000
+db %11011000
+db %01110000
+;6
+db 6
+db %01110000
+db %11000000
+db %11110000
+db %11011000
+db %11011000
+db %01110000
+;7
+db 6
+db %11111000
+db %00011000
+db %00110000
+db %01100000
+db %01100000
+db %01100000
+;8
+db 6
+db %01110000
+db %11011000
+db %01110000
+db %11011000
+db %11011000
+db %01110000
+;9
+db 6
+db %01110000
+db %11011000
+db %11011000
+db %01111000
+db %00011000
+db %01110000
+
+
+db %11011000
+db %11011000
+db %11011000
+db %11011000
+db %01110000

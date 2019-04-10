@@ -15,14 +15,18 @@ Z80 instructions: http://clrhome.org/table/
 # TODO
 
 * game idea
-* writing text 6x6 fonts
-* develop javascript pixel editor to export defb
+* writing text 6x6 fonts DONE
+* develop javascript pixel editor to export defb DONE
 
 # Dev diary
 
 2019-04-01: pixel precise 8x8 sprite with ASWD keys control
 
 2019-04-02: spr2 height added
+
+2019-04-10: pixel text with fonts added
+
+
 
 
 
