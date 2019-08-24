@@ -1,8 +1,0 @@
-{
-  "model": "ZX Spectrum 48K",
-  "edition": "PAL",
-
-  "defaultTape": "welcome.tzx",
-  "fastLoad": false
-}
-
