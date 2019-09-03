@@ -21,24 +21,26 @@ canvas{
 * @date 2019-08-15
 * 
 * TODO
-*   - camera
 *   - friction
 *   - spin must be there wheel and ball
+*   - refactor: render,phisic,game logic should split into classes
 *
 *
-
 */
 const GRV = .2;
 const FRC = .1;
 const RGD = .3;
 const BLUR = .8;
 const AIR = .998;
-const MAG = 20;
+const MAG = 24;
 const BALL_IN_BOX = .5; 
 const BOX_DRAW_METHOD = 0;
+const DEBUG = false;
+const LAPS = 10;
 var keyGas = false;
 var keyBreak = false;
-var level = 1;//1=car
+var section_length = 0;
+var level = 1;//0=double pendulum, 1=car
 var counter = 0;
 var distance = 0;
 var points=[];
@@ -60,17 +62,17 @@ var scenes=[
         {id:200,b1:101,b2:100},
         {id:201,b1:102,b2:101},
         ],
-    track:[
-        {x:250,y:10,w:100,h:0}
-        ]
+    track:
+        {p:400,h:10,data:[0,0,0,0,0,0]}
     },
     {ball:[//1 car
         {id:100,r:10,x:270,y:600,fix:true},
-        {id:101,r:20,x:290,y:300,fix:false},
+        {id:101,r:17,x:290,y:300,fix:false},
         {id:102,r:28,x:280,y:250,fix:false},//rear wheel
-        {id:103,r:25,x:380,y:250,fix:false},//front wheel
-        {id:104,r:20,x:360,y:300,fix:false},
-        {id:105,r:10,x:330,y:400,fix:false}
+        {id:103,r:25,x:390,y:250,fix:false},//front wheel
+        {id:104,r:17,x:340,y:300,fix:false},
+        {id:105,r:10,x:330,y:400,fix:false},
+        {id:106,r:50,x:600,y:400,fix:false}//ball to play
         ],
     rod:[
         {id:200,b1:105,b2:100},
@@ -84,94 +86,21 @@ var scenes=[
         {id:208,b1:105,b2:104},
         ],
     box:[
-        {x:710,y:140,w:20},
-        {x:790,y:140,w:20},
-        {x:750,y:210,w:40},
+        {x:710,y:140,w:15},
+        {x:810,y:140,w:30},
+        {x:990,y:140,w:40},
+        {x:1050,y:210,w:50},
+        {x:1060,y:140,w:30},
+        // {x:1100,y:210,w:25},
         //{x:760,y:350,w:40},
         ],
     track:
         {p:400,h:130,data:[0,0,0,0,0,0,2,4,6,4,2,1,0,-1,-2,-4,-6,-4,-2,0,0,0,0,1,3,4,0,-4,-3,-1,0,0,0]}
-    },
-    {ball:[//2
-        {id:100,r:10,x:300,y:800,fix:true},
-        {id:101,r:30,x:320,y:300,fix:false},
-        {id:102,r:30,x:300,y:100,fix:false},
-        ],
-     rod:[
-        {id:200,b1:100,b2:101},
-        {id:200,b1:101,b2:102},
-        ]
-    },
-    {ball:[//3
-        {id:100,r:2,x:301,y:590,fix:true},
-        {id:101,r:2,x:260,y:260,fix:false},
-        {id:102,r:2,x:300,y:300,fix:false},
-        {id:103,r:2,x:340,y:260,fix:false},
-        {id:104,r:2,x:260,y:180,fix:false},
-        {id:105,r:2,x:340,y:180,fix:false},
-        {id:106,r:2,x:260,y:100,fix:false},
-        {id:107,r:2,x:340,y:100,fix:false},
-        ],
-     rod:[
-        {id:200,b1:100,b2:102},
-        {id:201,b1:102,b2:101},
-        {id:202,b1:103,b2:102},
-        {id:203,b1:101,b2:103},
-        {id:204,b1:104,b2:103},
-        {id:205,b1:104,b2:101},
-        {id:206,b1:104,b2:105},
-        {id:207,b1:105,b2:103},
-        {id:208,b1:105,b2:101},
-        {id:209,b1:106,b2:104},
-        {id:210,b1:106,b2:105},
-        {id:211,b1:107,b2:104},
-        {id:212,b1:107,b2:105},
-        {id:213,b1:107,b2:106},
-        {id:214,b1:106,b2:107},
-        ],
-     track:{p:600,data:[100,15,100,20]}
-     // box:[
-        // {idball:}
-        // ]
-    },
-    {ball:[
-        {id:100,r:2,x:300,y:800,fix:true},
-        {id:101,r:2,x:260,y:260,fix:false},
-        {id:102,r:2,x:300,y:300,fix:false},
-        {id:103,r:2,x:340,y:260,fix:false},
-        {id:104,r:2,x:260,y:180,fix:false},
-        {id:105,r:2,x:340,y:180,fix:false},
-        {id:106,r:2,x:260,y:100,fix:false},
-        {id:107,r:2,x:340,y:100,fix:false},
-        {id:108,r:2,x:420,y:100,fix:false},
-        {id:109,r:2,x:420,y:180,fix:false},
-        ],
-     rod:[
-        {id:200,b1:100,b2:102},
-        {id:201,b1:102,b2:101},
-        {id:202,b1:103,b2:102},
-        {id:203,b1:101,b2:103},
-        {id:204,b1:104,b2:103},
-        {id:205,b1:104,b2:101},
-        {id:206,b1:104,b2:105},
-        {id:207,b1:105,b2:103},
-        {id:208,b1:105,b2:101},
-        {id:209,b1:106,b2:104},
-        {id:210,b1:106,b2:105},
-        {id:211,b1:107,b2:104},
-        {id:212,b1:107,b2:105},
-        {id:213,b1:107,b2:106},
-        {id:214,b1:106,b2:107},
-        {id:215,b1:108,b2:107},
-        {id:216,b1:108,b2:105},
-        {id:217,b1:109,b2:105},
-        {id:218,b1:109,b2:107},
-        {id:219,b1:108,b2:109},
-        ]
     }
 ];
 var w,h;
 var offsetX=0;
+var camera={x:1,y:0};
 var canvas = document.getElementById('c');
 window.onkeydown = function (e) {
     if (e.key == 'd') {
@@ -203,7 +132,7 @@ document.body.onload = function () {
     var scene = scenes[level];
     for(var i=0;i<scene.ball.length; i++){
         var ball = scene.ball[i];
-        points.push(createBall(ball.id,ball.r,ball.x,ball.y,ball.fix));
+        points.push(createBall(ball.id,ball.r,ball.x,ball.y,ball.fix,0));
     }
     for(var i=0; i<scene.rod.length; i++){
         var rod = scene.rod[i];
@@ -211,13 +140,13 @@ document.body.onload = function () {
     }
     if(scene.track){
         var x = 0;
-        var p = scene.track.p;
+        section_length = scene.track.p;
         var y = scene.track.h;
         for(var i=0; i<scene.track.data.length-1; i++){
             y += scene.track.data[i]*MAG;
             var y_next = y+scene.track.data[i+1]*MAG;
-            sections.push(createTrack(x,y,p,y_next-y));
-            x+=p;
+            sections.push(createTrack(x,y,section_length,y_next-y));
+            x += section_length;
         }
     }
     if(scene.box){
@@ -232,12 +161,16 @@ function draw() {
     var ctx = canvas.getContext('2d');
     ctx.lineWidth = 2;
     //clearStrips(ctx);
-    motionBlur(ctx);
-    //cls(ctx);
-    ctx.fillStyle = '#000';
-    ctx.font = "20px Arial";
-    ctx.fillText('TIME: ' + counter++, 10, 20);
-    
+    //motionBlur(ctx);
+    cls(ctx);
+    drawDebug(ctx);
+    drawBalls(ctx);
+    drawLines(ctx);
+    drawTrack(ctx);
+    drawGround(ctx);
+    drawBoxes(ctx);
+}
+function drawBalls(ctx){
     ctx.strokeStyle = '#000';
     for(var i=0; i<points.length; i++){
         var p = points[i];
@@ -248,10 +181,12 @@ function draw() {
         }
         if(p.visible){
             ctx.beginPath();
-            ctx.arc(p.x + offsetX, h-p.y, p.r, 0, 2*Math.PI);
+            ctx.arc(p.x + camera.x, h - p.y - camera.y, p.r, 0, 2*Math.PI);
             ctx.stroke();
         }
     }
+}
+function drawLines(ctx){
     ctx.strokeStyle = '#f00';
     for(var i=0; i<lines.length; i++){
         var l = lines[i];
@@ -259,26 +194,59 @@ function draw() {
             ctx.beginPath();
             var p1 = getBallById(l.id1);
             var p2 = getBallById(l.id2);
-            ctx.moveTo(p1.x + offsetX,h - p1.y);
-            ctx.lineTo(p2.x + offsetX,h - p2.y);
+            ctx.moveTo(p1.x + camera.x,h - p1.y - camera.y);
+            ctx.lineTo(p2.x + camera.x,h - p2.y - camera.y);
             ctx.stroke();
         }
     }
-    ctx.strokeStyle = '#00f';
-    for(var i=0; i<sections.length; i++){
-        var track = sections[i];
-        ctx.beginPath();
-        ctx.moveTo(track.x + offsetX, h - 0);
-        ctx.lineTo(track.x + offsetX, h - track.y);
-        ctx.lineTo(track.x + track.w + offsetX, h - track.y - track.h);
-        ctx.lineTo(track.x + track.w + offsetX, h - 0);
-        ctx.stroke();
+}
+function drawDebug(ctx){
+    ctx.fillStyle = '#000';
+    ctx.font = "20px Arial";
+    ctx.fillText('TIME: ' + counter++, 10, 20);
+    ctx.fillText('SPEED: ' + Math.floor(getBallById(102).xv), 10, 40);
+    ctx.fillText('LENGTH: ' + Math.floor(getBallById(102).x), 10, 60);
+    ctx.fillText('LAPS: ' + Math.floor(getBallById(102).x/(section_length*sections.length)), 10, 80);
+    ctx.fillText('CONTROL: A-BREAK  D-GAS', 10, 100);
+}
+function drawTrack(ctx){
+    for(var j=0; j<LAPS; j++){
+        for(var i=0; i<sections.length; i++){
+            var track = sections[i];
+            var translate_x = track.x + camera.x + j*section_length*sections.length;
+            if(translate_x > -section_length && translate_x + track.w < w + section_length){  
+                ctx.strokeStyle = '#00f';
+                ctx.beginPath();
+                ctx.moveTo(translate_x, h - 0 - camera.y);
+                ctx.lineTo(translate_x, h - track.y - camera.y);
+                ctx.lineTo(translate_x + track.w, h - track.y - track.h - camera.y);
+                ctx.lineTo(translate_x + track.w, h - 0 - camera.y);
+                ctx.stroke();
+                if(i==0){
+                    //flag
+                    ctx.strokeStyle = '#444';
+                    ctx.beginPath();
+                    ctx.moveTo(translate_x, h - track.y - camera.y);
+                    ctx.lineTo(translate_x, h - track.y - camera.y - 60);
+                    ctx.lineTo(translate_x + 40, h - track.y - camera.y - 50);
+                    ctx.lineTo(translate_x, h - track.y - camera.y - 40);
+                    ctx.stroke();
+                }
+            }
+        }
     }
-    drawBoxes(ctx);
+}
+function drawGround(ctx){
+    ctx.strokeStyle = '#080';
+    ctx.beginPath();
+    ctx.moveTo(0,h - camera.y);
+    ctx.lineTo(w,h - camera.y);
+    ctx.stroke();
 }
 function drawBoxes(ctx){
+    ctx.strokeStyle = '#000';
     for(var i=0;i<boxes.length;i++){
-        var box=boxes[i];
+        var box = boxes[i];
         var p1 = getBallById(box.first_point_id);
         var p2 = getBallById(box.first_point_id+1);
         var p3 = getBallById(box.first_point_id+2);
@@ -291,7 +259,7 @@ function drawBoxes(ctx){
         var v = {x:b2.x-b1.x,y:b2.y-b1.y};
         var v_length = Math.sqrt(v.x*v.x+v.y*v.y);
         var v2 = {x:v.x/v_length*box.size*2 , y:v.y/v_length*box.size*2};
-        ctx.strokeStyle = '#000';
+        
         ctx.beginPath();
         if(BOX_DRAW_METHOD == 0){
             var b = [
@@ -300,18 +268,18 @@ function drawBoxes(ctx){
                 {x:c.x+(p3.x-c.x)*f, y:c.y+(p3.y-c.y)*f},
                 {x:c.x+(p4.x-c.x)*f, y:c.y+(p4.y-c.y)*f},
             ];
-            ctx.moveTo(b[0].x + offsetX, h - b[0].y);
-            ctx.lineTo(b[1].x + offsetX, h - b[1].y);
-            ctx.lineTo(b[3].x + offsetX, h - b[3].y);
-            ctx.lineTo(b[2].x + offsetX, h - b[2].y);
-            ctx.lineTo(b[0].x + offsetX, h - b[0].y);
+            ctx.moveTo(b[0].x + camera.x, h - b[0].y - camera.y);
+            ctx.lineTo(b[1].x + camera.x, h - b[1].y - camera.y);
+            ctx.lineTo(b[3].x + camera.x, h - b[3].y - camera.y);
+            ctx.lineTo(b[2].x + camera.x, h - b[2].y - camera.y);
+            ctx.lineTo(b[0].x + camera.x, h - b[0].y - camera.y);
         }
         if(BOX_DRAW_METHOD == 1){
-            ctx.moveTo(b1.x + offsetX, h - b1.y);
-            ctx.lineTo(b1.x + v2.x + offsetX, h - (b1.y+v2.y));
-            ctx.lineTo(b1.x + v2.x - v2.y + offsetX, h - (b1.y+v2.y+v2.x));
-            ctx.lineTo(b1.x - v2.y + offsetX, h - (b1.y+v2.x));
-            ctx.lineTo(b1.x + offsetX, h - b1.y);
+            ctx.moveTo(b1.x + camera.x, h - b1.y - camera.y);
+            ctx.lineTo(b1.x + v2.x + camera.x, h - (b1.y+v2.y) - camera.y);
+            ctx.lineTo(b1.x + v2.x - v2.y + camera.x, h - (b1.y+v2.y+v2.x) - camera.y);
+            ctx.lineTo(b1.x - v2.y + camera.x, h - (b1.y+v2.x) - camera.y);
+            ctx.lineTo(b1.x + camera.x, h - b1.y - camera.y);
         }
         ctx.stroke();
     }
@@ -321,23 +289,31 @@ function interact(){
         getBallById(102).xv = 4;
     }
     if(level==0){
-        offsetX = -getBallById(100).x+w/2;
+        camera.x = -getBallById(100).x+w/2;
     }
     if(level==1){
-        if(counter==120){
-            disableLine(207);
-            
+        if(counter==10){
+            getBallById(100).visible = false;
+            getBallById(101).visible = false;
+            getBallById(104).visible = false;
+            getBallById(105).visible = false;
+            getLineById(202).visible = false;
+            getLineById(205).visible = false;
         }
-        if(counter==340){
+        if(counter==120){
+            disableLine(207);  
+        }
+        if(counter==130){
             disableLine(208);
         }
-        offsetX = -getBallById(102).x+w/2;//rear wheel
+        camera.x = -getBallById(102).x+w/2;//rear wheel
+        camera.y = -getBallById(102).y+h/2;//rear wheel
         var p_rear = getBallById(102);
         var p_front = getBallById(103);
         if(keyGas){
             if(p_rear.collied){
-                p_rear.xv += 2;
-                if(p_rear.xv>200)p_rear.xv=200;
+                p_rear.xv += .7;
+                if(p_rear.xv>150)p_rear.xv=150;
                 p_front.xv = p_rear.xv;
             }
         }
@@ -356,7 +332,7 @@ function interact(){
     }
     if(level==3){
         var p = getBallById(100);
-        //offsetX = -p.x+w/2;
+        //camera.x = -p.x+w/2;
         if(Math.abs(mouse.x-p.x)<30 && Math.abs(h-mouse.y-p.y)<30){
             p.x = mouse.x;
             p.y = h-mouse.y;
@@ -375,29 +351,36 @@ function collition(){
         p.collied = false;
         //with ground
         if(p.y-p.r<0){
+            p.y -=p.y-p.r;
             p.yv=-(p.y-p.r)*.6;
             p.collied = true;
-            //p.xv=p.xv * 0.9;//friction
+            if(p.id!=102 && p.id!=103 && p.id != 106){// friction if p not front and not rear wheel
+                p.xv *= .9;
+            }
         }
         //with track
-        for(var j=0; j<sections.length; j++){
-            var track = sections[j];
-            if(p.x >= track.x && p.x < track.x + track.w){
-                var p_diff = getPointByLineAndCircle(track.x,track.y,track.w,track.h,p.x,p.y);
-                var dist = Math.sqrt((p.x-p_diff.x)*(p.x-p_diff.x)+(p.y-p_diff.y)*(p.y-p_diff.y));
-                if(dist - p.r < 0){
-                    //p.yv=0;
-                    var diff = dist - p.r;
-                    var xa = (p_diff.x-p.x ) / dist * diff;
-                    var ya = (p_diff.y-p.y) / dist * diff;
-                    p.yv = ya;//BUG
-                    //p.xv=xa;
-                    //p.xv += xa*.1;
-                    p.xv += xa;
-                    p.collied = true;
-                    //TODO friction
-                    //p.xv *= .5;
-                    //p.yv *= .5;
+        for(var k=0; k<LAPS; k++){
+            for(var j=0; j<sections.length; j++){
+                var track = sections[j];
+                var translate_x = track.x + k*section_length*sections.length;
+                if(p.x >= translate_x && p.x < translate_x + track.w){
+                    var p_other = getBallFromSection(translate_x, track.y, track.w, track.h);
+                    if(p.getDistanceDiff(p_other) < 0){
+                        var v = p.getVector(p_other);
+                        if(p.id == 106){//bouncing
+                            p.x += v.x * .1;
+                            p.y += v.y * .1;
+                        }else{
+                            p.x += v.x;
+                            p.y += v.y;
+                        }
+                        p.xv += v.x;
+                        p.yv += v.y;
+                        if(p.id!=102 && p.id!=103 && p.id != 106){// friction
+                            p.xv *= .9;
+                        }
+                        p.collied = true;
+                    }
                 }
             }
         }
@@ -406,12 +389,13 @@ function collition(){
             var p_other = points[j];
             if(j!=i && notConnected(p,p_other) && p.getDistanceDiff(p_other) < 0){
                 var v = p.getVector(p_other);
-                p.xv += v.x*.5;
-                p.yv += v.y*.5;
-                p.xv *= .9;
-                p.yv *= .9;
+                p.x += v.x * .5;
+                p.y += v.y * .5;
+                p.xv += v.x;
+                p.yv += v.y;
+                //p.xv *= .9;
+                //p.yv *= .9;
                 p.collied = true;
-                //console.log(p.id+' and '+p_other.id);
             }
         }
     }
@@ -424,22 +408,29 @@ function notConnected(p1,p2){
     }
     return true;
 }
-function getPointByLineAndCircle(x,y,w,h,xc,yc){
-    if(h==0)h=.00001;
-    if(w==0)w=.00001;
-    var x2 = (w*w/h*xc+w*yc+h*x-w*y)/(w*w/h+h);
-    var y2 = (h*x-h*xc-h*h/w*yc-w*y)/(-w-h*h/w);
-    return {x:x2,y:y2};
+function getBallFromSection(x, y, w, h){
+    const M = 100;
+    var center = {
+        x: x + w/2 + h*M,
+        y: y + h/2 - w*M};//calculate center
+    var vector = {
+        x: x - center.x,
+        y: y - center.y};
+    var r = Math.sqrt(vector.x * vector.x + vector.y * vector.y);
+    return {x: center.x, y: center.y, r: r};
 }
 function forces(){
     for(var i=0; i<points.length; i++){
         points[i].lines = 0;
     }
     for(var i=0; i<lines.length; i++){
-        var p1 = getBallById(lines[i].id1);
-        var p2 = getBallById(lines[i].id2);
-        p1.lines++;
-        p2.lines++;
+        var line = lines[i];
+        var p1 = getBallById(line.id1);
+        var p2 = getBallById(line.id2);
+        if(line.active){
+            p1.lines++;
+            p2.lines++;
+        }
     }
     for(var i=0; i<lines.length; i++){
         var line = lines[i];
@@ -471,8 +462,18 @@ function forces(){
         }
     }
 }
-function createBall(id,r,x,y,fixed){
-    return {id:id, r:r, x:x, y:y, fixed:fixed, xv:0, yv:0, collied:false, lines:0, visible:true,
+function createBall(id,r,x,y,fixed,hardness){
+    return {id:id, 
+        r:r, 
+        x:x, 
+        y:y, 
+        fixed:fixed,
+        hardness:hardness,
+        xv:0, 
+        yv:0, 
+        collied:false, 
+        lines:0, 
+        visible:true,
         getDistanceDiff:function(p){
             return Math.sqrt((p.x-this.x)*(p.x-this.x)+(p.y-this.y)*(p.y-this.y))-this.r-p.r;
         },
@@ -500,26 +501,28 @@ function createBox(x,y,w){
     for(var i=0;i<lines.length;i++){
         if(lines[i].id>last_line_id)last_line_id=lines[i].id;
     }
-    points.push(createBall(++last_point_id,ball_size,x+w/2,y+w/2,false));
-    points.push(createBall(++last_point_id,ball_size,x+w*1.5,y+w/2,false));
-    points.push(createBall(++last_point_id,ball_size,x+w/2,y+w*1.5,false));
-    points.push(createBall(++last_point_id,ball_size,x+w*1.5,y+w*1.5,false));
+    points.push(createBall(++last_point_id,ball_size,x+w/2,y+w/2,false,0));
+    points.push(createBall(++last_point_id,ball_size,x+w*1.5,y+w/2,false,0));
+    points.push(createBall(++last_point_id,ball_size,x+w/2,y+w*1.5,false,0));
+    points.push(createBall(++last_point_id,ball_size,x+w*1.5,y+w*1.5,false,0));
     lines.push(createLine(++last_line_id,last_point_id-3,last_point_id-2));
     lines.push(createLine(++last_line_id,last_point_id-0,last_point_id-1));
     lines.push(createLine(++last_line_id,last_point_id-3,last_point_id-1));
     lines.push(createLine(++last_line_id,last_point_id-2,last_point_id-0));
     lines.push(createLine(++last_line_id,last_point_id-3,last_point_id-0));
     lines.push(createLine(++last_line_id,last_point_id-2,last_point_id-1));
-    getBallById(last_point_id-3).visible = false;
-    getBallById(last_point_id-2).visible = false;
-    getBallById(last_point_id-1).visible = false;
-    getBallById(last_point_id).visible = false;
-    getLineById(last_line_id-5).visible = false;
-    getLineById(last_line_id-4).visible = false;
-    getLineById(last_line_id-3).visible = false;
-    getLineById(last_line_id-2).visible = false;
-    getLineById(last_line_id-1).visible = false;
-    getLineById(last_line_id).visible = false;
+    if(!DEBUG){
+        getBallById(last_point_id-3).visible = false;
+        getBallById(last_point_id-2).visible = false;
+        getBallById(last_point_id-1).visible = false;
+        getBallById(last_point_id).visible = false;
+        getLineById(last_line_id-5).visible = false;
+        getLineById(last_line_id-4).visible = false;
+        getLineById(last_line_id-3).visible = false;
+        getLineById(last_line_id-2).visible = false;
+        getLineById(last_line_id-1).visible = false;
+        getLineById(last_line_id).visible = false;
+    }
     return {first_point_id:last_point_id-3,size:w};
 }
 function clearStrips(ctx){
