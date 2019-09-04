@@ -11,10 +11,31 @@ html,body{
 canvas{
     margin:0px;
 }
+#left,#right{
+    position:fixed;
+    bottom:0px;
+    background-color:rgba(128,128,128,.3);
+    color:rgba(0,0,0,.3);
+    width:25%; 
+    text-align:center;
+    padding-top:1%;
+    padding-bottom:1%;
+    font-size:20vh;
+    display:none;
+}
+#left{
+    left:0px;
+}
+#right{
+    right:0px;
+}
 </style>
 </head>
 <body>
 <canvas id="c"></canvas>
+<div id="left">&#8678;</div>
+<div id="right">&#8680;</div>
+<script src="TinyPhysic2D.js"></script>
 <script>
 /**
 * @author istvan.szalontai12@gmail.com
@@ -27,26 +48,12 @@ canvas{
 *
 *
 */
-const GRV = .2;
-const FRC = .1;
-const RGD = .3;
-const BLUR = .8;
-const AIR = .998;
+
 const MAG = 24;
-const BALL_IN_BOX = .5; 
-const BOX_DRAW_METHOD = 0;
-const DEBUG = false;
-const LAPS = 10;
 var keyGas = false;
 var keyBreak = false;
-var section_length = 0;
 var level = 1;//0=double pendulum, 1=car
 var counter = 0;
-var distance = 0;
-var points=[];
-var lines=[];
-var sections=[];
-var boxes=[];
 var mouse={x:0,y:0};
 var roadData=[-10,-8,-6,-4,-2,0,10,8,6,4,2,0,-2,-4,-2,0,4,8,12,-40,0,40,-2,-1,0,1,3,5,7];
 /*
@@ -98,10 +105,7 @@ var scenes=[
         {p:400,h:130,data:[0,0,0,0,0,0,2,4,6,4,2,1,0,-1,-2,-4,-6,-4,-2,0,0,0,0,1,3,4,0,-4,-3,-1,0,0,0]}
     }
 ];
-var w,h;
-var offsetX=0;
-var camera={x:1,y:0};
-var canvas = document.getElementById('c');
+
 window.onkeydown = function (e) {
     if (e.key == 'd') {
         keyGas=true;
@@ -125,18 +129,35 @@ window.onmousedown = function (e) {
     
     
 }
+window.mobileAndTabletcheck = function() {
+  var check = false;
+  (function(a){if(/(android|bb\d+|meego).+mobile|avantgo|bada\/|blackberry|blazer|compal|elaine|fennec|hiptop|iemobile|ip(hone|od)|iris|kindle|lge |maemo|midp|mmp|mobile.+firefox|netfront|opera m(ob|in)i|palm( os)?|phone|p(ixi|re)\/|plucker|pocket|psp|series(4|6)0|symbian|treo|up\.(browser|link)|vodafone|wap|windows ce|xda|xiino|android|ipad|playbook|silk/i.test(a)||/1207|6310|6590|3gso|4thp|50[1-6]i|770s|802s|a wa|abac|ac(er|oo|s\-)|ai(ko|rn)|al(av|ca|co)|amoi|an(ex|ny|yw)|aptu|ar(ch|go)|as(te|us)|attw|au(di|\-m|r |s )|avan|be(ck|ll|nq)|bi(lb|rd)|bl(ac|az)|br(e|v)w|bumb|bw\-(n|u)|c55\/|capi|ccwa|cdm\-|cell|chtm|cldc|cmd\-|co(mp|nd)|craw|da(it|ll|ng)|dbte|dc\-s|devi|dica|dmob|do(c|p)o|ds(12|\-d)|el(49|ai)|em(l2|ul)|er(ic|k0)|esl8|ez([4-7]0|os|wa|ze)|fetc|fly(\-|_)|g1 u|g560|gene|gf\-5|g\-mo|go(\.w|od)|gr(ad|un)|haie|hcit|hd\-(m|p|t)|hei\-|hi(pt|ta)|hp( i|ip)|hs\-c|ht(c(\-| |_|a|g|p|s|t)|tp)|hu(aw|tc)|i\-(20|go|ma)|i230|iac( |\-|\/)|ibro|idea|ig01|ikom|im1k|inno|ipaq|iris|ja(t|v)a|jbro|jemu|jigs|kddi|keji|kgt( |\/)|klon|kpt |kwc\-|kyo(c|k)|le(no|xi)|lg( g|\/(k|l|u)|50|54|\-[a-w])|libw|lynx|m1\-w|m3ga|m50\/|ma(te|ui|xo)|mc(01|21|ca)|m\-cr|me(rc|ri)|mi(o8|oa|ts)|mmef|mo(01|02|bi|de|do|t(\-| |o|v)|zz)|mt(50|p1|v )|mwbp|mywa|n10[0-2]|n20[2-3]|n30(0|2)|n50(0|2|5)|n7(0(0|1)|10)|ne((c|m)\-|on|tf|wf|wg|wt)|nok(6|i)|nzph|o2im|op(ti|wv)|oran|owg1|p800|pan(a|d|t)|pdxg|pg(13|\-([1-8]|c))|phil|pire|pl(ay|uc)|pn\-2|po(ck|rt|se)|prox|psio|pt\-g|qa\-a|qc(07|12|21|32|60|\-[2-7]|i\-)|qtek|r380|r600|raks|rim9|ro(ve|zo)|s55\/|sa(ge|ma|mm|ms|ny|va)|sc(01|h\-|oo|p\-)|sdk\/|se(c(\-|0|1)|47|mc|nd|ri)|sgh\-|shar|sie(\-|m)|sk\-0|sl(45|id)|sm(al|ar|b3|it|t5)|so(ft|ny)|sp(01|h\-|v\-|v )|sy(01|mb)|t2(18|50)|t6(00|10|18)|ta(gt|lk)|tcl\-|tdg\-|tel(i|m)|tim\-|t\-mo|to(pl|sh)|ts(70|m\-|m3|m5)|tx\-9|up(\.b|g1|si)|utst|v400|v750|veri|vi(rg|te)|vk(40|5[0-3]|\-v)|vm40|voda|vulc|vx(52|53|60|61|70|80|81|83|85|98)|w3c(\-| )|webc|whit|wi(g |nc|nw)|wmlb|wonu|x700|yas\-|your|zeto|zte\-/i.test(a.substr(0,4))) check = true;})(navigator.userAgent||navigator.vendor||window.opera);
+  return check;
+};
 document.body.onload = function () {
-    w = canvas.width = document.body.clientWidth;
-    h = canvas.height = document.body.clientHeight-20;
+    TinyPhysic2D.init();
+ 
+    if(mobileAndTabletcheck()){
+        var left = document.getElementById('left');
+        var right = document.getElementById('right');
+        
+        left.style.display = 'block';
+        left.addEventListener("touchstart",function(){keyBreak=true;});
+        left.addEventListener("touchend",function(){keyBreak=false;});
+        
+        right.style.display = 'block';
+        right.addEventListener("touchstart",function(){keyGas=true;});
+        right.addEventListener("touchend",function(){keyGas=false;});
+    }
     //car
     var scene = scenes[level];
     for(var i=0;i<scene.ball.length; i++){
         var ball = scene.ball[i];
-        points.push(createBall(ball.id,ball.r,ball.x,ball.y,ball.fix,0));
+        TinyPhysic2D.addBall(ball.id,ball.r,ball.x,ball.y,ball.fix,0);
     }
     for(var i=0; i<scene.rod.length; i++){
         var rod = scene.rod[i];
-        lines.push(createLine(rod.id,rod.b1,rod.b2));
+        TinyPhysic2D.addLine(rod.id,rod.b1,rod.b2);
     }
     if(scene.track){
         var x = 0;
@@ -145,146 +166,28 @@ document.body.onload = function () {
         for(var i=0; i<scene.track.data.length-1; i++){
             y += scene.track.data[i]*MAG;
             var y_next = y+scene.track.data[i+1]*MAG;
-            sections.push(createTrack(x,y,section_length,y_next-y));
+            TinyPhysic2D.addTrack(x, y, section_length, y_next-y);
             x += section_length;
         }
     }
     if(scene.box){
         for(var i=0; i<scene.box.length; i++){
             var box = scene.box[i];
-            boxes.push(createBox(box.x,box.y,box.w));
+            TinyPhysic2D.addBox(box.x, box.y, box.w);
         }
     }
+    TinyPhysic2D.lookTo(102);//rear wheel
     loop();
 }
-function draw() {
-    var ctx = canvas.getContext('2d');
-    ctx.lineWidth = 2;
-    //clearStrips(ctx);
-    //motionBlur(ctx);
-    cls(ctx);
-    drawDebug(ctx);
-    drawBalls(ctx);
-    drawLines(ctx);
-    drawTrack(ctx);
-    drawGround(ctx);
-    drawBoxes(ctx);
-}
-function drawBalls(ctx){
-    ctx.strokeStyle = '#000';
-    for(var i=0; i<points.length; i++){
-        var p = points[i];
-        if(p.collied){
-            ctx.strokeStyle = '#0f0';
-        }else{
-            ctx.strokeStyle = '#000';
-        }
-        if(p.visible){
-            ctx.beginPath();
-            ctx.arc(p.x + camera.x, h - p.y - camera.y, p.r, 0, 2*Math.PI);
-            ctx.stroke();
-        }
-    }
-}
-function drawLines(ctx){
-    ctx.strokeStyle = '#f00';
-    for(var i=0; i<lines.length; i++){
-        var l = lines[i];
-        if(l.active && l.visible){
-            ctx.beginPath();
-            var p1 = getBallById(l.id1);
-            var p2 = getBallById(l.id2);
-            ctx.moveTo(p1.x + camera.x,h - p1.y - camera.y);
-            ctx.lineTo(p2.x + camera.x,h - p2.y - camera.y);
-            ctx.stroke();
-        }
-    }
-}
-function drawDebug(ctx){
-    ctx.fillStyle = '#000';
-    ctx.font = "20px Arial";
-    ctx.fillText('TIME: ' + counter++, 10, 20);
-    ctx.fillText('SPEED: ' + Math.floor(getBallById(102).xv), 10, 40);
-    ctx.fillText('LENGTH: ' + Math.floor(getBallById(102).x), 10, 60);
-    ctx.fillText('LAPS: ' + Math.floor(getBallById(102).x/(section_length*sections.length)), 10, 80);
-    ctx.fillText('CONTROL: A-BREAK  D-GAS', 10, 100);
-}
-function drawTrack(ctx){
-    for(var j=0; j<LAPS; j++){
-        for(var i=0; i<sections.length; i++){
-            var track = sections[i];
-            var translate_x = track.x + camera.x + j*section_length*sections.length;
-            if(translate_x > -section_length && translate_x + track.w < w + section_length){  
-                ctx.strokeStyle = '#00f';
-                ctx.beginPath();
-                ctx.moveTo(translate_x, h - 0 - camera.y);
-                ctx.lineTo(translate_x, h - track.y - camera.y);
-                ctx.lineTo(translate_x + track.w, h - track.y - track.h - camera.y);
-                ctx.lineTo(translate_x + track.w, h - 0 - camera.y);
-                ctx.stroke();
-                if(i==0){
-                    //flag
-                    ctx.strokeStyle = '#444';
-                    ctx.beginPath();
-                    ctx.moveTo(translate_x, h - track.y - camera.y);
-                    ctx.lineTo(translate_x, h - track.y - camera.y - 60);
-                    ctx.lineTo(translate_x + 40, h - track.y - camera.y - 50);
-                    ctx.lineTo(translate_x, h - track.y - camera.y - 40);
-                    ctx.stroke();
-                }
-            }
-        }
-    }
-}
-function drawGround(ctx){
-    ctx.strokeStyle = '#080';
-    ctx.beginPath();
-    ctx.moveTo(0,h - camera.y);
-    ctx.lineTo(w,h - camera.y);
-    ctx.stroke();
-}
-function drawBoxes(ctx){
-    ctx.strokeStyle = '#000';
-    for(var i=0;i<boxes.length;i++){
-        var box = boxes[i];
-        var p1 = getBallById(box.first_point_id);
-        var p2 = getBallById(box.first_point_id+1);
-        var p3 = getBallById(box.first_point_id+2);
-        var p4 = getBallById(box.first_point_id+3);
-        
-        var c = {x:(p1.x+p2.x+p3.x+p4.x)/4,y:(p1.y+p2.y+p3.y+p4.y)/4};
-        var f = BALL_IN_BOX*2+1;
-        var b1 = {x:c.x+(p1.x-c.x)*f, y:c.y+(p1.y-c.y)*f};
-        var b2 = {x:c.x+(p2.x-c.x)*f, y:c.y+(p2.y-c.y)*f};
-        var v = {x:b2.x-b1.x,y:b2.y-b1.y};
-        var v_length = Math.sqrt(v.x*v.x+v.y*v.y);
-        var v2 = {x:v.x/v_length*box.size*2 , y:v.y/v_length*box.size*2};
-        
-        ctx.beginPath();
-        if(BOX_DRAW_METHOD == 0){
-            var b = [
-                {x:c.x+(p1.x-c.x)*f, y:c.y+(p1.y-c.y)*f},
-                {x:c.x+(p2.x-c.x)*f, y:c.y+(p2.y-c.y)*f},
-                {x:c.x+(p3.x-c.x)*f, y:c.y+(p3.y-c.y)*f},
-                {x:c.x+(p4.x-c.x)*f, y:c.y+(p4.y-c.y)*f},
-            ];
-            ctx.moveTo(b[0].x + camera.x, h - b[0].y - camera.y);
-            ctx.lineTo(b[1].x + camera.x, h - b[1].y - camera.y);
-            ctx.lineTo(b[3].x + camera.x, h - b[3].y - camera.y);
-            ctx.lineTo(b[2].x + camera.x, h - b[2].y - camera.y);
-            ctx.lineTo(b[0].x + camera.x, h - b[0].y - camera.y);
-        }
-        if(BOX_DRAW_METHOD == 1){
-            ctx.moveTo(b1.x + camera.x, h - b1.y - camera.y);
-            ctx.lineTo(b1.x + v2.x + camera.x, h - (b1.y+v2.y) - camera.y);
-            ctx.lineTo(b1.x + v2.x - v2.y + camera.x, h - (b1.y+v2.y+v2.x) - camera.y);
-            ctx.lineTo(b1.x - v2.y + camera.x, h - (b1.y+v2.x) - camera.y);
-            ctx.lineTo(b1.x + camera.x, h - b1.y - camera.y);
-        }
-        ctx.stroke();
-    }
+
+function drawDebug(){
+    TinyPhysic2D.drawText('TIME: ' + counter, 10, 20);
+    TinyPhysic2D.drawText('SPEED: ' + Math.floor(TinyPhysic2D.getBallById(102).xv), 10, 40);
+    TinyPhysic2D.drawText('LENGTH: ' + Math.floor(TinyPhysic2D.getBallById(102).x), 10, 60);
+    TinyPhysic2D.drawText('CONTROL: A-BREAK  D-GAS', 10, 80);
 }
 function interact(){
+    counter++;
     if(level==0 && counter>250 && counter <350){
         getBallById(102).xv = 4;
     }
@@ -293,23 +196,23 @@ function interact(){
     }
     if(level==1){
         if(counter==10){
-            getBallById(100).visible = false;
-            getBallById(101).visible = false;
-            getBallById(104).visible = false;
-            getBallById(105).visible = false;
-            getLineById(202).visible = false;
-            getLineById(205).visible = false;
+            TinyPhysic2D.getBallById(100).visible = false;
+            TinyPhysic2D.getBallById(101).visible = false;
+            TinyPhysic2D.getBallById(104).visible = false;
+            TinyPhysic2D.getBallById(105).visible = false;
+            TinyPhysic2D.getLineById(202).visible = false;
+            TinyPhysic2D.getLineById(205).visible = false;
         }
         if(counter==120){
-            disableLine(207);  
+            TinyPhysic2D.disableLine(207);  
         }
         if(counter==130){
-            disableLine(208);
+            TinyPhysic2D.disableLine(208);
         }
-        camera.x = -getBallById(102).x+w/2;//rear wheel
-        camera.y = -getBallById(102).y+h/2;//rear wheel
-        var p_rear = getBallById(102);
-        var p_front = getBallById(103);
+        //camera.x = -getBallById(102).x+w/2;//rear wheel
+        //camera.y = -getBallById(102).y+h/2;//rear wheel
+        var p_rear = TinyPhysic2D.getBallById(102);
+        var p_front = TinyPhysic2D.getBallById(103);
         if(keyGas){
             if(p_rear.collied){
                 p_rear.xv += .7;
@@ -330,271 +233,12 @@ function interact(){
             }
         }
     }
-    if(level==3){
-        var p = getBallById(100);
-        //camera.x = -p.x+w/2;
-        if(Math.abs(mouse.x-p.x)<30 && Math.abs(h-mouse.y-p.y)<30){
-            p.x = mouse.x;
-            p.y = h-mouse.y;
-            p.xv = 0;
-            p.yv =0;
-        }
-    }
-    if(level==3 && counter>250 && counter <370){
-        //getBallById(106).xv = 4;
-    }
-}
-
-function collition(){
-    for(var i=0; i<points.length; i++){
-        var p = points[i];
-        p.collied = false;
-        //with ground
-        if(p.y-p.r<0){
-            p.y -=p.y-p.r;
-            p.yv=-(p.y-p.r)*.6;
-            p.collied = true;
-            if(p.id!=102 && p.id!=103 && p.id != 106){// friction if p not front and not rear wheel
-                p.xv *= .9;
-            }
-        }
-        //with track
-        for(var k=0; k<LAPS; k++){
-            for(var j=0; j<sections.length; j++){
-                var track = sections[j];
-                var translate_x = track.x + k*section_length*sections.length;
-                if(p.x >= translate_x && p.x < translate_x + track.w){
-                    var p_other = getBallFromSection(translate_x, track.y, track.w, track.h);
-                    if(p.getDistanceDiff(p_other) < 0){
-                        var v = p.getVector(p_other);
-                        if(p.id == 106){//bouncing
-                            p.x += v.x * .1;
-                            p.y += v.y * .1;
-                        }else{
-                            p.x += v.x;
-                            p.y += v.y;
-                        }
-                        p.xv += v.x;
-                        p.yv += v.y;
-                        if(p.id!=102 && p.id!=103 && p.id != 106){// friction
-                            p.xv *= .9;
-                        }
-                        p.collied = true;
-                    }
-                }
-            }
-        }
-        //with others
-        for(var j=0; j<points.length; j++){
-            var p_other = points[j];
-            if(j!=i && notConnected(p,p_other) && p.getDistanceDiff(p_other) < 0){
-                var v = p.getVector(p_other);
-                p.x += v.x * .5;
-                p.y += v.y * .5;
-                p.xv += v.x;
-                p.yv += v.y;
-                //p.xv *= .9;
-                //p.yv *= .9;
-                p.collied = true;
-            }
-        }
-    }
-}
-function notConnected(p1,p2){
-    for(var i=0;i<lines.length;i++){
-        var line = lines[i];
-        if(line.id1 == p1.id && line.id2 == p2.id)return false;
-        if(line.id1 == p2.id && line.id2 == p1.id)return false;
-    }
-    return true;
-}
-function getBallFromSection(x, y, w, h){
-    const M = 100;
-    var center = {
-        x: x + w/2 + h*M,
-        y: y + h/2 - w*M};//calculate center
-    var vector = {
-        x: x - center.x,
-        y: y - center.y};
-    var r = Math.sqrt(vector.x * vector.x + vector.y * vector.y);
-    return {x: center.x, y: center.y, r: r};
-}
-function forces(){
-    for(var i=0; i<points.length; i++){
-        points[i].lines = 0;
-    }
-    for(var i=0; i<lines.length; i++){
-        var line = lines[i];
-        var p1 = getBallById(line.id1);
-        var p2 = getBallById(line.id2);
-        if(line.active){
-            p1.lines++;
-            p2.lines++;
-        }
-    }
-    for(var i=0; i<lines.length; i++){
-        var line = lines[i];
-        if(line.active){
-            var p1 = getBallById(line.id1);
-            var p2 = getBallById(line.id2);
-            var newDistance = getDistance(p1,p2);
-            var diff = newDistance - line.length;
-            var xa = (p2.x - p1.x) / newDistance * diff;
-            var ya = (p2.y - p1.y) / newDistance * diff;
-            if(!p1.fixed){
-                p1.xv += xa / p1.lines;
-                p1.yv += ya / p1.lines;
-            }
-            if(!p2.fixed){
-                p2.xv -= xa / p2.lines;
-                p2.yv -= ya / p2.lines;
-            }
-        }
-    }
-    for(var i=0; i<points.length; i++){
-        var p = points[i];
-        if(!p.fixed){
-            p.yv -= GRV;
-            p.x += p.xv;
-            p.y += p.yv;
-            p.xv *= AIR;//air resist
-            p.yv *= AIR;
-        }
-    }
-}
-function createBall(id,r,x,y,fixed,hardness){
-    return {id:id, 
-        r:r, 
-        x:x, 
-        y:y, 
-        fixed:fixed,
-        hardness:hardness,
-        xv:0, 
-        yv:0, 
-        collied:false, 
-        lines:0, 
-        visible:true,
-        getDistanceDiff:function(p){
-            return Math.sqrt((p.x-this.x)*(p.x-this.x)+(p.y-this.y)*(p.y-this.y))-this.r-p.r;
-        },
-        getVector:function(p){
-            var distancePoints =  Math.sqrt((p.x-this.x)*(p.x-this.x)+(p.y-this.y)*(p.y-this.y));
-            var diff = (p.r + this.r) - distancePoints;
-            var xd = (this.x - p.x) / distancePoints * diff;
-            var yd = (this.y - p.y) / distancePoints * diff;
-            return {x:xd,y:yd};
-        }
-    };
-}
-function createLine(id, id1,id2){
-    var p1 = getBallById(id1);
-    var p2 = getBallById(id2);
-    return {id:id, id1:id1, id2:id2, length:getDistance(p1,p2), active:true, visible:true};
-}
-function createBox(x,y,w){
-    var last_point_id = 0;
-    var last_line_id = 0;
-    var ball_size=w*BALL_IN_BOX;
-    for(var i=0;i<points.length;i++){
-        if(points[i].id>last_point_id)last_point_id=points[i].id;
-    }
-    for(var i=0;i<lines.length;i++){
-        if(lines[i].id>last_line_id)last_line_id=lines[i].id;
-    }
-    points.push(createBall(++last_point_id,ball_size,x+w/2,y+w/2,false,0));
-    points.push(createBall(++last_point_id,ball_size,x+w*1.5,y+w/2,false,0));
-    points.push(createBall(++last_point_id,ball_size,x+w/2,y+w*1.5,false,0));
-    points.push(createBall(++last_point_id,ball_size,x+w*1.5,y+w*1.5,false,0));
-    lines.push(createLine(++last_line_id,last_point_id-3,last_point_id-2));
-    lines.push(createLine(++last_line_id,last_point_id-0,last_point_id-1));
-    lines.push(createLine(++last_line_id,last_point_id-3,last_point_id-1));
-    lines.push(createLine(++last_line_id,last_point_id-2,last_point_id-0));
-    lines.push(createLine(++last_line_id,last_point_id-3,last_point_id-0));
-    lines.push(createLine(++last_line_id,last_point_id-2,last_point_id-1));
-    if(!DEBUG){
-        getBallById(last_point_id-3).visible = false;
-        getBallById(last_point_id-2).visible = false;
-        getBallById(last_point_id-1).visible = false;
-        getBallById(last_point_id).visible = false;
-        getLineById(last_line_id-5).visible = false;
-        getLineById(last_line_id-4).visible = false;
-        getLineById(last_line_id-3).visible = false;
-        getLineById(last_line_id-2).visible = false;
-        getLineById(last_line_id-1).visible = false;
-        getLineById(last_line_id).visible = false;
-    }
-    return {first_point_id:last_point_id-3,size:w};
-}
-function clearStrips(ctx){
-    var x,y;
-    for(var i=0; i<200; i++){
-        x=Math.floor(Math.random()*w);
-        y=Math.floor(Math.random()*h);
-        ctx.clearRect(0, y, w, 2);
-        ctx.clearRect(x, 0, 2, h);
-    }
-}
-function cls(ctx){
-    ctx.clearRect(0, 0, w, h);
-}
-function motionBlur(ctx){
-    ctx.fillStyle = 'rgba(255,255,255,'+BLUR+')';
-    ctx.fillRect(0,0,w,h);
-}
-function disableLine(id){
-    getLineById(id).active = false;
-}
-function createTrack(x,y,w,h){
-    return{x:x,y:y,w:w,h:h};
-}
-function createSection(x1, y1, x2, y2){
-    const M = 10;
-    var xd = x2 - x1;
-    var yd = y2 - y1;
-    var xc = x1 + xd/2 + yd * M;
-    var yc = y1 + yd/2 - xd * M;
-    console.log(xc+' , '+yc)
-    var r = Math.sqrt(xd * M * xd * M + yd * M * yd * M);
-    return {x1:x1, y1:y1, x2:x2, y2:y2, xc:xc, yc:yc, r:r,
-    getDistanceDiff:function(p){
-        if(p.x >= x1 && p.x <= x2){
-            return Math.sqrt((p.x-xc)*(p.x-xc)+(p.y-yc)*(p.y-yc))-r-p.r;
-        }else{
-            return 1;
-        }
-    },getVector:function(p){
-        var distancePoints =  Math.sqrt((p.x-xc)*(p.x-xc)+(p.y-yc)*(p.y-yc));
-        var diff = (p.r + r) - distancePoints;
-        var xd = (p.x - xc) / distancePoints * diff;
-        var yd = (p.y - yc) / distancePoints * diff;
-        return {x:xd,y:yd};
-    }};
-}
-function getBallById(id){
-    for(var i=0; i<points.length; i++){
-        if(points[i].id == id){return points[i];}
-    }
-}
-function getLineById(id){
-    for(var i=0; i<lines.length; i++){
-        if(lines[i].id == id){return lines[i];}
-    }
-}
-function getBallDistance(p1,p2){
-    var x = p1.x - p2.x;
-    var y = p1.y - p2.y;
-    return Math.sqrt(x*x+y*y)-p1.r-p2.r;
-}
-function getDistance(p1,p2){
-    var x = p1.x - p2.x;
-    var y = p1.y - p2.y;
-    return Math.sqrt(x*x+y*y);
 }
 function loop(){
     interact();
-    collition();
-    forces();
-    draw();
+    TinyPhysic2D.update();
+    TinyPhysic2D.draw();
+    drawDebug();
     requestAnimationFrame(loop);
 }
 </script>
