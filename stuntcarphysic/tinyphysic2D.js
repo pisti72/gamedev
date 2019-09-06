@@ -1,19 +1,18 @@
 var TinyPhysic2D = {
-    GRV: .2,
-    FRC: .1,
-    RGD: .3,
+    GRAVITY: -.25,
+    FRICTION: .9,
+    SOFTNESS: .1,
     BLUR: .8,
-    AIR:.998,
-    MAG: 24,
-    BALL_IN_BOX:.5, 
+    AIR:.9995,
+    MAG: 50,
     BOX_DRAW_METHOD: 0,
     CLS_METHOD:0,
     DEBUG: false,
     w:0,
     h:0,
-    camera:{x:0,y:0,lookTo:0},
-    lookTo:function(ballId){
-        this.camera.lookTo = ballId; 
+    camera:{x:0,y:0,lookAt:0},
+    lookAt:function(ballId){
+        this.camera.lookAt = ballId; 
     },
     canvas:{},
     ctx:{},
@@ -22,30 +21,32 @@ var TinyPhysic2D = {
     sections:[],
     boxes:[],
     init:function(){
-        this.canvas = document.getElementById('c');
+        this.canvas = document.getElementsByTagName('canvas')[0];
         this.w = this.canvas.width = document.body.clientWidth;
         this.h = this.canvas.height = document.body.clientHeight-20;
         //create canvas here somehow
     },
-    addBall:function(id,r,x,y,fixed,hardness){
+    addBall:function(id,r,x,y,fixed,wheel,soft){
         var ball = {
             id:id, 
             r:r, 
             x:x, 
             y:y, 
             fixed:fixed,
-            hardness:hardness,
+            soft:soft,
+            wheel:wheel,
             xv:0, 
             yv:0, 
             collied:false, 
             linesCount:0, 
             visible:true,
+            boxId:9999,
             getDistanceDiff:function(p){
                 return Math.sqrt((p.x-this.x)*(p.x-this.x)+(p.y-this.y)*(p.y-this.y))-this.r-p.r;
             },
             getVector:function(p){
                 var distancePoints =  Math.sqrt((p.x-this.x)*(p.x-this.x)+(p.y-this.y)*(p.y-this.y));
-                var diff = (p.r + this.r) - distancePoints;
+                var diff = p.r + this.r - distancePoints;
                 var xd = (this.x - p.x) / distancePoints * diff;
                 var yd = (this.y - p.y) / distancePoints * diff;
                 return {x:xd,y:yd};
@@ -64,13 +65,8 @@ var TinyPhysic2D = {
             if(point.id == id){return point;}
         }
     },
-    notConnected:function(p,p_other){
-        for(var i=0;i<this.lines.length;i++){
-            var line = this.lines[i];
-            if(line.id1 == p.id && line.id2 == p_other.id)return false;
-            if(line.id1 == p_other.id && line.id2 == p.id)return false;
-        }
-        return true;
+    getNumberOfBalls:function(){
+        return this.points.length;
     },
     addLine:function(id,id1,id2){
         var p1 = this.getBallById(id1);
@@ -83,6 +79,7 @@ var TinyPhysic2D = {
             active:true, 
             visible:true};
         this.lines.push(line);
+        this.calculateLineConnectionsToBalls();
     },
     getLineById:function (id){
         for(var i=0; i<this.lines.length; i++){
@@ -93,6 +90,7 @@ var TinyPhysic2D = {
     },
     disableLine:function(id){
         this.getLineById(id).active = false;
+        this.calculateLineConnectionsToBalls();
     },
     addTrack:function(x, y, w, h){
         var track = {x:x, y:y, w:w, h:h};
@@ -101,7 +99,7 @@ var TinyPhysic2D = {
     addBox:function(x, y, w){
         var last_point_id = 0;
         var last_line_id = 0;
-        var ball_size = w * this.BALL_IN_BOX;
+        var ball_size = w / 2;
         for(var i=0; i<this.points.length; i++){
             if(this.points[i].id > last_point_id){
                 last_point_id = this.points[i].id;
@@ -112,16 +110,20 @@ var TinyPhysic2D = {
                 last_line_id = this.lines[i].id;
             }
         }
-        this.addBall(++last_point_id,ball_size,x+w/2,y+w/2,false,0);
-        this.addBall(++last_point_id,ball_size,x+w*1.5,y+w/2,false,0);
-        this.addBall(++last_point_id,ball_size,x+w/2,y+w*1.5,false,0);
-        this.addBall(++last_point_id,ball_size,x+w*1.5,y+w*1.5,false,0);
+        this.addBall(++last_point_id,ball_size,x+w/2,y+w/2,false,false,false);
+        this.addBall(++last_point_id,ball_size,x+w*1.5,y+w/2,false,false,false);
+        this.addBall(++last_point_id,ball_size,x+w/2,y+w*1.5,false,false,false);
+        this.addBall(++last_point_id,ball_size,x+w*1.5,y+w*1.5,false,false,false);
         this.addLine(++last_line_id,last_point_id-3,last_point_id-2);
         this.addLine(++last_line_id,last_point_id-0,last_point_id-1);
         this.addLine(++last_line_id,last_point_id-3,last_point_id-1);
         this.addLine(++last_line_id,last_point_id-2,last_point_id-0);
         this.addLine(++last_line_id,last_point_id-3,last_point_id-0);
         this.addLine(++last_line_id,last_point_id-2,last_point_id-1);
+        this.getBallById(last_point_id-3).boxId = last_point_id-3;
+        this.getBallById(last_point_id-2).boxId = last_point_id-3;
+        this.getBallById(last_point_id-1).boxId = last_point_id-3;
+        this.getBallById(last_point_id-0).boxId = last_point_id-3;
         if(!this.DEBUG){
             this.getBallById(last_point_id-3).visible = false;
             this.getBallById(last_point_id-2).visible = false;
@@ -135,6 +137,9 @@ var TinyPhysic2D = {
             this.getLineById(last_line_id).visible = false;
         }
         this.boxes.push({first_point_id:last_point_id-3,size:w});
+    },
+    getNumberOfBoxes:function(){
+        return this.boxes.length;
     },
     draw:function(){
         var ctx = this.canvas.getContext('2d');
@@ -232,7 +237,7 @@ var TinyPhysic2D = {
             var p4 = this.getBallById(box.first_point_id+3);
             
             var c = {x:(p1.x+p2.x+p3.x+p4.x)/4,y:(p1.y+p2.y+p3.y+p4.y)/4};
-            var f = this.BALL_IN_BOX * 2 + 1;
+            var f = 2;
             var b1 = {x:c.x+(p1.x-c.x)*f, y:c.y+(p1.y-c.y)*f};
             var b2 = {x:c.x+(p2.x-c.x)*f, y:c.y+(p2.y-c.y)*f};
             var v = {x:b2.x-b1.x,y:b2.y-b1.y};
@@ -273,45 +278,25 @@ var TinyPhysic2D = {
         for(var i=0; i<this.points.length; i++){
             var p = this.points[i];
             p.collied = false;
-            //with ground
-            if(p.y-p.r<0){
-                p.y -=p.y-p.r;
-                p.yv=-(p.y-p.r)*.6;
-                p.collied = true;
-                if(p.id!=102 && p.id!=103 && p.id != 106){// friction if p not front and not rear wheel
-                    p.xv *= .9;
-                }
-            }
-            //with track
             
+            //with ground
+            var p_other = this.getBallFromPlane(p);
+            this.collitionHelper(p,p_other);
+            
+            //with track
             for(var j=0; j<this.sections.length; j++){
                 var track = this.sections[j];
                 var translate_x = track.x;
                 if(p.x >= translate_x && p.x < translate_x + track.w){
                     var p_other = this.getBallFromSection(translate_x, track.y, track.w, track.h);
-                    if(p.getDistanceDiff(p_other) < 0){
-                        var v = p.getVector(p_other);
-                        if(p.id == 106){//bouncing
-                            p.x += v.x * .1;
-                            p.y += v.y * .1;
-                        }else{
-                            p.x += v.x;
-                            p.y += v.y;
-                        }
-                        p.xv += v.x;
-                        p.yv += v.y;
-                        if(p.id!=102 && p.id!=103 && p.id != 106){// friction
-                            p.xv *= .9;
-                        }
-                        p.collied = true;
-                    }
+                    this.collitionHelper(p,p_other);
                 }
             }
             
-            //with others
+            //with each others
             for(var j=0; j<this.points.length; j++){
                 var p_other = this.points[j];
-                if(j!=i && this.notConnected(p,p_other) && p.getDistanceDiff(p_other) < 0){
+                if(j!=i && (p.boxId == 9999 || p.boxId != p_other.boxId) && p.getDistanceDiff(p_other) < 0){
                     var v = p.getVector(p_other);
                     p.x += v.x * .5;
                     p.y += v.y * .5;
@@ -324,11 +309,31 @@ var TinyPhysic2D = {
             }
         }
     },
+    collitionHelper:function(p,p_other){
+        if(p.getDistanceDiff(p_other) < 0){
+            var v = p.getVector(p_other);
+            if(p.soft){//bouncing
+                p.x += v.x * this.SOFTNESS;
+                p.y += v.y * this.SOFTNESS;
+            }else{
+                p.x += v.x;
+                p.y += v.y;
+            }
+            p.xv += v.x;
+            p.yv += v.y;
+            if(!p.wheel){
+                p.xv *= this.FRICTION;
+            }
+            p.collied = true;
+        }
+    },
+    getBallFromPlane:function(p){
+        return {x:p.x, y:-MAG, r:MAG};
+    },
     getBallFromSection:function(x, y, w, h){
-        const M = 100;
         var center = {
-            x: x + w/2 + h*M,
-            y: y + h/2 - w*M};//calculate center
+            x: x + w/2 + h*this.MAG,
+            y: y + h/2 - w*this.MAG};//calculate center
         var vector = {
             x: x - center.x,
             y: y - center.y};
@@ -336,18 +341,6 @@ var TinyPhysic2D = {
         return {x: center.x, y: center.y, r: r};
     },
     forces:function(){
-        for(var i=0; i<this.points.length; i++){
-            this.points[i].linesCount = 0;
-        }
-        for(var i=0; i<this.lines.length; i++){
-            var line = this.lines[i];
-            var p1 = this.getBallById(line.id1);
-            var p2 = this.getBallById(line.id2);
-            if(line.active){
-                p1.linesCount++;
-                p2.linesCount++;
-            }
-        }
         for(var i=0; i<this.lines.length; i++){
             var line = this.lines[i];
             if(line.active){
@@ -370,7 +363,7 @@ var TinyPhysic2D = {
         for(var i=0; i<this.points.length; i++){
             var p = this.points[i];
             if(!p.fixed){
-                p.yv -= this.GRV;
+                p.yv += this.GRAVITY;
                 p.x += p.xv;
                 p.y += p.yv;
                 p.xv *= this.AIR;//air resist
@@ -378,9 +371,23 @@ var TinyPhysic2D = {
             }
         }
     },
+    calculateLineConnectionsToBalls:function(){
+        for(var i=0; i<this.points.length; i++){
+            this.points[i].linesCount = 0;
+        }
+        for(var i=0; i<this.lines.length; i++){
+            var line = this.lines[i];
+            var p1 = this.getBallById(line.id1);
+            var p2 = this.getBallById(line.id2);
+            if(line.active){
+                p1.linesCount++;
+                p2.linesCount++;
+            }
+        }
+    },
     update:function(){
-        this.camera.x = -this.getBallById(this.camera.lookTo).x + this.w/2;
-        this.camera.y = -this.getBallById(this.camera.lookTo).y + this.h/2;
+        this.camera.x = -this.getBallById(this.camera.lookAt).x + this.w/2;
+        this.camera.y = -this.getBallById(this.camera.lookAt).y + this.h/2;
         this.collition();
         this.forces();
     }

@@ -1,0 +1,28 @@
+html,body{
+    height:100%;
+    margin:0px;
+}
+body{
+    font: 20px Sans-serif;
+}
+canvas{
+    margin:0px;
+}
+#left,#right{
+    position:fixed;
+    bottom:0px;
+    background-color:rgba(128,128,128,.3);
+    color:rgba(0,0,0,.3);
+    width:25%; 
+    text-align:center;
+    padding-top:1%;
+    padding-bottom:1%;
+    font-size:20vw;
+    display:none;
+}
+#left{
+    left:0px;
+}
+#right{
+    right:0px;
+}

@@ -1,42 +1,3 @@
-<!doctype html>
-<html>
-<head>
-<title>stunt</title>
-<meta charset="UTF-8">
-<style>
-html,body{
-    height:100%;
-    margin:0px;
-}
-canvas{
-    margin:0px;
-}
-#left,#right{
-    position:fixed;
-    bottom:0px;
-    background-color:rgba(128,128,128,.3);
-    color:rgba(0,0,0,.3);
-    width:25%; 
-    text-align:center;
-    padding-top:1%;
-    padding-bottom:1%;
-    font-size:20vh;
-    display:none;
-}
-#left{
-    left:0px;
-}
-#right{
-    right:0px;
-}
-</style>
-</head>
-<body>
-<canvas id="c"></canvas>
-<div id="left">&#8678;</div>
-<div id="right">&#8680;</div>
-<script src="tinyphysic2D.js"></script>
-<script>
 /**
 * @author istvan.szalontai12@gmail.com
 * @date 2019-08-15
@@ -52,57 +13,27 @@ canvas{
 const MAG = 24;
 var keyGas = false;
 var keyBreak = false;
-var level = 1;//0=double pendulum, 1=car
+var level = 0;//0=pendulum
 var counter = 0;
 var mouse={x:0,y:0};
-var roadData=[-10,-8,-6,-4,-2,0,10,8,6,4,2,0,-2,-4,-2,0,4,8,12,-40,0,40,-2,-1,0,1,3,5,7];
 /*
 double pendulum https://www.youtube.com/watch?v=uWzPe_S-RVE
 */
 var scenes=[
     {ball:[//0 double pendulum
-        {id:100,r:10,x:300,y:500,fix:true},
-        {id:101,r:30,x:300,y:300,fix:false},
-        {id:102,r:30,x:300,y:100,fix:false},
+        {id:100,r:1,x:300,y:480,z:0,fix:true,wheel:false,soft:false},
+        {id:101,r:30,x:530,y:480,z:380,fix:false,wheel:true,soft:true},
+        {id:102,r:0,x:300,y:200,z:0,fix:true,wheel:false,soft:false},
+        //{id:103,r:25,x:510,y:200,z:200,fix:false,wheel:false,soft:false},
         ],
     rod:[
-        {id:200,b1:101,b2:100},
-        {id:201,b1:102,b2:101},
-        ],
-    track:
-        {p:400,h:10,data:[0,0,0,0,0,0]}
-    },
-    {ball:[//1 car
-        {id:100,r:10,x:270,y:600,fix:true},
-        {id:101,r:17,x:290,y:300,fix:false},
-        {id:102,r:28,x:280,y:250,fix:false},//rear wheel
-        {id:103,r:25,x:390,y:250,fix:false},//front wheel
-        {id:104,r:17,x:340,y:300,fix:false},
-        {id:105,r:10,x:330,y:400,fix:false},
-        {id:106,r:50,x:600,y:400,fix:false}//ball to play
-        ],
-    rod:[
-        {id:200,b1:105,b2:100},
-        {id:201,b1:101,b2:102},
-        {id:202,b1:101,b2:103},
-        {id:203,b1:102,b2:103},
-        {id:204,b1:104,b2:101},
-        {id:205,b1:104,b2:102},
-        {id:206,b1:104,b2:103},
-        {id:207,b1:105,b2:101},
-        {id:208,b1:105,b2:104},
+        {id:200,b1:101,b2:100}
         ],
     box:[
-        {x:710,y:140,w:15},
-        {x:810,y:140,w:30},
-        {x:990,y:140,w:40},
-        {x:1050,y:210,w:50},
-        {x:1060,y:140,w:30},
-        // {x:1100,y:210,w:25},
-        //{x:760,y:350,w:40},
+        {x:510,y:100,z:200,w:50}
         ],
     track:
-        {p:400,h:130,data:[0,0,0,0,0,0,2,4,6,4,2,1,0,-1,-2,-4,-6,-4,-2,0,0,0,0,1,3,4,0,-4,-3,-1,0,0,0]}
+        {p:400,h:10,data:[1,0,0,0,0,-1]}
     }
 ];
 
@@ -135,7 +66,7 @@ window.mobileAndTabletcheck = function() {
   return check;
 };
 document.body.onload = function () {
-    TinyPhysic2D.init();
+    TinyPhysic3D.init();
  
     if(mobileAndTabletcheck()){
         var left = document.getElementById('left');
@@ -148,16 +79,18 @@ document.body.onload = function () {
         right.style.display = 'block';
         right.addEventListener("touchstart",function(){keyGas=true;});
         right.addEventListener("touchend",function(){keyGas=false;});
+        
+        event.preventDefault();
     }
     //car
     var scene = scenes[level];
     for(var i=0;i<scene.ball.length; i++){
         var ball = scene.ball[i];
-        TinyPhysic2D.addBall(ball.id,ball.r,ball.x,ball.y,ball.fix,0);
+        TinyPhysic3D.addBall(ball.id,ball.r,ball.x,ball.y,ball.z,ball.fix,ball.wheel,ball.soft);
     }
     for(var i=0; i<scene.rod.length; i++){
         var rod = scene.rod[i];
-        TinyPhysic2D.addLine(rod.id,rod.b1,rod.b2);
+        TinyPhysic3D.addLine(rod.id,rod.b1,rod.b2);
     }
     if(scene.track){
         var x = 0;
@@ -166,81 +99,43 @@ document.body.onload = function () {
         for(var i=0; i<scene.track.data.length-1; i++){
             y += scene.track.data[i]*MAG;
             var y_next = y+scene.track.data[i+1]*MAG;
-            TinyPhysic2D.addTrack(x, y, section_length, y_next-y);
+            TinyPhysic3D.addTrack(x, y, section_length, y_next-y);
             x += section_length;
         }
     }
     if(scene.box){
         for(var i=0; i<scene.box.length; i++){
             var box = scene.box[i];
-            TinyPhysic2D.addBox(box.x, box.y, box.w);
+            TinyPhysic3D.addBox(box.x, box.y, box.z, box.w);
         }
     }
-    TinyPhysic2D.lookTo(102);//rear wheel
+    TinyPhysic3D.lookAt(102);//look to center
+    //TinyPhysic3D.getBallById(101).zv = 2;
     loop();
 }
 
 function drawDebug(){
-    TinyPhysic2D.drawText('TIME: ' + counter, 10, 20);
-    TinyPhysic2D.drawText('SPEED: ' + Math.floor(TinyPhysic2D.getBallById(102).xv), 10, 40);
-    TinyPhysic2D.drawText('LENGTH: ' + Math.floor(TinyPhysic2D.getBallById(102).x), 10, 60);
-    TinyPhysic2D.drawText('CONTROL: A-BREAK  D-GAS', 10, 80);
+    TinyPhysic3D.drawText('TIME: ' + counter, 10, 20);
+    TinyPhysic3D.drawText('BALLS: ' + TinyPhysic3D.getNumberOfBalls(), 10, 40);
+    TinyPhysic3D.drawText('BOXES: ' + TinyPhysic3D.getNumberOfBoxes(), 10, 60);
 }
 function interact(){
     counter++;
-    if(level==0 && counter>250 && counter <350){
-        getBallById(102).xv = 4;
+    if(counter<20){
+        TinyPhysic3D.getBallById(101).zv++;
     }
-    if(level==0){
-        camera.x = -getBallById(100).x+w/2;
+    if(counter == 2100){
+        // TinyPhysic3D.disableLine(200);
     }
-    if(level==1){
-        if(counter==10){
-            TinyPhysic2D.getBallById(100).visible = false;
-            TinyPhysic2D.getBallById(101).visible = false;
-            TinyPhysic2D.getBallById(104).visible = false;
-            TinyPhysic2D.getBallById(105).visible = false;
-            TinyPhysic2D.getLineById(202).visible = false;
-            TinyPhysic2D.getLineById(205).visible = false;
-        }
-        if(counter==120){
-            TinyPhysic2D.disableLine(207);  
-        }
-        if(counter==130){
-            TinyPhysic2D.disableLine(208);
-        }
-        //camera.x = -getBallById(102).x+w/2;//rear wheel
-        //camera.y = -getBallById(102).y+h/2;//rear wheel
-        var p_rear = TinyPhysic2D.getBallById(102);
-        var p_front = TinyPhysic2D.getBallById(103);
-        if(keyGas){
-            if(p_rear.collied){
-                p_rear.xv += .7;
-                if(p_rear.xv>150)p_rear.xv=150;
-                p_front.xv = p_rear.xv;
-            }
-        }
-        //p_front.xv = p_rear.xv;
-        if(keyBreak){
-            if(p_rear.collied){
-                p_rear.xv -= 1;
-                p_front.xv = p_rear.xv;
-            }
-        }
-        if(!keyGas){
-            if(p_rear.collied){
-                //p_rear.xv *= .8;
-            }
-        }
+    if(counter%50 == 0){
+        //TinyPhysic3D.addBall(1000,Math.random()*30+10,Math.random()*300+300,600,Math.random()*20+100,false,false,false);
+        TinyPhysic3D.addBox(Math.random()*300+300,Math.random()*300+300,Math.random()*300+300,40);
     }
 }
 function loop(){
     interact();
-    TinyPhysic2D.update();
-    TinyPhysic2D.draw();
+    TinyPhysic3D.update();
+    TinyPhysic3D.draw();
     drawDebug();
     requestAnimationFrame(loop);
 }
-</script>
-</body>
-</html>
