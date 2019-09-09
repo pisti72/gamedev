@@ -7,7 +7,7 @@ var TinyPhysic2D = {
     MAG: 50,
     BOX_DRAW_METHOD: 0,
     CLS_METHOD: 0,
-    DEBUG: false,
+    DEBUG: true,
     w: 0,
     h: 0,
     camera: { x: 0, y: 0, lookAt: 0 },
@@ -37,6 +37,8 @@ var TinyPhysic2D = {
             wheel: wheel,
             xv: 0,
             yv: 0,
+            rotate: 0,
+            spin: 0,
             collied: false,
             linesCount: 0,
             visible: true,
@@ -49,7 +51,8 @@ var TinyPhysic2D = {
                 var diff = p.r + this.r - distancePoints;
                 var xd = (this.x - p.x) / distancePoints * diff;
                 var yd = (this.y - p.y) / distancePoints * diff;
-                return { x: xd, y: yd };
+                var length = Math.sqrt(xd * xd + yd * yd);
+                return { x: xd, y: yd ,xn: xd / length, yn: yd / length};
             },
             getDistanceOfCenter: function (p) {
                 var x = p.x - this.x;
@@ -97,7 +100,38 @@ var TinyPhysic2D = {
         var track = { x: x, y: y, w: w, h: h };
         this.sections.push(track);
     },
-    addBox: function (x, y, w) {
+    addBox:function(x,y,w){
+        var last_point_id = 0;
+        var last_line_id = 0;
+        for (var i = 0; i < this.points.length; i++) {
+            if (this.points[i].id > last_point_id) {
+                last_point_id = this.points[i].id;
+            }
+        }
+        for (var i = 0; i < this.lines.length; i++) {
+            if (this.lines[i].id > last_line_id) {
+                last_line_id = this.lines[i].id;
+            }
+        }
+        var r = w/6;
+        this.addBall(++last_point_id, w, x , y , false, false, false);
+        this.addBall(++last_point_id, r, x + r - w, y + r - w, false, false, false);
+        this.addBall(++last_point_id, r, x - r + w, y - r + w, false, false, false);
+        this.addBall(++last_point_id, r, x - r + w, y + r - w, false, false, false);
+        this.addBall(++last_point_id, r, x + r - w, y - r + w, false, false, false);
+        this.addLine(++last_line_id, last_point_id - 3, last_point_id - 1);
+        this.addLine(++last_line_id, last_point_id - 3, last_point_id - 0);
+        this.addLine(++last_line_id, last_point_id - 2, last_point_id - 0);
+        this.addLine(++last_line_id, last_point_id - 2, last_point_id - 1);
+        this.addLine(++last_line_id, last_point_id - 3, last_point_id - 2);
+        this.addLine(++last_line_id, last_point_id - 0, last_point_id - 1);
+        this.addLine(++last_line_id, last_point_id - 4, last_point_id - 2);
+        this.addLine(++last_line_id, last_point_id - 4, last_point_id - 3);
+        this.addLine(++last_line_id, last_point_id - 4, last_point_id - 0);
+        this.addLine(++last_line_id, last_point_id - 4, last_point_id - 1);
+        this.boxes.push({ first_point_id: last_point_id - 4, size: w });
+    },
+    addBox2: function (x, y, w) {
         var last_point_id = 0;
         var last_line_id = 0;
         var ball_size = w / 2;
@@ -149,7 +183,10 @@ var TinyPhysic2D = {
         this.drawLines(ctx);
         this.drawTrack(ctx);
         this.drawGround(ctx);
-        this.drawBoxes(ctx);
+        //this.drawBoxes(ctx);
+    },
+    projectTo2D: function (p) {
+        return {x:p.x + this.camera.x, y:this.h - p.y - this.camera.y};
     },
     clearCanvas: function (ctx) {
         ctx.lineWidth = 2;
@@ -177,8 +214,16 @@ var TinyPhysic2D = {
             }
             if (p.visible) {
                 ctx.beginPath();
-                ctx.arc(p.x + this.camera.x, this.h - p.y - this.camera.y, p.r, 0, 2 * Math.PI);
+                var p2D = this.projectTo2D(p);
+                ctx.arc(p2D.x, p2D.y, p.r, 0, 2 * Math.PI);
                 ctx.stroke();
+                if(this.DEBUG){
+                    ctx.beginPath();
+                    ctx.strokeStyle = '#888';
+                    ctx.moveTo(p2D.x, p2D.y);
+                    ctx.lineTo(p2D.x + Math.cos(p.rotate) * p.r, p2D.y + Math.sin(p.rotate) * p.r);
+                    ctx.stroke();
+                }
             }
         }
     },
@@ -190,8 +235,10 @@ var TinyPhysic2D = {
                 ctx.beginPath();
                 var p1 = this.getBallById(line.id1);
                 var p2 = this.getBallById(line.id2);
-                ctx.moveTo(p1.x + this.camera.x, this.h - p1.y - this.camera.y);
-                ctx.lineTo(p2.x + this.camera.x, this.h - p2.y - this.camera.y);
+                var p2D = this.projectTo2D(p1);
+                ctx.moveTo(p2D.x, p2D.y);
+                p2D = this.projectTo2D(p2);
+                ctx.lineTo(p2D.x, p2D.y);
                 ctx.stroke();
             }
         }
@@ -297,7 +344,7 @@ var TinyPhysic2D = {
             //with each others
             for (var j = 0; j < this.points.length; j++) {
                 var p_other = this.points[j];
-                if (j != i && (p.boxId == 9999 || p.boxId != p_other.boxId) && p.getDistanceDiff(p_other) < 0) {
+                if (j != i /*&& (p.boxId == 9999 || p.boxId != p_other.boxId)*/ && p.getDistanceDiff(p_other) < 0) {
                     var v = p.getVector(p_other);
                     p.x += v.x * .5;
                     p.y += v.y * .5;
@@ -323,8 +370,9 @@ var TinyPhysic2D = {
             p.xv += v.x;
             p.yv += v.y;
             if (!p.wheel) {
-                p.xv *= this.FRICTION;
+                p.xv *= this.FRICTION;//BUG
             }
+            p.spin = (p.xv * v.yn - p.yv * v.xn) / p.r;
             p.collied = true;
         }
     },
@@ -371,6 +419,7 @@ var TinyPhysic2D = {
                 p.y += p.yv;
                 p.xv *= this.AIR;//air resist
                 p.yv *= this.AIR;
+                p.rotate += p.spin;
             }
         }
     },

@@ -35,13 +35,13 @@ var scenes = [
     },
     {
         ball: [//1 car
-            { id: 100, r: 10, x: 270, y: 600, fix: true, wheel: false, soft: false },
-            { id: 101, r: 17, x: 290, y: 300, fix: false, wheel: false, soft: false },
-            { id: 102, r: 25, x: 280, y: 250, fix: false, wheel: true, soft: false },//rear wheel
-            { id: 103, r: 28, x: 390, y: 250, fix: false, wheel: true, soft: false },//front wheel
-            { id: 104, r: 17, x: 340, y: 300, fix: false, wheel: false, soft: false },
-            { id: 105, r: 10, x: 330, y: 400, fix: false, wheel: false, soft: false },
-            { id: 106, r: 50, x: 600, y: 400, fix: false, wheel: true, soft: true }//ball to play
+            { id: 100, r: 10, x: 320, y: 600, fix: true, wheel: false, soft: false },
+            { id: 101, r: 17, x: 300, y: 200, fix: false, wheel: false, soft: false },
+            { id: 102, r: 30, x: 280, y: 150, fix: false, wheel: true, soft: false },//rear wheel
+            { id: 103, r: 30, x: 390, y: 150, fix: false, wheel: true, soft: false },//front wheel
+            { id: 104, r: 17, x: 370, y: 200, fix: false, wheel: false, soft: false },
+            { id: 105, r: 10, x: 320, y: 300, fix: false, wheel: false, soft: false },
+            { id: 106, r: 50, x: 600, y: 300, fix: false, wheel: true, soft: true }//ball to play
         ],
         rod: [
             { id: 200, b1: 105, b2: 100 },
@@ -55,8 +55,8 @@ var scenes = [
             { id: 208, b1: 105, b2: 104 },
         ],
         box: [
-            { x: 710, y: 100, w: 13 },
-            // {x:810,y:140,w:30},
+            // { x: 710, y: 140, w: 40 },
+            // { x: 710, y: 220, w: 20 },
             // {x:990,y:140,w:40},
             // {x:1050,y:210,w:50},
             // {x:1100,y:140,w:30},
@@ -104,14 +104,28 @@ document.body.onload = function () {
         var right = document.getElementById('right');
 
         left.style.display = 'block';
-        left.addEventListener("touchstart", function () { keyBreak = true; });
-        left.addEventListener("touchend", function () { keyBreak = false; });
+        left.addEventListener("touchstart", 
+            function (e) {
+                e.preventDefault(); 
+                keyBreak = true; 
+                },false);
+        left.addEventListener("touchend", 
+            function (e) { 
+                e.preventDefault(); 
+                keyBreak = false;
+                },false);
 
         right.style.display = 'block';
-        right.addEventListener("touchstart", function () { keyGas = true; });
-        right.addEventListener("touchend", function () { keyGas = false; });
-
-        event.preventDefault();
+        right.addEventListener("touchstart", 
+            function (e) { 
+                e.preventDefault(); 
+                keyGas = true;
+                },false);
+        right.addEventListener("touchend", 
+            function (e) { 
+                e.preventDefault(); 
+                keyGas = false;
+                },false);
     }
     //car
     var scene = scenes[level];
@@ -165,12 +179,16 @@ function interact() {
             TinyPhysic2D.getLineById(205).visible = false;
         }
         if (counter % 200 == 0) {
-            TinyPhysic2D.addBall(
-                200,
-                Math.random() * 30 + 10,
+            // TinyPhysic2D.addBall(
+                // 200,
+                // Math.random() * 30 + 10,
+                // Math.random() * 2000 + 6000,
+                // 800,
+                // false, true, true);
+            TinyPhysic2D.addBox(
                 Math.random() * 2000 + 6000,
                 800,
-                false, true, true);
+                Math.random() * 30 + 10);    
         }
         if (counter == 120) {
             TinyPhysic2D.disableLine(207);
@@ -183,16 +201,18 @@ function interact() {
         if (keyGas) {
             if (p_rear.collied) {
                 p_rear.xv += .7;
+                //p_rear.spin += .01;
                 // if(p_rear.xv>150)p_rear.xv=150;
                 //p_front.xv = p_rear.xv;
             }
             if (p_front.collied) {
-                p_front.xv += .7;
+                //p_front.xv += .7;
             }
         }
         //p_front.xv = p_rear.xv;
         if (keyBreak) {
             if (p_rear.collied) {
+                //p_rear.spin -= .01;
                 p_rear.xv -= 1;
                 //p_front.xv = p_rear.xv;
             }
