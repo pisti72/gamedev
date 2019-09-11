@@ -38,21 +38,21 @@ var scenes = [
             { id: 100, r: 10, x: 320, y: 600, fix: true, wheel: false, soft: false },
             { id: 101, r: 17, x: 300, y: 200, fix: false, wheel: false, soft: false },
             { id: 102, r: 30, x: 280, y: 150, fix: false, wheel: true, soft: false },//rear wheel
-            { id: 103, r: 30, x: 390, y: 150, fix: false, wheel: true, soft: false },//front wheel
+            { id: 103, r: 28, x: 390, y: 150, fix: false, wheel: true, soft: false },//front wheel
             { id: 104, r: 17, x: 370, y: 200, fix: false, wheel: false, soft: false },
             { id: 105, r: 10, x: 320, y: 300, fix: false, wheel: false, soft: false },
-            { id: 106, r: 50, x: 600, y: 300, fix: false, wheel: true, soft: true }//ball to play
+            { id: 106, r: 60, x: 600, y: 600, fix: false, wheel: true, soft: true }//ball to play
         ],
         rod: [
             { id: 200, b1: 105, b2: 100 },
             { id: 201, b1: 101, b2: 102 },
             { id: 202, b1: 101, b2: 103 },
             { id: 203, b1: 102, b2: 103 },
-            { id: 204, b1: 104, b2: 101 },
+            { id: 204, b1: 101, b2: 104 },
             { id: 205, b1: 104, b2: 102 },
             { id: 206, b1: 104, b2: 103 },
-            { id: 207, b1: 105, b2: 101 },
-            { id: 208, b1: 105, b2: 104 },
+            { id: 207, b1: 105, b2: 102 },
+            { id: 208, b1: 105, b2: 103 },
         ],
         box: [
             // { x: 710, y: 140, w: 40 },
@@ -64,7 +64,7 @@ var scenes = [
             //{x:760,y:350,w:40},
         ],
         track:
-            { p: 400, h: 0, data: [0, 4, 0, 0, 0, 0, 2, 4, 6, 4, 2, 1, 0, -1, -2, -4, -6, -4, -2, 0, 1, 3, 4, 6, 0, -6, -4, -3, -1, 0, 8, -12] }
+            { p: 400, h: 0, data: [0, 4, 0, 0, 0, 0, 2, 4, 6, 4, 2, 1, 0, -1, -2, -4, -6, -4, -2, 0, 1, 3, 4, 6, 0, -6, -4, -3, -1, 0, 1, 2] }
     }
 ];
 
@@ -154,7 +154,9 @@ document.body.onload = function () {
             TinyPhysic2D.addBox(box.x, box.y, box.w);
         }
     }
-    TinyPhysic2D.lookAt(100);//first ball
+    TinyPhysic2D.lookAt(102);//rear wheel
+    TinyPhysic2D.skinTo(204,[-30,-40,90,-40,90,-10,60,-8,50,20,0,20,-30,0]);//car shape
+    TinyPhysic2D.getBallById(106).mass = 1;
     loop();
 }
 
@@ -176,24 +178,30 @@ function interact() {
             TinyPhysic2D.getBallById(104).visible = false;
             TinyPhysic2D.getBallById(105).visible = false;
             TinyPhysic2D.getLineById(202).visible = false;
+            TinyPhysic2D.getLineById(203).visible = false;
+            TinyPhysic2D.getLineById(204).visible = false;
+            TinyPhysic2D.getLineById(205).visible = false;
+            TinyPhysic2D.getLineById(206).visible = false;
+            TinyPhysic2D.getLineById(201).visible = false;
+            
             TinyPhysic2D.getLineById(205).visible = false;
         }
         if (counter % 200 == 0) {
-            // TinyPhysic2D.addBall(
-                // 200,
-                // Math.random() * 30 + 10,
-                // Math.random() * 2000 + 6000,
-                // 800,
-                // false, true, true);
-            TinyPhysic2D.addBox(
+            TinyPhysic2D.addBall(
+                200,
+                Math.random() * 20 + 20,
                 Math.random() * 2000 + 6000,
                 800,
-                Math.random() * 30 + 10);    
+                false, true, true);
+            // TinyPhysic2D.addBox(
+                // Math.random() * 2000 + 6000,
+                // 800,
+                // Math.random() * 30 + 10);    
         }
-        if (counter == 120) {
+        if (counter == 220) {
             TinyPhysic2D.disableLine(207);
         }
-        if (counter == 130) {
+        if (counter == 230) {
             TinyPhysic2D.disableLine(208);
         }
         var p_rear = TinyPhysic2D.getBallById(102);
@@ -213,7 +221,7 @@ function interact() {
         if (keyBreak) {
             if (p_rear.collied) {
                 //p_rear.spin -= .01;
-                p_rear.xv -= 1;
+                p_front.xv -= 4;
                 //p_front.xv = p_rear.xv;
             }
         }

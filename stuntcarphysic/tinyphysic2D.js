@@ -1,7 +1,7 @@
 var TinyPhysic2D = {
     GRAVITY: -.25,
     FRICTION: .9,
-    SOFTNESS: .1,
+    SOFTNESS: .3,
     BLUR: .8,
     AIR: .9995,
     MAG: 50,
@@ -11,6 +11,7 @@ var TinyPhysic2D = {
     w: 0,
     h: 0,
     camera: { x: 0, y: 0, lookAt: 0 },
+    skin: {ball_id1:0, ball_id2:0, obj:{}},
     lookAt: function (ballId) {
         this.camera.lookAt = ballId;
     },
@@ -39,6 +40,7 @@ var TinyPhysic2D = {
             yv: 0,
             rotate: 0,
             spin: 0,
+            mass: r*r*Math.PI,
             collied: false,
             linesCount: 0,
             visible: true,
@@ -173,6 +175,12 @@ var TinyPhysic2D = {
         }
         this.boxes.push({ first_point_id: last_point_id - 3, size: w });
     },
+    skinTo(lineId, obj){
+        var line = this.getLineById(lineId);
+        this.skin.ball_id1 = line.id1;
+        this.skin.ball_id2 = line.id2;
+        this.skin.obj = obj;
+    },
     getNumberOfBoxes: function () {
         return this.boxes.length;
     },
@@ -183,6 +191,7 @@ var TinyPhysic2D = {
         this.drawLines(ctx);
         this.drawTrack(ctx);
         this.drawGround(ctx);
+        this.drawSkin(ctx);
         //this.drawBoxes(ctx);
     },
     projectTo2D: function (p) {
@@ -322,6 +331,44 @@ var TinyPhysic2D = {
         ctx.font = "20px Arial";
         ctx.fillText(text, x, y);
     },
+    drawSkin:function(ctx){
+        ctx.strokeStyle = '#000';
+        ctx.beginPath();
+        var p = {x:this.skin.obj[0], y:this.skin.obj[1]};
+        var p2 = this.calculateSkin(p);
+        ctx.moveTo(p2.x, p2.y);
+        for(var i=2;i<this.skin.obj.length;i+=2){
+            p = {x:this.skin.obj[i], y:this.skin.obj[i+1]};
+            p2 = this.calculateSkin(p);
+            ctx.lineTo(p2.x, p2.y);
+        }
+        p = {x:this.skin.obj[0], y:this.skin.obj[1]};
+        p2 = this.calculateSkin(p);
+        ctx.lineTo(p2.x, p2.y);
+        ctx.stroke();
+    },
+    calculateSkin:function(p){
+        var p1 = p;
+        var ball1 = this.getBallById(this.skin.ball_id1);
+        var ball2 = this.getBallById(this.skin.ball_id2);
+        var v = {x:ball2.x-ball1.x, y:ball2.y-ball1.y};
+        var v_length = Math.sqrt(v.x*v.x + v.y*v.y);
+        
+        var sin = v.y / v_length;
+        var cos = v.x / v_length;
+        var p2 = {x:ball1.x, y:ball1.y};
+        var rot_p2 = this.rotateVectors(p1,sin,cos);
+        var new_p = this.addVectors(p2,rot_p2);
+        return this.projectTo2D(new_p);
+    },
+    addVectors:function(p1,p2){
+        return {x:p1.x + p2.x, y:p1.y + p2.y};
+    },
+    rotateVectors:function(p,s,c){
+        var x = p.x * c - p.y * s;
+        var y = p.x * s + p.y * c;
+        return {x:x,y:y};
+    },
     collition: function () {
         for (var i = 0; i < this.points.length; i++) {
             var p = this.points[i];
@@ -344,15 +391,8 @@ var TinyPhysic2D = {
             //with each others
             for (var j = 0; j < this.points.length; j++) {
                 var p_other = this.points[j];
-                if (j != i /*&& (p.boxId == 9999 || p.boxId != p_other.boxId)*/ && p.getDistanceDiff(p_other) < 0) {
-                    var v = p.getVector(p_other);
-                    p.x += v.x * .5;
-                    p.y += v.y * .5;
-                    p.xv += v.x;
-                    p.yv += v.y;
-                    //p.xv *= .9;
-                    //p.yv *= .9;
-                    p.collied = true;
+                if (j != i && p.getDistanceDiff(p_other) < 0) {
+                    this.collitionHelper(p, p_other);
                 }
             }
         }
@@ -360,24 +400,26 @@ var TinyPhysic2D = {
     collitionHelper: function (p, p_other) {
         if (p.getDistanceDiff(p_other) < 0) {
             var v = p.getVector(p_other);
-            if (p.soft) {//bouncing
-                p.x += v.x * this.SOFTNESS;
-                p.y += v.y * this.SOFTNESS;
-            } else {
-                p.x += v.x;
-                p.y += v.y;
+            var k = p_other.mass / (p.mass + p_other.mass);//no bouncing :-(  FIXIT
+            if(p.soft){//if ball is bouncy
+                k *= this.SOFTNESS;
             }
+            p.x += v.x * k;
+            p.y += v.y * k;
             p.xv += v.x;
             p.yv += v.y;
             if (!p.wheel) {
                 p.xv *= this.FRICTION;//BUG
+                // p.yv *= this.FRICTION;
+                // if(p.id==106)console.log(p.yv);
             }
             p.spin = (p.xv * v.yn - p.yv * v.xn) / p.r;
+            // p.xv = (p.spin * p.r + p.yv * v.xn)/v.yn;
             p.collied = true;
         }
     },
     getBallFromPlane: function (p) {
-        return { x: p.x, y: -MAG, r: MAG };
+        return { x: p.x, y: -MAG, r: MAG, mass: MAG*MAG*Math.PI };
     },
     getBallFromSection: function (x, y, w, h) {
         var center = {
@@ -389,7 +431,8 @@ var TinyPhysic2D = {
             y: y - center.y
         };
         var r = Math.sqrt(vector.x * vector.x + vector.y * vector.y);
-        return { x: center.x, y: center.y, r: r };
+        var mass = r*r*Math.PI;
+        return { x: center.x, y: center.y, r: r, mass: mass };
     },
     forces: function () {
         for (var i = 0; i < this.lines.length; i++) {
@@ -437,9 +480,16 @@ var TinyPhysic2D = {
             }
         }
     },
-    update: function () {
+    updateCamera:function(){
         this.camera.x = -this.getBallById(this.camera.lookAt).x + this.w / 2;
         this.camera.y = -this.getBallById(this.camera.lookAt).y + this.h / 2;
+    },
+    updateSkin:function(){
+         
+    },
+    update: function () {
+        this.updateSkin();
+        this.updateCamera();
         this.collition();
         this.forces();
     }
