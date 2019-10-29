@@ -17,7 +17,7 @@ public class Mazeboy extends Component{
 	BufferedImage img;
  
     public void paint(Graphics g) {
-        g.drawImage(img, 10, 10, null);
+        g.drawImage(img, 20, 10, null);
     }
  
     public Mazeboy(){
