@@ -1,43 +1,222 @@
 <script>
-    const TILE = 32;
+    const TILE = 24;
     const WIDTH = 10;
+    const LEFT = 0;
+    const RIGHT = 1;
+    const UP = 2;
+    const DOWN = 3;
+    const STAY = 4;
+    var counter = 0;
     var canvas = document.createElement('canvas');
     document.body = document.createElement('body');
     document.body.appendChild(canvas);
     document.title = 'Mazeboy';
+    document.addEventListener('keydown', keyDown);
+    document.addEventListener('keyup', keyUp);
     canvas.width = window.innerWidth - 50;
     canvas.height = window.innerHeight - 50;
     var ctx = canvas.getContext('2d');
-    var player = { x: 1, y: 1 };
-    var maze = [
-        'MMMMMMMMMM',
-        'M        M',
-        'M MMMMMM M',
-        'M M    M M',
-        'M   MM   M',
-        'M MMMMMM M',
-        'M        M',
-        'MMMMMMMMMM'
+    var enemies = [];
+    var levels = [
+        {
+            name: 'easypeasy',
+            data: [
+                'MMMMMMMMMMMMMMMM',
+                'M. .e.  ...     ',
+                'M.MMMMMM.MM MMM ',
+                'M  M  .M.M..M...',
+                'M .M  .MMM   p..',
+                'M . . ...M.M .M.',
+                'M..M..MMMM.MM.M ',
+                'M..     . ....M.',
+            ]
+        }
     ];
-    drawMaze();
-    drawPlayer();
+    var player = {
+        x: 1,
+        y: 1,
+        speed: .5,
+        want: STAY,
+        moving: STAY,
+        update: function () {
+            if (this.isMiddle()) {
+                if (this.want == UP && this.isEmpty(0, -1)) {
+                    this.moving = this.want;
+                } else if (this.want == DOWN && this.isEmpty(0, 1)) {
+                    this.moving = this.want;
+                } else if (this.want == LEFT && this.isEmpty(-1, 0)) {
+                    this.moving = this.want;
+                } else if (this.want == RIGHT && this.isEmpty(1, 0)) {
+                    this.moving = this.want;
+                }
+                if(this.isDot()){
+                    maze.setBlock(' ', this.x, this.y);
+                }
+                if (this.moving == UP && this.isEmpty(0, -1)) {
+                    this.y -= this.speed;
+                } else if (this.moving == DOWN && this.isEmpty(0, 1)) {
+                    this.y += this.speed;
+                } else if (this.moving == LEFT && this.isEmpty(-1, 0)) {
+                    this.x -= this.speed;
+                } else if (this.moving == RIGHT && this.isEmpty(1, 0)) {
+                    this.x += this.speed;
+                } else {
+                    this.moving = STAY;
+                }
+                
+            } else {
+                if (this.moving == UP) {
+                    this.y -= this.speed;
+                } else if (this.moving == DOWN) {
+                    this.y += this.speed;
+                } else if (this.moving == LEFT) {
+                    this.x -= this.speed;
+                } else if (this.moving == RIGHT) {
+                    this.x += this.speed;
+                }
+            }
+
+        },
+        isMiddle: function () {
+            return this.x == Math.floor(this.x) && this.y == Math.floor(this.y);
+        },
+        isEmpty: function (x, y) {
+            return maze.getBlock(this.x + x, this.y + y) != 'M';
+        },
+        isDot: function () {
+            return maze.getBlock(this.x, this.y) == '.';
+        }
+    };
+    var maze = {
+        data: [],
+        getBlock: function (x, y) {
+            return this.data[y].substr(x, 1);
+        },
+        setBlock: function (block, x, y) {
+            var row = this.data[y];
+            row = row.substr(0, x) + block + row.substr(x + 1, row.length - 1);
+            this.data[y] = row;
+        }
+    };
+    init();
+    setInterval('update()', 50);
+    function init() {
+        var map = levels[0].data;
+        for (var i = 0; i < map.length; i++) {
+            var left = map[i];
+            console.log(left.length);
+            var right = '';
+            for (var j = 0; j < left.length; j++) {
+                right += left.substr(left.length - j - 1, 1);
+            }
+            maze.data.push(left + right);
+        }
+        for (var i = 0; i < map.length; i++) {
+            maze.data.push(maze.data[map.length - i - 1]);
+        }
+        for (var i = 0; i < maze.data.length; i++) {
+            var row = maze.data[i];
+            for (j = 0; j < row.length; j++) {
+                var block = row.substr(j, 1);
+                if (block == 'p') {
+                    player.x = j;
+                    player.y = i;
+                } else if (block == 'e') {
+                    enemies.push({ x: j, y: i });
+                }
+            }
+        }
+        counter = 0;
+    }
+    function update() {
+        counter++;
+        player.update();
+        updateEnemies();
+        drawEmpty();
+        drawMaze();
+        drawPlayer();
+        drawEnemies();
+    }
+
     //drawWall(0, 0);
+    function getBlock(x, y) {
+        return maze.getBlock(x, y);
+    }
+    function keyDown(event) {
+        if (event.key == 'w') {
+            player.want = UP;
+        } else if (event.key == 's') {
+            player.want = DOWN;
+        } else if (event.key == 'a') {
+            player.want = LEFT;
+        } else if (event.key == 'd') {
+            player.want = RIGHT;
+        }
+    }
+    function keyUp(event) {
+        //player.pressed = '';
+    }
     function drawMaze() {
-        for (var i = 0; i < maze.length; i++) {
-            var row = maze[i];
+        for (var i = 0; i < maze.data.length; i++) {
+            var row = maze.data[i];
             for (j = 0; j < row.length; j++) {
                 var block = row.substr(j, 1);
                 if (block == 'M') {
                     drawWall(j, i);
+                } else if (block == '.') {
+                    drawDot(j, i);
                 }
             }
         }
+    }
+    function drawEmpty() {
+        ctx.fillStyle = '#FFF';
+        ctx.fillRect(0, 0, maze.data[0].length * TILE, maze.data.length * TILE);
+    }
+    function updateEnemies() {
+        for (var i = 0; i < enemies.length; i++) {
+            var e = enemies[i];
+            var r = Math.floor(Math.random() * 6);
+            if (r == 0) {
+                if (e.x > player.x) {
+                    moveEnemy(e, -1, 0);
+                } else if (e.x < player.x) {
+                    moveEnemy(e, 1, 0);
+                }
+            }
+            if (r == 1) {
+                if (e.y > player.y) {
+                    moveEnemy(e, 0, -1);
+                } else if (e.y < player.y) {
+                    moveEnemy(e, 0, 1);
+                }
+            }
+        }
+    }
+    function moveEnemy(obj, x, y) {
+        var block = maze.getBlock(obj.x + x, obj.y + y);
+        if (block != 'M' && !isEnemeyThere(obj.x + x, obj.y + y)) {
+            obj.x += x;
+            obj.y += y;
+        }
+    }
+    function isEnemeyThere(x, y) {
+        for (var i = 0; i < enemies.length; i++) {
+            if (enemies[i].x == x && enemies[i].y == y) {
+                return true;
+            }
+        }
+        return false;
     }
     function drawWall(x, y) {
         ctx.fillStyle = '#888';
         ctx.fillRect(x * TILE, y * TILE, TILE, TILE);
         ctx.fillStyle = '#DDD';
         ctx.fillRect(x * TILE, (y + 1) * TILE, TILE, TILE / 2);
+    }
+    function drawDot(x, y) {
+        ctx.fillStyle = '#CC0';
+        ctx.fillRect(x * TILE + TILE / 2 - TILE / 8, y * TILE + TILE / 2 - TILE / 8, TILE / 4, TILE / 4);
     }
     function drawPlayer() {
         var x = player.x;
@@ -49,5 +228,18 @@
         ctx.fillStyle = '#444';
         ctx.fillRect(x * TILE + TILE / 4, y * TILE + TILE / 4, TILE / 8, TILE / 8);
         ctx.fillRect(x * TILE + TILE - TILE / 4 - TILE / 8, y * TILE + TILE / 4, TILE / 8, TILE / 8);
+    }
+    function drawEnemies() {
+        for (var i = 0; i < enemies.length; i++) {
+            var x = enemies[i].x;
+            var y = enemies[i].y;
+            ctx.fillStyle = '#A00';
+            ctx.beginPath();
+            ctx.arc(x * TILE + TILE / 2, y * TILE + TILE / 2, TILE / 2, 0, 2 * Math.PI);
+            ctx.fill();
+            ctx.fillStyle = '#444';
+            ctx.fillRect(x * TILE + TILE / 4, y * TILE + TILE / 4, TILE / 8, TILE / 8);
+            ctx.fillRect(x * TILE + TILE - TILE / 4 - TILE / 8, y * TILE + TILE / 4, TILE / 8, TILE / 8);
+        }
     }
 </script>
