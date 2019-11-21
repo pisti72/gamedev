@@ -22,7 +22,7 @@
             name: 'easypeasy',
             data: [
                 'MMMMMMMMMMMMMMMM',
-                'M. .e.  ...     ',
+                'Me . .  ...     ',
                 'M.MMMMMM.MM MMM ',
                 'M  M  .M.M..M...',
                 'M .M  .MMM   p..',
@@ -39,7 +39,7 @@
         want: STAY,
         moving: STAY,
         update: function () {
-            if (this.isMiddle()) {
+            if (this.x == Math.floor(this.x) && this.y == Math.floor(this.y)) {
                 if (this.want == UP && this.isEmpty(0, -1)) {
                     this.moving = this.want;
                 } else if (this.want == DOWN && this.isEmpty(0, 1)) {
@@ -49,7 +49,7 @@
                 } else if (this.want == RIGHT && this.isEmpty(1, 0)) {
                     this.moving = this.want;
                 }
-                if(this.isDot()){
+                if (this.isDot()) {
                     maze.setBlock(' ', this.x, this.y);
                 }
                 if (this.moving == UP && this.isEmpty(0, -1)) {
@@ -63,7 +63,7 @@
                 } else {
                     this.moving = STAY;
                 }
-                
+
             } else {
                 if (this.moving == UP) {
                     this.y -= this.speed;
@@ -75,10 +75,6 @@
                     this.x += this.speed;
                 }
             }
-
-        },
-        isMiddle: function () {
-            return this.x == Math.floor(this.x) && this.y == Math.floor(this.y);
         },
         isEmpty: function (x, y) {
             return maze.getBlock(this.x + x, this.y + y) != 'M';
@@ -96,6 +92,10 @@
             var row = this.data[y];
             row = row.substr(0, x) + block + row.substr(x + 1, row.length - 1);
             this.data[y] = row;
+        },
+        isEmpty: function (x, y) {
+            //return true;
+            return this.getBlock(x, y) != 'M';
         }
     };
     init();
@@ -104,7 +104,6 @@
         var map = levels[0].data;
         for (var i = 0; i < map.length; i++) {
             var left = map[i];
-            console.log(left.length);
             var right = '';
             for (var j = 0; j < left.length; j++) {
                 right += left.substr(left.length - j - 1, 1);
@@ -122,7 +121,7 @@
                     player.x = j;
                     player.y = i;
                 } else if (block == 'e') {
-                    enemies.push({ x: j, y: i });
+                    enemies.push({ x: j, y: i, moving: STAY });
                 }
             }
         }
@@ -174,39 +173,69 @@
         ctx.fillRect(0, 0, maze.data[0].length * TILE, maze.data.length * TILE);
     }
     function updateEnemies() {
+        var speed = .25;
         for (var i = 0; i < enemies.length; i++) {
             var e = enemies[i];
-            var r = Math.floor(Math.random() * 6);
-            if (r == 0) {
-                if (e.x > player.x) {
-                    moveEnemy(e, -1, 0);
-                } else if (e.x < player.x) {
-                    moveEnemy(e, 1, 0);
+            var want = STAY;
+            if (e.x == Math.floor(e.x) && e.y == Math.floor(e.y)) {
+                var r = Math.floor(Math.random() * 2);
+                //r = 1;
+                if (r == 0) {
+                    if (e.x > player.x) {
+                        want = LEFT;
+                    } else if (e.x < player.x) {
+                        want = RIGHT;
+                    }
+                } else {
+                    if (e.y > player.y) {
+                        want = UP;
+                    } else if (e.y < player.y) {
+                        want = DOWN;
+                    }
                 }
-            }
-            if (r == 1) {
-                if (e.y > player.y) {
-                    moveEnemy(e, 0, -1);
-                } else if (e.y < player.y) {
-                    moveEnemy(e, 0, 1);
+                if (want == UP && maze.isEmpty(e.x, e.y - 1)) {
+                    e.moving = want;
+                } else if (want == DOWN && maze.isEmpty(e.x, e.y + 1)) {
+                    e.moving = want;
+                } else if (want == LEFT && maze.isEmpty(e.x - 1, e.y)) {
+                    e.moving = want;
+                } else if (want == RIGHT && maze.isEmpty(e.x + 1, e.y)) {
+                    e.moving = want;
+                }
+
+                if (e.moving == UP && maze.isEmpty(e.x, e.y - 1)) {
+                    e.y -= speed;
+                } else if (e.moving == DOWN && maze.isEmpty(e.x, e.y + 1)) {
+                    e.y += speed;
+                } else if (e.moving == LEFT && maze.isEmpty(e.x - 1, e.y)) {
+                    e.x -= speed;
+                } else if (e.moving == RIGHT && maze.isEmpty(e.x + 1, e.y)) {
+                    e.x += speed;
+                } else {
+                    e.moving = STAY;
+                }
+            } else {
+                
+                if (e.moving == UP) {
+                    e.y -= speed;
+                } else if (e.moving == DOWN) {
+                    e.y += speed;
+                } else if (e.moving == LEFT) {
+                    e.x -= speed;
+                } else if (e.moving == RIGHT) {
+                    e.x += speed;
                 }
             }
         }
     }
-    function moveEnemy(obj, x, y) {
-        var block = maze.getBlock(obj.x + x, obj.y + y);
-        if (block != 'M' && !isEnemeyThere(obj.x + x, obj.y + y)) {
-            obj.x += x;
-            obj.y += y;
-        }
-    }
-    function isEnemeyThere(x, y) {
+    function isEnemyNotThere(x, y) {
         for (var i = 0; i < enemies.length; i++) {
             if (enemies[i].x == x && enemies[i].y == y) {
-                return true;
+                console.log('Enemy there');
+                return false;
             }
         }
-        return false;
+        return true;
     }
     function drawWall(x, y) {
         ctx.fillStyle = '#888';
