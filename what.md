@@ -6,6 +6,6 @@ Mi legyen
 * tic80: minek? itch.io
 * zx: minek? mindig is akartam. itch.io
 * love: minek?
-* js: escape room?
+* js: escape room? prototyping
 * java: nem szeretem
 * py: strs miatt?
