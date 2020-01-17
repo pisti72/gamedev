@@ -43,7 +43,7 @@ var Wire3d = {
             2, 6,
             3, 7,
             4, 5,
-            4, 6,
+            5, 6,
             6, 7,
             7, 4]);
     },
@@ -60,7 +60,7 @@ var Wire3d = {
     addMesh: function (name, points, edges) {
         var p = [];
         var e = [];
-        for (var i = 0; i < Math.floor(points.length / 3); i += 3) {
+        for (var i = 0; i < points.length; i += 3) {
             p.push(
                 {
                     x: points[i],
@@ -68,8 +68,9 @@ var Wire3d = {
                     z: points[i + 2]
                 });
         }
-        for (var i = 0; i < Math.floor(edges.length / 2); i += 2) {
-            p.push(
+        //console.log(p);
+        for (var i = 0; i < edges.length; i += 2) {
+            e.push(
                 {
                     a: edges[i],
                     b: edges[i + 1]
@@ -106,8 +107,13 @@ var Wire3d = {
             var object = this.objects[i];
             var mesh = this.getMeshByName(object.name);
             //look above
+            var points2D = [];
+            
             for (var j = 0; j < mesh.points.length; j++) {
-                var point
+                var point = mesh.points[j];
+                this.ctx.fillRect(
+                    point.x * object.scale + this.w / 2,
+                    point.y * object.scale + this.h / 2, 4, 4);
             }
         }
     },
