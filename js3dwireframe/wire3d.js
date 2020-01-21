@@ -1,5 +1,3 @@
-console.log('wire loaded');
-
 var Wire3d = {
     ctx: {},
     objects: [],
@@ -28,46 +26,11 @@ var Wire3d = {
         this.h = canvas.height = document.body.clientHeight;
         this.player.fov = this.w / 2;
         this.meshes = [];
-        //create cube
-        this.addMesh('cube', [
-            -1, -1, -1,
-            1, -1, -1,
-            1, 1, -1,
-            -1, 1, -1,
-            -1, -1, 1,
-            1, -1, 1,
-            1, 1, 1,
-            -1, 1, 1
-        ], [
-            0, 1,
-            1, 2,
-            2, 3,
-            3, 0,
-            0, 4,
-            1, 5,
-            2, 6,
-            3, 7,
-            4, 5,
-            5, 6,
-            6, 7,
-            7, 4]);
-        //create pyramid
-        this.addMesh('pyramid', [
-            -1, -1, 0,
-            1, -1, 0,
-            1, 1, 0,
-            -1, 1, 0,
-            0, 0, 1.5
-        ], [
-            0, 1,
-            1, 2,
-            2, 3,
-            3, 0,
-            0, 4,
-            1, 4,
-            2, 4,
-            3, 4]);
-
+        //create primitives
+        for (var i = 0; i < this.primitives.length; i++) {
+            var primitive = this.primitives[i];
+            this.addMesh(primitive.name, primitive.points, primitive.edges);
+        }
     },
     addObject: function (name, scale, x, y, z) {
         var object = {
@@ -166,11 +129,11 @@ var Wire3d = {
             z: p1.z + p2.z
         };
     },
-    differencePoints: function (p1, p2) {
+    subPoints: function (p1, p2) {
         return {
-            x: p2.x - p1.x,
-            y: p2.y - p1.y,
-            z: p2.z - p1.z
+            x: p1.x - p2.x,
+            y: p1.y - p2.y,
+            z: p1.z - p2.z
         };
     },
     rotateAxisZ: function (p, rad) {
@@ -180,15 +143,15 @@ var Wire3d = {
             z: p.z
         };
     },
-    isFrontOfMe: function(object){
-        var p1 = this.differencePoints(object, this.player);
+    isFrontOfMe: function (object) {
+        var p1 = this.subPoints(object, this.player);
         var p2 = this.rotateAxisZ(p1, this.player.rot);
         return p2.y > 0;
     },
     getProjected: function (mesh, object) {
         var p1 = this.scalePoint(mesh, object.scale);
         var p2 = this.addPoints(p1, object);
-        var p3 = this.differencePoints(p2, this.player);
+        var p3 = this.subPoints(p2, this.player);
         var p4 = this.rotateAxisZ(p3, this.player.rot);
         var p5 = {
             x: p4.x * this.player.fov / p4.y + this.w / 2,// x/z=xs/f
@@ -197,21 +160,21 @@ var Wire3d = {
         return p5;
     },
     playerUpdate: function () {
-        this.player.x += Math.cos(this.player.rot) * this.player.speed;
-        this.player.y += Math.sin(this.player.rot) * this.player.speed;
+        this.player.x += Math.sin(this.player.rot) * this.player.speed;
+        this.player.y += Math.cos(this.player.rot) * this.player.speed;
         this.player.rot += this.player.speedOfRot;
         this.player.speed *= .95;
         this.player.speedOfRot *= this.player.rotLoss;
-       
+
         if (this.player.isForward) {
             this.player.speed += 1;
         } else if (this.player.isBackward) {
             this.player.speed -= 1;
         }
         if (this.player.isRotLeft) {
-            this.player.speedOfRot += this.player.rotAcc;
-        } else if (this.player.isRotRight) {
             this.player.speedOfRot -= this.player.rotAcc;
+        } else if (this.player.isRotRight) {
+            this.player.speedOfRot += this.player.rotAcc;
         }
         if (this.player.rot < 0) {
             this.player.rot += Math.PI * 2;
@@ -248,5 +211,57 @@ var Wire3d = {
     },
     getPlayer: function () {
         return this.player;
-    }
+    },
+    primitives: [
+        {
+            name: 'cube',
+            points: [
+                -1, -1, -1,
+                1, -1, -1,
+                1, 1, -1,
+                -1, 1, -1,
+                -1, -1, 1,
+                1, -1, 1,
+                1, 1, 1,
+                -1, 1, 1
+            ],
+            edges: [
+                0, 1,
+                1, 2,
+                2, 3,
+                3, 0,
+                0, 4,
+                1, 5,
+                2, 6,
+                3, 7,
+                4, 5,
+                5, 6,
+                6, 7,
+                7, 4]
+        },
+        {
+            name: 'pyramid',
+            points: [
+                -1, -1, 0,
+                1, -1, 0,
+                1, 1, 0,
+                -1, 1, 0,
+                0, 0, 1.5
+            ],
+            edges: [
+                0, 1,
+                1, 2,
+                2, 3,
+                3, 0,
+                0, 4,
+                1, 4,
+                2, 4,
+                3, 4]
+        },
+        {
+            name: 'null',
+            points: [],
+            edges: []
+        }
+    ]
 }
