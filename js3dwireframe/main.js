@@ -32,8 +32,8 @@ document.body.onload = function (e) {
 }
 
 function init() {
-    Wire3d.addCube(10, 200, 0, 0);
-    Wire3d.addPyramid(10, 200, 0, 11);
+    Wire3d.addCube(10, 0, 200, 0);
+    Wire3d.addPyramid(10, 0, 200, 11);
     //console.log(Wire3d.getMeshByName('cube').points[1]);
 }
 

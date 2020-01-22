@@ -10,6 +10,8 @@ var Wire3d = {
         z: 0,
         fov: 0,
         speed: 0,
+        acc: .05,
+        loss: .9,
         rot: 0,
         rotAcc: .005,
         rotLoss: .9,
@@ -163,13 +165,13 @@ var Wire3d = {
         this.player.x += Math.sin(this.player.rot) * this.player.speed;
         this.player.y += Math.cos(this.player.rot) * this.player.speed;
         this.player.rot += this.player.speedOfRot;
-        this.player.speed *= .95;
+        this.player.speed *= this.player.loss;
         this.player.speedOfRot *= this.player.rotLoss;
 
         if (this.player.isForward) {
-            this.player.speed += 1;
+            this.player.speed += this.player.acc;
         } else if (this.player.isBackward) {
-            this.player.speed -= 1;
+            this.player.speed -= this.player.acc;
         }
         if (this.player.isRotLeft) {
             this.player.speedOfRot -= this.player.rotAcc;
