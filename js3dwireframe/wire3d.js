@@ -55,7 +55,6 @@ var Wire3d = {
                     z: points[i + 2]
                 });
         }
-        //console.log(p);
         for (var i = 0; i < edges.length; i += 2) {
             e.push(
                 {
@@ -109,10 +108,12 @@ var Wire3d = {
 
                 for (var j = 0; j < mesh.edges.length; j++) {
                     var edge = mesh.edges[j];
-                    this.ctx.beginPath();
-                    this.ctx.moveTo(points2D[edge.a].x, points2D[edge.a].y);
-                    this.ctx.lineTo(points2D[edge.b].x, points2D[edge.b].y);
-                    this.ctx.stroke();
+                    if (points2D[edge.a].visible && points2D[edge.b].visible) {
+                        this.ctx.beginPath();
+                        this.ctx.moveTo(points2D[edge.a].x, points2D[edge.a].y);
+                        this.ctx.lineTo(points2D[edge.b].x, points2D[edge.b].y);
+                        this.ctx.stroke();
+                    }
                 }
             }
         }
@@ -155,9 +156,13 @@ var Wire3d = {
         var p2 = this.addPoints(p1, object);
         var p3 = this.subPoints(p2, this.player);
         var p4 = this.rotateAxisZ(p3, this.player.rot);
+        var x = p4.x * this.player.fov / p4.y + this.w / 2;// x/z=xs/f
+        var y = this.h / 2 - p4.z * this.player.fov / p4.y;
+        var visible = p4.y > 0 && x > -6 * this.w && x < 7 * this.w && y > -6 * this.h && y < 7 * this.h;
         var p5 = {
-            x: p4.x * this.player.fov / p4.y + this.w / 2,// x/z=xs/f
-            y: this.h / 2 - p4.z * this.player.fov / p4.y
+            x: x,
+            y: y,
+            visible: visible
         };
         return p5;
     },
