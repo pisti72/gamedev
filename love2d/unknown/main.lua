@@ -3,7 +3,7 @@ This is my lua game
 ]]--
 
 function love.load()
-    SILENT = true
+    SILENT = false
     DEBUG = false
 
     EMPTY = 0
@@ -896,8 +896,8 @@ function createSecondStage()
     wallVertical(math.floor(wallsWidth/2),1,wallsHeight-2,EMPTY)
     setWall(wallsWidth-3,math.floor(wallsHeight/2),DOOR)
     
-    createActor("p1",PLAYER,GFX_KNIGHT,3,FAST,math.floor(wallsWidth/2)+2,math.floor(wallsHeight/2))
-    createActor("p2",PLAYER,GFX_KNIGHT_BLUE,3,FAST,math.floor(wallsWidth/2)-2,math.floor(wallsHeight/2))
+    createActor("p1",PLAYER,GFX_KNIGHT,10,FAST,math.floor(wallsWidth/2)+2,math.floor(wallsHeight/2))
+    createActor("p2",PLAYER,GFX_KNIGHT_BLUE,10,FAST,math.floor(wallsWidth/2)-2,math.floor(wallsHeight/2))
     
     createActor("e1",ENEMY1,GFX_SKELETON,3,SLOW,1,1)
     createActor("e2",ENEMY1,GFX_SKELETON,3,SLOW,wallsWidth-2,wallsHeight-2)
