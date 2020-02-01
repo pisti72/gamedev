@@ -1,0 +1,35 @@
+html, body {
+    height: 100%;
+    width: 100%;
+    margin: 0px;
+}
+
+#display {
+    cursor: default;
+    position: absolute;
+    background: lightgrey;
+    left: 0px;
+    top: 0px;
+    image-rendering: pixelated;
+}
+
+#map{
+    padding: 10px;
+    position: absolute;
+    left: 10px;
+    top: 10px;
+    background-color: rgba(0,0,0,.2);
+    font-family: 'Courier New', Courier, monospace;
+    font-size: 20px;
+    display: none;
+}
+
+#legend{
+    padding: 10px;
+    position: absolute;
+    right: 10px;
+    top: 10px;
+    background-color: rgba(0,0,0,.2);
+    font-family: 'Courier New', Courier, monospace;
+    font-size: 20px;
+}

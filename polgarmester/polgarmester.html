@@ -1,0 +1,297 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+	<meta charset="UTF-8">
+	<title>POLGÁRMESTER</title>
+	<link rel="icon"
+		href="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQAgMAAABinRfyAAAAAXNSR0IArs4c6QAAAAxQTFRFpDY2z2ts2pCR0KGdnrZUzQAAACxJREFUCNdj+DVt1SqGX6tgxH8gYAgFAggR4MgiACHia7/fh4hNRZWYjyIBAFADHYHFC0a2AAAAAElFTkSuQmCC"
+		type="image/png" sizes="16x16" />
+	<style>
+		html,
+		body {
+			height: 100%;
+			width: 100%;
+			margin: 0px;
+		}
+
+		#display {
+			cursor: none;
+			position: absolute;
+			background: PaleGreen;
+			left: 0px;
+			top: 0px;
+		}
+
+		#download {
+			position: absolute;
+			right: 10px;
+			bottom: 10px;
+		}
+	</style>
+</head>
+
+<body>
+	<audio id="explosion0" src="snd/explosion.wav">Your browser does not support the audio element.</audio>
+	<audio id="explosion1" src="snd/explosion.wav">Your browser does not support the audio element.</audio>
+	<audio id="explosion2" src="snd/explosion.wav">Your browser does not support the audio element.</audio>
+	<audio id="explosion3" src="snd/explosion.wav">Your browser does not support the audio element.</audio>
+	<audio id="explosion4" src="snd/explosion.wav">Your browser does not support the audio element.</audio>
+	<audio id="explosion5" src="snd/explosion.wav">Your browser does not support the audio element.</audio>
+	<audio id="explosion6" src="snd/explosion.wav">Your browser does not support the audio element.</audio>
+	<audio id="explosion7" src="snd/explosion.wav">Your browser does not support the audio element.</audio>
+	<audio id="build0" src="snd/build.wav">Your browser does not support the audio element.</audio>
+	<audio id="build1" src="snd/build.wav">Your browser does not support the audio element.</audio>
+	<audio id="build2" src="snd/build.wav">Your browser does not support the audio element.</audio>
+	<audio id="build3" src="snd/build.wav">Your browser does not support the audio element.</audio>
+	<audio id="build4" src="snd/build.wav">Your browser does not support the audio element.</audio>
+	<audio id="build5" src="snd/build.wav">Your browser does not support the audio element.</audio>
+	<audio id="build6" src="snd/build.wav">Your browser does not support the audio element.</audio>
+	<audio id="build7" src="snd/build.wav">Your browser does not support the audio element.</audio>
+	<canvas id="display">Your browser does not support the canvas element.</canvas>
+	<script>
+		/*
+		http://yscik.com/jf/mgeowlist.php
+		https://developer.mozilla.org/en/Canvas_tutorial/Using_images
+		http://www.motobit.com/util/base64-decoder-encoder.asp
+		http://www.opinionatedgeek.com/dotnet/tools/base64encode/
+		http://www.drpetter.se/project_sfxr.html
+		http://js1k.com/2010-first/demos
+		https://developer.mozilla.org/En/XPCOM_Interface_Reference/NsIDOMHTMLMediaElement
+		
+		2012 Janu�r 23., h�tf� d�l
+		*/
+		console.log('Started');
+		document.onmousemove = onMouseMove;
+		document.onmousedown = onMousePressed;
+		document.onmouseup = onMouseReleased;
+		document.body.onload = function (e) {
+			init();
+			update();
+		}
+		const version = '1.5';
+		const tilew = 64;
+		const tileh = 32;
+		const gravity = 16;
+		var debugValue;
+		var mouse_x = 0, mouse_y = 0;
+		var snd_explosion = [];
+		snd_explosion[0] = f("explosion0");
+		snd_explosion[1] = f("explosion1");
+		snd_explosion[2] = f("explosion2");
+		snd_explosion[3] = f("explosion3");
+		snd_explosion[4] = f("explosion4");
+		snd_explosion[5] = f("explosion5");
+		snd_explosion[6] = f("explosion6");
+		snd_explosion[7] = f("explosion7");
+		var snd_build = [];
+		snd_build[0] = f("build0");
+		snd_build[1] = f("build1");
+		snd_build[2] = f("build2");
+		snd_build[3] = f("build3");
+		snd_build[4] = f("build4");
+		snd_build[5] = f("build5");
+		snd_build[6] = f("build6");
+		snd_build[7] = f("build7");
+		var ctx = f('display').getContext('2d');
+		var w = f('display').width = document.body.clientWidth;
+		var h = f('display').height = document.body.clientHeight;
+		console.log('Display: ' + w + ' x ' + h);
+		var img_pointer = new Image();
+		var img_tiles = new Image();
+		var img_title = new Image();
+		var img_digits = new Image();
+		var period = Math.floor(w / tilew) + 1;
+		var map = [];
+		var map2 = [];
+		var ast = [];//xy,z
+		var mnz = [];
+		var mnv = [];
+		var score, hi;
+		var c1, c2, c3, c4, c5;
+		var state = 'TITLE';
+		var cash, house;
+		var mapsize = (Math.floor(w / tilew) + 1) * Math.floor(h / tileh);
+		var strength = Math.floor(mapsize / 12);
+		var scan;
+		img_pointer.src = 'gfx/hand.png';
+		img_tiles.src = 'gfx/tiles.png';
+		img_title.src = 'gfx/title.png';
+		img_digits.src = 'gfx/digits.png';
+		if (localStorage.hiscore2 >= 0 && localStorage.hiscore2 <= 9999)//NaN   0....99999
+		{
+			hi = Number(localStorage.hiscore2);
+			console.log('Stored high score found:' + hi);
+		} else {
+			console.log('Not high score stored');
+			localStorage.hiscore2 = 0;
+		}
+
+		function onMouseMove(e) {
+			mouse_x = e.pageX;
+			mouse_y = e.pageY;
+		}
+		function onMousePressed(e) {
+			c1 = 1;
+		}
+		function onMouseReleased(e) {
+			c1 = 0;
+			if (state == 'TITLE') { state = 'GAME'; init(); }
+			if (state == 'OVER') state = 'TITLE';
+		}
+		function asteroid() {
+			var j;
+			var i = 0;
+			do {
+				j = Math.floor(Math.random() * mapsize);
+			} while (++i < strength && map[j] != 1)
+			if (map[j] == 1 && ast[j] == 9999) ast[j] = h;
+		}
+		function update() {
+			if (c1 == 1) {
+				var xy = Math.floor(mouse_x / tilew) + Math.floor(mouse_y / tileh) * period;
+				if (state == 'GAME') {
+					if ((map[xy] == 0 && cash >= 5) || (map[xy] == 2 && cash >= 12) || (map[xy] == 11 && cash >= 12)) {
+						if (c5 > 7) c5 = 0;
+						//if(snd_build[c5].ended==true)
+						snd_build[c5++].play();
+						if (map[xy] == 0) {
+							mnv[xy] = '-5$';
+							cash -= 5;
+						}
+						if (map[xy] == 2 || map[xy] == 11) {
+							mnv[xy] = '-12$';
+							cash -= 12;
+						}
+						map[xy] = 1;
+						map2[xy] = Math.floor(Math.random() * 4);
+						mnz[xy] = 0;
+						house++;
+					}
+				}
+			}
+			c2++;
+			if (state == 'GAME' && c2 % 33 == 0) {
+				score++;
+				if (score > hi) hi = score;
+			}
+			meteorGenerator();
+			if (c3 > 0) c3--;
+			var shake = (c3 % 4) * 2;
+			ctx.clearRect(0, 0, w, h);
+			ctx.fillStyle = 'rgb(255,255,0)';
+
+			if (c2 > 500 && house == 0 && state == 'GAME') state = 'OVER';
+			//map
+			for (var i = 0; i < mapsize; i++) {
+				//explosion
+				if (map[i] > 11) {
+					drawTile(9 + Math.floor(map[i] / 2) % 2, i, shake);
+					map[i]--;
+				}
+				//houses, trees, ruins
+				if (map[i] == 1) {
+					drawTile(1 + map2[i], i, shake);
+					if (c2 % 100 == 0) {
+						mnz[i] = 0;
+						mnv[i] = '+1$';
+						cash++;
+					}
+				}
+				if (map[i] == 2) drawTile(5 + i % 2, i, shake);
+				if (map[i] == 11) drawTile(11, i, shake);
+
+				//asteroid
+				if (ast[i] != 9999) {
+					drawTile(7 + Math.floor(c2 / 4) % 2, i, ast[i]);
+					ast[i] -= gravity;
+					if (ast[i] < 0) {
+						if (c4 > 7) c4 = 0;
+						snd_explosion[c4++].play();
+						map[i] = 50;
+						ast[i] = 9999;
+						house--;
+						if (c3 == 0) c3 = 50;
+					}
+
+				}
+
+				//cash
+				if (mnz[i] != 9999) {
+					var u = mnz[i];
+					drawString(mnv[i], (i % period) * tilew, Math.floor(i / period) * tileh - 96 - 2 * u);
+					mnz[i]++;
+					if (mnz[i] > 30) mnz[i] = 9999;
+				}
+			}
+			//cursor
+			ctx.drawImage(img_tiles, 0, 96, 64, 32, Math.floor(mouse_x / tilew) * tilew, Math.floor(mouse_y / tileh) * tileh - shake, 64, 32);
+			//hand
+			if (c1 == 0) ctx.drawImage(img_pointer, 0, 0, 38, 56, mouse_x - 13, mouse_y - 5, 38, 56);
+			if (c1 != 0) ctx.drawImage(img_pointer, 38, 0, 38, 56, mouse_x - 13, mouse_y - 5, 38, 56);
+			//cash
+			drawString(cash + '$', 10, 10);
+			//score
+			drawString(score + '', 10, 50);
+			drawString(hi + '', 10, 90);
+			//title
+			if (state == 'TITLE') ctx.drawImage(img_title, Math.floor((w - img_title.width) / 2), Math.floor((h - img_title.height) / 3));
+			if (state == 'OVER') {
+				localStorage.hiscore2 = Number(hi);
+			}
+			//debug();
+			window.requestAnimationFrame(update);
+		}
+
+		function debug() {
+			ctx.fillStyle = '#000';
+			ctx.font = "30px Arial";
+			ctx.fillText(debugValue, 10, 200);
+		}
+
+		function meteorGenerator() {
+			var p = (Math.sin(c2 / 400) + 1) / 2;
+			debugValue = p;
+			if (c2 > 500 && c2 % 8 == 0) {
+				if (p < Math.random()) asteroid();
+			}
+		}
+
+		function drawTile(n, i, z) {
+			ctx.drawImage(img_tiles, n * 64, 0, 64, 128, (i % period) * tilew, Math.floor(i / period) * tileh - 96 - z, 64, 128);
+		}
+
+		function drawString(s, x, y) {
+			var c, j;
+			for (var i = 0; i < s.length; i++) {
+				j = 0;
+				var c = s.charCodeAt(i);
+				if (c >= 48 && c <= 57) j = 48;
+				if (c == 36) j = 24;
+				if (c == 43) j = 33;
+				if (c == 45) j = 34;
+				if (j != 0) ctx.drawImage(img_digits, 18 * (c - j), 0, 18, 24, x + i * 18, y, 18, 24);
+			}
+		}
+
+		function init() {
+			for (var i = 0; i < mapsize; i++) {
+				map[i] = 0;
+				ast[i] = 9999;
+				mnz[i] = 9999;
+			}
+			for (i = 0; i < 20; i++)map[Math.floor(Math.random() * mapsize)] = 2;//fa
+			score = 0;
+			c1 = 0, c2 = 0, c3 = 0, c4 = 0, c5 = 0;
+			cash = 50, house = 0;
+			scan = 9999;
+			console.log('Initialized');
+		}
+
+		function f(i) {
+			return document.getElementById(i);
+		}
+	</script>
+</body>
+
+</html>

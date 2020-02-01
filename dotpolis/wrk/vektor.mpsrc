@@ -1,0 +1,573 @@
+//project started: 2008.12.24.
+//2009.01.10. z-buffer ready, worldreader
+//2009.01.12. data in bytes --> better compression
+program vektor;
+const
+	f=128;
+	zcut=8;
+	speedlimit=60;
+	NEWWORLD=125;//7D
+	NEWOBJECT=126;//7E
+	ENDOFBLOCK=127;//7F
+	ENDOFFACE=124;
+	objectsize=400;
+type vertexTip=record
+										x:integer;
+										y:integer;
+										z:integer;
+										end;
+			displayTip=record
+										x:integer;
+										y:integer;
+										hide:integer;
+										end;
+			faceTip=record
+										p1:integer;
+										p2:integer;
+										p3:integer;
+										p4:integer;
+										nl:integer;
+										end;
+			worldTip=record
+										obj:integer;
+										tx:integer;
+										ty:integer;
+										tz:integer;
+										hide:integer;
+										end;
+var
+		objectstream:array[1..2000]of integer;
+		worldstream:array[1..2000]of integer;
+		worldpointer, objectpointer:integer;
+		vertex:array[1..50]of vertexTip;
+		vertext:array[1..50]of vertexTip;
+		normal:array[1..50]of vertexTip;
+		world:array[1..50]of worldTip;
+		worldt:array[1..50]of worldTip;
+		face2:array[1..200]of integer;
+		p1:array[1..200]of integer;
+		pn:array[1..200]of integer;
+		speed,shift:integer;
+		display:array[1..50]of displayTip;
+		s:array[0..128]of integer;
+	res:resource;
+	line:string;
+	i,j,dw,dh:integer;
+	rx,ry,rz:integer;
+	tgx,tgy,tgz:integer;
+	sx,sy,sz:integer;
+	vertexn, facen, worldn, scale, big:integer;
+	minx,miny,maxx,maxy:integer;
+	linemode:integer;
+
+procedure readobject(pointer:integer);
+	var i,j:integer;
+	begin
+		vertexn:=0;
+		i:=1;
+		scale:=objectstream[pointer];
+		pointer:=pointer+1;
+		repeat
+			vertex[i].x:=objectstream[pointer];
+			pointer:=pointer+1;
+			vertex[i].z:=objectstream[pointer];
+			pointer:=pointer+1;
+			vertex[i].y:=-objectstream[pointer];
+			pointer:=pointer+1;
+			i:=i+1;
+		until objectstream[pointer]=ENDOFBLOCK;
+		vertexn:=i-1;
+		pointer:=pointer+1;
+		
+		i:=1;
+		facen:=0;
+		repeat
+			face2[i]:=objectstream[pointer]+1;
+			pointer:=pointer+1;
+			i:=i+1;
+		until objectstream[pointer]=ENDOFBLOCK;
+		facen:=i-1;
+	end;
+	
+
+procedure readObjectStream;
+	var i:integer;
+	begin
+		i:=0;
+		repeat
+			objectstream[objectpointer]:=ReadByte(res);
+			if objectstream[objectpointer]=ENDOFBLOCK then i:=i+1;
+			objectpointer:=objectpointer+1;
+		until i=2;
+	end;
+
+procedure readWorldStream;
+	begin
+		repeat
+			worldstream[worldpointer]:=ReadByte(res);
+			worldpointer:=worldpointer+1;
+		until worldstream[worldpointer-1]=ENDOFBLOCK;
+	end;
+
+
+procedure readworld(pointer:integer);
+	var i:integer;
+	begin
+		i:=1;
+		worldn:=0;
+		repeat
+			world[i].obj:=worldstream[pointer];
+			pointer:=pointer+1;
+			world[i].tx:=worldstream[pointer]*32;
+			pointer:=pointer+1;
+			world[i].ty:=-worldstream[pointer]*32;
+			pointer:=pointer+1;
+			world[i].tz:=worldstream[pointer]*32;
+			pointer:=pointer+1;
+			i:=i+1;
+		until worldstream[pointer]=ENDOFBLOCK;
+		worldn:=i-1;
+	end;
+
+procedure loader3d;
+	var i,byte:integer;
+	begin
+		res:=OpenResource('/data.bin');
+		objectpointer:=1;
+		worldpointer:=1;
+		repeat
+			byte:=ReadByte(res);
+			if byte=NEWOBJECT then readObjectStream;
+			if byte=NEWWORLD then readWorldStream;
+		until byte=ENDOFBLOCK;
+		CloseResource(res);
+	end;
+
+
+
+procedure loaderSinus;
+	var i:integer;
+		line:String;
+	begin
+		res:=OpenResource('/sinus.txt');
+		for i:=0 to 128 do
+			begin
+				line:=ReadLine(res);
+				s[i]:=StringToInteger(line);
+			end;
+		CloseResource(res);
+	end;
+
+procedure SetWorldPointer(number:integer);
+	var i:integer;
+	begin
+		i:=1;
+		worldpointer:=1;
+		if number<>1 then //number=1-->0
+			begin
+				repeat//number=2-->1  K  E i=2     E i=3
+					if worldstream[worldpointer]=ENDOFBLOCK then i:=i+1;
+						worldpointer:=worldpointer+1;
+				until number=i;//ez jó
+			end;
+	end;
+
+procedure SetObjectPointer(number:integer);
+	var i,counter:integer;
+	begin
+		i:=1;
+		objectpointer:=1;
+		if number<>1 then
+			begin//2-->2   3-->4  K   E i=2       E i=3     E i=4    E i=5
+				number:=number*2;
+				repeat
+					if objectstream[objectpointer]=ENDOFBLOCK then i:=i+1;
+						objectpointer:=objectpointer+1;
+				until number-1=i;
+			end;
+	end;
+
+
+
+function sinint(degree:integer):integer;
+ begin
+  if degree<0 then degree:=degree+512;
+  degree:=degree mod 512;
+  if (degree>=0) and (degree<=127) then sinint:=s[degree];
+  if (degree>=128) and (degree<=255) then sinint:=s[256-degree];
+  if (degree>=256) and (degree<=383) then sinint:=-s[degree-256];
+  if (degree>=384) and (degree<=511) then sinint:=-s[512-degree];
+ end;
+
+
+function xr(x,y,degree:integer):integer;
+ begin
+  xr:=(x*sinint(degree+128)+y*sinint(degree))/4096;
+ end;
+
+
+function yr(x,y,degree:integer):integer;
+ begin
+  yr:=(-x*sinint(degree)+y*sinint(degree+128))/4096;
+ end;
+
+
+
+procedure drawLine2(mode,x1,y1,x2,y2:integer);
+	begin
+		if mode=0 then drawLine(x1,y1,x2,y2); else
+			begin
+				if abs(x1-x2)<abs(y1-y2) then
+					begin
+						drawLine(x1,y1,x2,y2);
+						drawLine(x1+1,y1,x2+1,y2);
+					end
+				else
+					begin
+						drawLine(x1,y1,x2,y2);
+						drawLine(x1,y1+1,x2,y2+1);
+					end;
+			end;
+	end;
+
+
+
+procedure drawCube;
+	var i,j:integer;
+		axb:integer;
+	begin
+		SetColor(255,255,255);
+		fillRect(minx,miny,maxx-minx,maxy-miny);
+		SetColor(0,0,0);
+		j:=1;//number of faces
+		for i:=1 to facen-2 do
+			begin
+				if face2[i]-1=ENDOFFACE then j:=j+1;
+				if (face2[i]-1<>ENDOFFACE) and (face2[i+1]-1<>ENDOFFACE) then
+					begin
+						if p1[j]=i then axb:=normal[j].x*vertext[face2[i]].x
+							+normal[j].y*vertext[face2[i]].y
+							+normal[j].z*vertext[face2[i]].z;
+						if axb<0 then
+							begin
+								if (display[face2[i]].hide=0) or (display[face2[i+1]].hide=0) then
+										drawLine2(linemode,
+											display[face2[i]].x,
+											display[face2[i]].y,
+											display[face2[i+1]].x,
+											display[face2[i+1]].y);
+								//draw p1-pn
+								if p1[j]=i then
+									if (display[face2[p1[j]]].hide=0) or (display[face2[pn[j]]].hide=0) then
+										drawLine2(linemode,
+											display[face2[p1[j]]].x,
+											display[face2[p1[j]]].y,
+											display[face2[pn[j]]].x,
+											display[face2[pn[j]]].y);
+							end;
+					end;
+			end;			
+	end;
+
+	
+
+procedure drawVertex;
+	var i:integer;
+	begin
+		SetColor(0,128,0);
+		for i:=1 to vertexn do
+			begin
+				if display[i].hide=0 then 
+					drawText(''+(i-1),display[i].x,display[i].y);
+			end;
+	end;
+
+
+
+procedure scaleVertex;
+	var i:integer;
+	begin
+		for i:=1 to vertexn do
+			begin
+				vertex[i].x:=vertex[i].x*scale;
+				vertex[i].y:=vertex[i].y*scale;
+				vertex[i].z:=vertex[i].z*scale;
+			end;
+	end;
+
+	
+
+procedure origoVertex;
+	var i,minx,miny,minz,maxx,maxy,maxz:integer;
+	begin
+		minx:=vertex[1].x;
+		maxx:=minx;
+		miny:=vertex[1].y;
+		maxy:=miny;
+		minz:=vertex[1].z;
+		maxz:=minz;
+		for i:=1 to vertexn do
+			begin
+				if vertex[i].x<minx then minx:=vertex[i].x;
+				if vertex[i].x>maxx then maxx:=vertex[i].x;
+				
+				if vertex[i].y<miny then miny:=vertex[i].y;
+				if vertex[i].y>maxy then maxy:=vertex[i].y;
+				
+				if vertex[i].z<minz then minz:=vertex[i].z;
+				if vertex[i].z>maxz then maxz:=vertex[i].z;
+			end;
+		for i:=1 to vertexn do
+			begin
+				vertex[i].x:=vertex[i].x-(maxx+minx)/2;
+				vertex[i].y:=vertex[i].y-(maxy+miny)/2;
+				vertex[i].z:=vertex[i].z-(maxz+minz)/2;
+			end;
+	end;
+
+
+procedure createNormals;
+	var i,j,k:integer;
+	//    |i  j  k |
+	//axb=|ax ay az|=(ay*bz-az*by)i-(ax*bz-az*bx)j+(ax*by-ay*bx)k
+	//    |bx by bz|
+		p1p2x,p1p2y,p1p2z:integer;//a
+		p1p3x,p1p3y,p1p3z:integer;//b
+	begin
+		j:=1;//number of faces
+		k:=0;//switcher
+		for i:=1 to facen do
+			begin
+				if k=0 then
+					begin
+						//a
+						p1p2x:=vertex[face2[i+1]].x-vertex[face2[i]].x;
+						p1p2y:=vertex[face2[i+1]].y-vertex[face2[i]].y;
+						p1p2z:=vertex[face2[i+1]].z-vertex[face2[i]].z;
+						//b
+						p1p3x:=vertex[face2[i+2]].x-vertex[face2[i]].x;
+						p1p3y:=vertex[face2[i+2]].y-vertex[face2[i]].y;
+						p1p3z:=vertex[face2[i+2]].z-vertex[face2[i]].z;
+						normal[j].x:=p1p2y*p1p3z-p1p2z*p1p3y;//ay*bz-az*by
+						normal[j].y:=p1p2z*p1p3x-p1p2x*p1p3z;//az*bx-ax*bz
+						normal[j].z:=p1p2x*p1p3y-p1p2y*p1p3x;//ax*by-ay*bx
+						p1[j]:=i;
+						k:=1;
+						j:=j+1;
+					end;
+				if face2[i]-1=ENDOFFACE then
+					begin
+						pn[j-1]:=i-1;
+						k:=0;
+					end;
+			end;
+	end;
+
+{	
+
+procedure drawCube2;
+
+	var i:integer;
+
+	begin
+
+		for i:=1 to vertexn do
+
+			begin
+
+				Plot(display[i].x,display[i].y);
+
+			end;
+
+	end;
+
+}
+procedure Projector(tx,ty,tz:integer);
+	var x,y,z,x2,y2,z2,i:integer;
+	begin
+		for i:=1 to vertexn do
+			begin
+				x:=vertex[i].x;
+				y:=vertex[i].y;
+				z:=vertex[i].z;
+				
+				//x:=x*sx; y:=y*sy; z:=z*sz;
+				x:=x+tx+tgx; y:=y+ty+tgy; z:=z+tz+tgz;
+				
+				vertext[i].x:=x;
+				vertext[i].y:=y;
+				vertext[i].z:=z;
+				
+				x2:=x; y2:=xr(y,z,rx); z2:=yr(y,z,rx);
+				x:=xr(x2,z2,ry); y:=y2; z:=yr(x2,z2,ry);
+				x2:=xr(x,y,rz); y2:=yr(x,y,rz); z2:=z;
+				
+				display[i].hide:=0;
+				if z2<=zcut then
+					begin
+						z2:=zcut;
+						display[i].hide:=1;
+					end;
+				
+
+				//x2:=x2+tx; y2:=y2+ty; z2:=z2+tz;
+
+
+
+				display[i].x:=x2*f/z2+dw/2;
+				display[i].y:=y2*f/z2+dh/2;
+				if i=1 then
+					begin
+						minx:=display[i].x;
+						miny:=display[i].y;
+						maxx:=minx;
+						maxy:=miny;
+					end;
+				if minx>display[i].x then minx:=display[i].x;
+				if maxx<display[i].x then maxx:=display[i].x;
+				if miny>display[i].y then miny:=display[i].y;
+				if maxy<display[i].y then maxy:=display[i].y;
+			end;
+			drawCube;
+
+			//drawVertex;
+
+	end;
+
+	
+
+procedure drawWorld;
+	var x,y,z,x2,y2,z2,i,j,csere:integer;
+	begin
+		//Akit nem látunk, azt nem rajzoljuk - hide
+		for i:=1 to worldn do
+			begin
+				x:=world[i].tx+tgx; y:=world[i].ty+tgy; z:=world[i].tz+tgz;
+								
+
+				x2:=x; y2:=xr(y,z,rx); z2:=yr(y,z,rx);
+				x:=xr(x2,z2,ry); y:=y2; z:=yr(x2,z2,ry);
+				x2:=xr(x,y,rz); y2:=yr(x,y,rz); z2:=z;
+
+				
+
+				//worldt[i].tx:=x2;
+
+				//worldt[i].ty:=y2;
+
+				worldt[i].tz:=z2;
+				world[i].hide:=0;
+				if z2<=zcut then
+					begin
+						world[i].hide:=1;
+					end;
+			end;
+
+		//z-buffer worldt
+
+			for j:=1 to worldn-1 do
+				begin
+					for i:=1 to worldn-1 do
+						begin
+							if (worldt[i].tz < worldt[i+1].tz) then
+								begin
+									csere:=world[i].tx;
+									world[i].tx:=world[i+1].tx;
+									world[i+1].tx:=csere;
+									
+									csere:=world[i].ty;
+									world[i].ty:=world[i+1].ty;
+									world[i+1].ty:=csere;
+									
+									csere:=world[i].tz;
+									world[i].tz:=world[i+1].tz;
+									world[i+1].tz:=csere;
+									
+									csere:=worldt[i].tz;
+									worldt[i].tz:=worldt[i+1].tz;
+									worldt[i+1].tz:=csere;
+									
+									csere:=world[i].obj;
+									world[i].obj:=world[i+1].obj;
+									world[i+1].obj:=csere;
+								end;
+						end;
+				end;
+		
+		for i:=1 to worldn do
+			begin
+				if world[i].hide=0 then
+					SetObjectpointer(world[i].obj);
+					//SetObjectpointer(1);
+					readobject(objectpointer);
+					createNormals;
+					scaleVertex;
+					origoVertex;
+					Projector(world[i].tx,world[i].ty,world[i].tz);
+			end;
+	end;
+	
+procedure keyboard;
+	var key,key2:integer;
+	begin
+		key2:=getKeyPressed;
+		key:=KeyToAction(key2);
+		if key=GA_LEFT then ry:=ry+8;
+		if key=GA_RIGHT then ry:=ry-8;
+		if key=GA_UP then speed:=speed+1;
+		if key=GA_DOWN then speed:=speed-1;
+		if key2=KE_KEY1 then shift:=shift-1;
+		if key2=KE_KEY3 then shift:=shift+1;
+		
+		if key2=KE_KEY7 then
+			begin
+				if linemode=1 then linemode:=0 else linemode:=1;
+			end;
+		if speed>speedlimit then speed:=speedlimit;
+		if speed<-speedlimit then speed:=-speedlimit;
+		//tgx:=tgx-yr(0,shift,ry);
+		//tgz:=tgz-xr(0,shift,ry);
+		tgx:=tgx-yr(speed,shift,ry);
+		tgz:=tgz-xr(speed,shift,ry);
+		ry:=ry mod 512;
+	end;
+
+
+procedure GetDisplay;
+	begin
+		dw:=GetWidth;
+		dh:=GetHeight;
+	end;
+	
+
+begin
+	linemode:=1;
+	loader3d;
+	loaderSinus;
+	SetWorldPointer(1);
+	readworld(worldpointer);
+	SetObjectPointer(1);//ha ezt kiveszed akkor fagyás
+	GetDisplay;
+	rx:=0;ry:=192;rz:=0;
+	tgx:=0;tgy:=-5;tgz:=0;
+	//sx:=1;sy:=1;sz:=1;
+	speed:=0;
+	shift:=0;
+	repeat
+		keyboard;
+		Setcolor(255,255,255);
+		fillRect(0,0,dw,dh);
+		SetColor(0,0,0);
+		drawLine2(linemode,0,dh div 2,dw,dh div 2);
+		drawWorld;
+		SetColor(200,200,200);
+		//drawText(''+tgz+','+tgx+','+ry+','+speed,0,0);
+		//drawText('vertexn:'+vertexn+' worldn:'+worldn+' facen:'+facen,0,50);
+		drawEllipse(10,10,40,40);
+		drawLine(30,30,xr(18,0,ry)+30,yr(18,0,ry)+30);
+		repaint;	
+		delay(50);
+	until getkeypressed=-7;
+end.
+
+ 
