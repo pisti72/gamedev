@@ -4,6 +4,7 @@ var Wire3d = {
         RUN: 1,
         FLY: 2
     },
+    debug: true,
     ctx: {},
     objects: [],
     meshes: [],
@@ -14,21 +15,26 @@ var Wire3d = {
         x: 0,
         y: 0,
         z: 0,
+        height: 10,
         fov: 0,
         speed: 0,
         acc: .1,
         loss: .9,
         rot: 0,
+        pull: 0,
+        roll: 0,
         rotAcc: .005,
         speedOfRot: 0,
+        speedOfPull: 0,
+        speedOfRoll: 0,
         isForward: false,
         isBackward: false,
         isRotRight: false,
         isRotLeft: false,
         isPushDown: false,
-        isPullUp:false,
+        isPullUp: false,
         isRollRight: false,
-        isRollLeft:false
+        isRollLeft: false
     },
     keypressed: function (e) {
         if (e.key == 'w') {
@@ -38,7 +44,12 @@ var Wire3d = {
                 this.playerPushDown();
             }
         } else if (e.key == 's') {
-            this.playerBackward();
+            if (this.player.ctrlMode == this.mode.WALK) {
+                this.playerBackward();
+            } else if (this.player.ctrlMode == this.mode.FLY) {
+                this.playerPullUp();
+            }
+            
         }
         if (e.key == 'a') {
             this.playerLeft();
@@ -48,7 +59,11 @@ var Wire3d = {
     },
     keyreleased: function (e) {
         if (e.key == 'w' || e.key == 's') {
-            this.playerNotForward();
+            if (this.player.ctrlMode == this.mode.WALK) {
+                this.playerNotForward();
+            } else if (this.player.ctrlMode == this.mode.FLY) {
+                this.playerNotPull();
+            } 
         }
         if (e.key == 'a' || e.key == 'd') {
             this.playerDoNotRot();
@@ -60,6 +75,9 @@ var Wire3d = {
         this.w = canvas.width = document.body.clientWidth;
         this.h = canvas.height = document.body.clientHeight;
         this.player.fov = this.w / 2;
+        this.player.ctrlMode = this.mode.WALK;
+        this.player.ctrlMode = this.mode.FLY;
+        this.player.z = this.player.height;
         this.meshes = [];
         //key handling
         document.onkeydown = function (e) {
@@ -122,7 +140,7 @@ var Wire3d = {
     addPyramid: function (scale, x, y, z) {
         this.addObject('pyramid', scale, x, y, z);
     },
-    debug: function (n, line) {
+    print: function (n, line) {
         this.ctx.fillStyle = '#000';
         this.ctx.font = "30px Arial";
         this.ctx.fillText(n, 10, line);
@@ -154,6 +172,13 @@ var Wire3d = {
             }
         }
         this.drawWASD();
+        this.drawDebug();
+    },
+    drawDebug: function() {
+        if(this.debug){
+        this.print('speed: ' + this.getPlayerSpeed(), 40);
+        this.print('rotation: ' + this.getPlayerDegree(), 80);
+        }
     },
     drawHorizon: function () {
         this.ctx.fillStyle = '#EEE';
@@ -201,6 +226,20 @@ var Wire3d = {
             z: p1.z - p2.z
         };
     },
+    rotateAxisX: function (p, rad) {
+        return {
+            x: p.x,
+            y: p.y * Math.cos(rad) - p.z * Math.sin(rad),
+            z: p.y * Math.sin(rad) + p.z * Math.cos(rad)
+        };
+    },
+    rotateAxisY: function (p, rad) {
+        return {
+            x: p.x * Math.cos(rad) - p.z * Math.sin(rad),
+            y: p.y,
+            z: p.x * Math.sin(rad) + p.z * Math.cos(rad)
+        };
+    },
     rotateAxisZ: function (p, rad) {
         return {
             x: p.x * Math.cos(rad) - p.y * Math.sin(rad),
@@ -217,12 +256,24 @@ var Wire3d = {
         var p1 = this.scalePoint(mesh, object.scale);
         var p2 = this.addPoints(p1, object);
         var p3 = this.subPoints(p2, this.player);
-        var p4 = this.rotateAxisZ(p3, this.player.rot);
+        var p11 = this.rotateAxisZ(p3, this.player.rot);
+        var p12 = this.rotateAxisY(p11,this.player.roll);
+        var p4 = this.rotateAxisX(p12, this.player.pull);
         if (p4.y <= 0) {
-            p4.y = .0001;
+            p4.y = .001;
         }
         var x = p4.x * this.player.fov / p4.y + this.w / 2;// x/z=xs/f
         var y = this.h / 2 - p4.z * this.player.fov / p4.y;
+        if (x < -40 * this.w) {
+            x = -40 * this.w;
+        } else if (x > 50 * this.w) {
+            x = 50 * this.w;
+        }
+        if (y < -40 * this.h) {
+            y = -40 * this.h;
+        } else if (y > 50 * this.h) {
+            y = 50 * this.h;
+        }
         var p5 = {
             x: x,
             y: y
@@ -230,11 +281,29 @@ var Wire3d = {
         return p5;
     },
     playerUpdate: function () {
-        this.player.x += Math.sin(this.player.rot) * this.player.speed;
-        this.player.y += Math.cos(this.player.rot) * this.player.speed;
+        var speed = {
+            x:0,
+            y:0,
+            z:0
+        };
+        speed.y = this.player.speed;
+        var speed2 = this.rotateAxisZ(speed, -this.player.rot);
+        var speed3 = this.rotateAxisX(speed2, -this.player.pull);
+        this.player.x += speed3.x;
+        this.player.y += speed3.y;
+        this.player.z += speed3.z;
         this.player.rot += this.player.speedOfRot;
-        this.player.speed *= this.player.loss;
+        this.player.pull += this.player.speedOfPull;
+        
+
+        if(this.player.ctrlMode == this.mode.WALK){
+            this.player.speed *= this.player.loss;
+        }else if(this.player.ctrlMode == this.mode.FLY){
+            this.player.roll = this.player.speedOfRot * 4;
+        }
         this.player.speedOfRot *= this.player.loss;
+        this.player.speedOfPull *= this.player.loss;
+        this.player.speedOfRoll *= this.player.loss;
 
         if (this.player.isForward) {
             this.player.speed += this.player.acc;
@@ -246,11 +315,18 @@ var Wire3d = {
         } else if (this.player.isRotRight) {
             this.player.speedOfRot += this.player.rotAcc;
         }
-        if(this.player.isPushDown) {
-
-        }else if(this.player.isPullUp){
-
+        if (this.player.isPushDown) {
+            this.player.speedOfPull += this.player.rotAcc;
+            //this.player.speed -= this.player.acc;
+        } else if (this.player.isPullUp) {
+            this.player.speedOfPull -= this.player.rotAcc;
+            this.player.speed += this.player.acc;
         }
+        // if (this.player.isRollLeft) {
+        //     this.player.speedOfRoll += this.player.rotAcc;
+        // } else if (this.player.isRollRight) {
+        //     this.player.speedOfRoll -= this.player.rotAcc;
+        // }
         if (this.player.rot < 0) {
             this.player.rot += Math.PI * 2;
         }
@@ -258,13 +334,13 @@ var Wire3d = {
     playerForward: function () {
         this.player.isForward = true;
     },
-    playerPushDown: function(){
+    playerPushDown: function () {
         this.player.isPushDown = true;
     },
-    playerPullUp: function(){
+    playerPullUp: function () {
         this.player.isPullUp = true;
     },
-    playerNotPull: function(){
+    playerNotPull: function () {
         this.player.isPushDown = false;
         this.player.isPullUp = false;
     },
@@ -285,8 +361,16 @@ var Wire3d = {
         this.player.isRotLeft = false;
         this.player.isRotRight = false;
     },
+    playerDoNotPull: function () {
+        this.player.isPullUp = false;
+        this.player.isPushDown = false;
+    },
+    playerDoNotRoll: function () {
+        this.player.isRollLeft = false;
+        this.player.isRollLeft = false;
+    },
     getPlayerSpeed: function () {
-        return Math.floor(this.player.speed);
+        return Math.floor(this.player.speed * 10);
     },
     getPlayerRot: function () {
         return this.player.rot;
