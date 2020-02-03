@@ -183,9 +183,37 @@ var Wire3d = {
     drawHorizon: function () {
         this.ctx.fillStyle = '#EEE';
         //this.ctx.clearRect(0, 0, this.w, this.h);
-        this.ctx.fillRect(0, 0, this.w, this.h / 2);
+        this.ctx.fillRect(0, 0, this.w, this.h);
         this.ctx.fillStyle = '#AAA';
-        this.ctx.fillRect(0, this.h / 2, this.w, this.h / 2);
+        //this.ctx.fillRect(0, this.h / 2, this.w, this.h / 2);
+        var p11 = {
+            x:-this.w,
+            y:this.player.fov,
+            z:0
+        }
+        var p12 = this.rotateAxisY(p11,this.player.roll);
+        var p4 = this.rotateAxisX(p12, this.player.pull);
+        var left ={};
+        var right = {};
+        left.x = p4.x * this.player.fov / p4.y + this.w / 2;// x/z=xs/f
+        left.y = this.h / 2 - p4.z * this.player.fov / p4.y;
+        p11 = {
+            x:this.w,
+            y:this.player.fov,
+            z:0
+        }
+        p12 = this.rotateAxisY(p11,this.player.roll);
+        p4 = this.rotateAxisX(p12, this.player.pull);
+        right.x = p4.x * this.player.fov / p4.y + this.w / 2;// x/z=xs/f
+        right.y = this.h / 2 - p4.z * this.player.fov / p4.y;
+        //this.ctx.fillRect(x, y, 10, 10);
+        this.ctx.beginPath();
+        this.ctx.moveTo(left.x, left.y);
+        this.ctx.lineTo(right.x, right.y);
+        this.ctx.lineTo(this.w, this.h);
+        this.ctx.lineTo(0, this.h);
+        this.ctx.closePath();
+        this.ctx.fill();
     },
     drawWASD: function () {
         var u = Math.floor(this.w / 30);
