@@ -1,0 +1,57 @@
+V
+130
+300
+2
+9
+8
+MMMMMMMMMMMMMMMMMMMMMMMMMMMMMM
+M...e..... ...k              M
+M.. e. .eee. .k .. . . . . . M
+M. oe.v.....k.k  ....... ... M
+M..k.o...k....k .e.o..o..e.. M
+M.. ...o.o. ..k ... .....o.  M
+Mkk.o.e.e....ok  .o..L.. .o. M
+M.o....k..kkk.k .o.. ....... M
+M..e.k...o.. .k ..e.....e.o  M
+M.k.e. o. .e.ek  ..eo.e.o... M
+M..oe...ee.o.ek .o.. ..o..e. M
+M.k..o..o...kek ...o...e.o.  M
+M.o.okk.k.k...k  ....o...... M
+M. ..o.. .ee. k ..eo.. . . . M
+M..e...ee..o..k . ...v       M
+M.o. .o..k.okkk  .o   kkkkkkkM
+Mk...oo....o.ok ..... ko.... M
+M..oo..keoo...k .e.o. k..o.o.M
+M. ..e...o.. .k  . . vk o. ..M
+Mk.oke. ..k...kv..o.. k ...o.M
+M..o.oo. .    k .e... k ..o .M
+M......... ..vk  ..  vk o....M
+Mkkkkkkkkk .. k . .e. k ...o.M
+M .... . k e. kvo.o.. k o... M
+M.. .....k .. k  .o.  k .. ..M
+M...e. .ek .. k ..... k .o ..M
+M........k    k . . . k ....oM
+Me.o.k. .k....k    v  k ..eeeM
+M. o.k...kee.ekkkkkkkkk .oeeeM
+M..o.ke. k....k.oo..... ..eeeM
+M.e..k. .ko.o k.ooo.... .. ..M
+M . .k.e.ko.. k..... ..  ....M
+M...ok.. ko.. k.. oo... .... M
+M...ok...ko.. k...oo... . ...M
+M.e.ok . koe.vk.o..o... oo.ooM
+M.. .k.e ko.. keeee. ...oo.ooM
+M e..ke.....e keeee.....o..ooM
+M...ek. .e... keeeeoo. .o..ooM
+Mo...k....ee. keeeeoo........M
+Moe .k. ..... keeee....... ..M
+Mo..ekkkkkkkkkkkkkkkkkkkkkkkkM
+M.e.......e...e.. ...oo.eeee.M
+Mo. ..oooo..oo...oo..oo.. oo.M
+Mo... ...  .oe. .o.. .e. ....M
+M..e.........e.......e...e.e M
+Mkkkkkkkkke..e.kkkkkkkkkkkkkkM
+Mo...o..e....o......oo..e....M
+M... .o..eo....i..e.oo. .eoo.M
+M..o... ..e.o..e.. .....e....M
+MMMMMMMMMMMMMMMMMMMMMMMMMMMMMM
+eof

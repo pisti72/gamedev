@@ -1,0 +1,280 @@
+<!--
+Készítette: Szalontai István
+Projekt neve: Tunnel
+Fejlesztés: 2011-08-25 - 2011-08-26
+Beküldési határidõ: augusztus 29, hétfõ 20 óra.
+
+Metropolisz + rejtély (+ idõutazás)
+
+js csomagolo:
+http://www.iteral.com/jscrush/
+
+-->
+<style>
+body{
+	background-color:rgb(0,0,40);
+	color:#ffffff;
+	font-family:courier;
+	font-weight:bold;
+}
+#title{
+	margin-left:10px;
+	margin-bottom:10px;
+	width:400px;
+	height:100px;
+	background:url(gfx/tunnel.png);
+}
+#b{
+	text-align:left;
+	font-weight:bold;
+	font-size:20px;
+}
+#r{
+	text-align:left;
+	color:#ffffff;
+	font-family:courier;
+	font-weight:bold;
+}
+#s{
+	text-align:left;
+	color:#ffffff;
+	font-family:arial;
+	font-weight:bold;
+	font-size:50px;
+}
+</style>
+<body>
+	<div id="title"></div>
+	<div id="b"></div>
+	<a href="http://istvanszalontai.atw.hu/games.html" target="_blank"><img src="gfx/bitboy_small_grey.png" border="0" alt="BITBOY"></a>
+	<img src="gfx/readme.png" border="0" alt="LEÍRÁS" onclick="readme()" style="cursor:pointer">
+	<a href="tunnel.zip"><img src="gfx/download.png" border="0" alt="LETÖLTÉS"></a>
+	<a href="http://yscik.com/jf/index.php" target="_blank"><img src="gfx/jf.png" border="0" alt="www.jatekfejlesztes.hu"></a>
+	<a href="http://www.w3schools.com/" target="_blank"><img src="gfx/w3s.png" border="0" alt="www.w3schools.com"></a>
+	<br><input type="checkbox" CHECKED id="y">Reverse Y-axis
+	<div id="s"></div>
+	<div id="r"></div>
+</body>
+<script>
+document.title='tunnel';
+var w = document.body.clientWidth;
+var h = document.body.clientHeight;
+
+var rm=0;
+var k=800;
+var line=16;
+var n=12;
+var ns=50;
+var path=new Array(3*n);//x,y,z
+var px=new Array(2000);
+var py=new Array(2000);
+var pc=new Array(2000);
+var stars=new Array(3*ns);
+var pp=0;
+var speed;
+var distance=14000;
+var focus=100;
+var size=w;
+var mouse_x, mouse_y;
+var tx,txv,txa;
+var ty,tyv,tya;
+var myx,myy,myxv,myyv,myxa,myya;
+var counter=0;
+var score;
+var hi=1000;
+//detecting browser
+var brw = 'IE';
+if (navigator.appName == 'Netscape') brw = 'FF';
+if (brw == 'IE') {document.onmousemove = mouseListener;}
+	else {window.onmousemove = mouseListener;}
+
+function mouseListener(e)
+{
+	if(brw == 'IE')
+	{
+		mouse_x = event.clientX;
+		mouse_y = event.clientY;
+	}
+	else
+	{
+		mouse_x = e.clientX;
+		mouse_y = e.clientY;
+	}
+}
+
+function moveStars()
+{
+	for(var i=0;i<ns;i++)
+	{
+		push((stars[i*3]+myxv*focus)%w,(stars[i*3+1]+myyv*focus)%h,stars[i*3+2]);
+	}
+}
+
+function movePlayer()
+{
+	myxv=-(mouse_x-w/2)/50;
+	myyv=-(mouse_y-h/2)/50;
+	if(document.getElementById('y').checked)myyv=-myyv;
+	myx+=myxv*speed;
+	myy+=myyv*speed;
+}
+
+function moveCircles()
+{
+	for(var i=0;i<n;i++)
+	{
+		path[i*3+2]-=speed;
+		if(path[i*3+2]<0)
+		{
+			if(Math.abs(path[i*3+0]+myx)>size || Math.abs(path[i*3+1]+myy)>size)
+			{
+				inicCircles();
+			}
+			else
+			{
+				path[i*3+0]=tx;
+				path[i*3+1]=ty;
+				path[i*3+2]+=distance;
+				tx+=txv;
+				txv+=txa;
+				ty+=tyv;
+				tyv+=tya;
+				counter++;
+				if(counter%10==0 && counter>10)
+				{
+					txa=Math.random()*(score/10+80)+30;
+					if(txv>0)txa=-txa;
+				}
+				if(counter%11==0 && counter>100)
+				{
+					tya=Math.random()*(score/10+80)+30;
+					if(tyv>0)tya=-tya;
+				}
+				score+=10;
+				speed+=.1;
+				if(score>=hi)hi=score;
+			}
+		}
+		var color=255-Math.floor(path[i*3+2]/distance*220);
+		circle(((path[i*3+0]+myx+myxv*path[i*3+2])*focus)/(path[i*3+2]+focus)+w/2,((path[i*3+1]+myy+myyv*path[i*3+2])*focus)/(path[i*3+2]+focus)+h/2,(size*focus)/(path[i*3+2]+focus),color);
+	}
+}
+
+function inicCircles()
+{
+	tx=0,txv=0,txa=0;
+	ty=0,tyv=0,tya=0;
+	myx=0,myy=0,myxv=0,myyv=0,myxa=0,myya=0;
+	mouse_x=w/2,mouse_y=h/2;
+	counter=0;
+	score=0;
+	speed=50;
+	for(var i=0;i<n;i++)
+	{
+		path[i*3+0]=tx;
+		path[i*3+1]=ty;
+		path[i*3+2]=i*(distance/n);
+	}
+}
+
+function inicStars()
+{
+	for(var i=0;i<ns;i++)
+	{
+		stars[i*3]=Math.random()*w+w;
+		stars[i*3+1]=Math.random()*h+h;
+		var t=Math.floor(Math.random()*4);
+		stars[i*3+2]='#B0B0B0';
+		if(t==1)stars[i*3+2]='#808080';
+		if(t==2)stars[i*3+2]='#787878';
+		if(t==3)stars[i*3+2]='#707070';
+	}
+}
+
+function circle(x,y,r,c)
+{
+	
+	var cx=[4.18 , 12.25 , 19.48 , 25.39 , 29.56 , 31.73]; //6*4=24 dots
+	//var cx=[2.09 , 6.24 , 10.29 , 14.15 , 17.78 , 21.10 , 24.06 , 26.61 , 28.70 , 30.30 , 31.39 , 31.93 ];//12*4=48 dots 
+	c=grey(c);
+	for(var i=0;i<cx.length;i++)
+	{
+		var xt=cx[i]*r/32;
+		var yt=cx[cx.length-1-i]*r/32;
+		push(xt+x,yt+y,c);
+		push(x-xt,yt+y,c);
+		push(xt+x,y-yt,c);
+		push(x-xt,y-yt,c);
+	}
+}
+function color(c)
+{
+	if(c==1)return '00f';
+	if(c==2)return 'f00';
+	if(c==7)return 'fff';
+}
+
+function grey(c)
+{
+	if(c>255)c=255;
+	return 'rgb('+c+','+c+','+Math.floor(c*.6)+')';
+}
+
+function push(x,y,c)
+{
+	if(x>=0 && x<w-50 && y>=0 && y<h-50)
+	{
+		px[pp]=x;
+		py[pp]=y;
+		pc[pp]=c;
+		pp++;
+	}
+}
+
+function redraw()
+{
+	var a='';
+	
+	for (var i=0;i<pp;i++)
+	{
+			a+='<p style="position:absolute;left:'+px[i]+'px;top:'+py[i]+'px;color:'+pc[i]+';" >.</p>';
+	}
+	
+	
+	//update display
+	document.getElementById('b').innerHTML=a;
+	//score
+	document.getElementById('s').innerHTML='000000'.slice(0,6-(''+score).length)+score+'<br>'+'000000'.slice(0,6-(''+hi).length)+hi;
+}
+function readme()
+{
+	var a='';
+	if(rm==0)
+	{
+		a='t u n n e l<br>===========<br>';
+		a+='<br>Játékmenet<br>==========<br>';
+		a+='Meddig jutsz el az idõ alagútban?<br>';
+		a+='<br>Készítõ<br>=======<br>';
+		a+='Programozás: Szalontai István (C)2011 Bitboy<br>';
+		a+='A játék teljes mértékben Java Scriptben íródott.<br>';
+		a+='Használt programok: Blender, Gimp, Notepad++, Mozilla, IE7<br>';
+		a+='Minden jog fenntartva!<br>';
+		a+='Verzió: 1.0<br>';
+		a+='<br>Jó játékot!!!<br>';
+		rm=1;
+	}else{rm=0;}
+	document.getElementById('r').innerHTML=a;
+}
+function gameLoop()
+{
+	moveStars();
+	moveCircles();
+	movePlayer();
+	redraw();
+	pp=0;
+	window.setTimeout("gameLoop();",20);//frissítés 1sec=1000 30frame/sec = 33
+}
+inicStars();
+inicCircles();
+gameLoop();
+</script>

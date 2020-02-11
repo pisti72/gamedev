@@ -1,0 +1,47 @@
+N
+99
+550
+4
+2
+10
+MMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMM
+Mi........o........M......e..M........M.....................eMeM
+MMMMMMMMM..MMMMMMM.M.MMMMMMM.M.M.MMM.MMM....................eM.M
+M..o ...M  M.......M..e..M...M.M.MeM.........................M.M
+M..M M..MMeM.MMMMMMMMMMM.M.M.M.M.M.MMMMM.....................M.M
+M..M M...MeM .     M....eM.M.M.M...MeeeM...M.M.M.MMMMMMMMMMMMM.M
+M..M M.M.MeM MMMMM M.MMMMM.M.M.M.MMMeeeM...M.M.M.Me............M
+MM.MvM.M.MeM .   v Me......MeM.M.MeeeeeMMMMM.M.M.MMMMMMM.MMMMMMM
+Me.M M.M.MMM.MMMMM.M.MMMMMMMMM.MMMeeeeeMe......M.M.......M.....M
+MM.MMM.M.e.......M.M.MMMMMMM...MeeeeeMMMMMMMMM.M.M.MMMMMMM.M.M.M
+Me..eM.M.MMMMMMMMMe.eM.....M...MeeeeeM.......M.M.M...........M.M
+MM.MMM.M.........MMMMM.M.M.M.......MMM.MMMMM.M.M.MMMMMMMMMMMMM.M
+Me..eM.M.........M...M.M.M.M.......M.M.....M.MeM.............M.M
+MM.MMM.M..v    ..M.M.M.M.M.M.....MMM.M.MMM.M.MMMMMMMMMMMMMMM.M.M
+Me...e.M..     ..M.M.M.MeM.M.......M.M.Me..M.....M.......eeM...M
+MMMMMMMM.MMMMMMM.M.M.M.MMM.MMMMMMM.M.M.MMMMMMM.M.M.M.MMMMMMM.M.M
+M...e....Me......M.M.M.M...........M.M.......M.M.M.M.M.......M.M
+MM.MMMMMMM.MMMMMMMeM.M.M.MMMMMMMMMMM.MMMMMMM.M.M.M.M.M.MMMMMMM.M
+M..M...e...M.....M.M.M.M.M.................M.M.M.M.M.M.......M.M
+MM.MMMMMMMMM.MMM.M.M.M.M.M.MMMMMMMMMMMMMMM.M.M.M.M.M.MMMMMMM.M.M
+M...e..............M.M.M.M...........M.....M.M.M.M.MeM.......M.M
+MMMMMMMMMMMMMMMMMMMM.MeM.M.MMMMMMMMM.M.MMMMM.MMM.M.MMMMMMMMM.M.M
+Mo..e....Me..M.e.....M.M.M.M.......M.M.M.....M.......M.......MeM
+Mk MMM.MMM.M.M.MMMMMMMMM.M.M.MMMMM.M.M.M.M.MMM.......M.M.M.M.MMM
+M. ..M.e.M.M.M.M...M...M.MeM.M...M.MeM.M...MeM.eeeee.M.M...M...M
+MMvMMM.MMM.M.M.M.M.M.M.M.MMM.M.M.M.MMM.MMM.M.M.e...e.M.MMMMM.M.M
+M. M........eM.M.M.M.M.M.....M.M.M.M.......M.M.e.L.e.M.M...M.M.M
+MM.MMM.MMMMMMM.M.M.M.MMMMMMMMMMM.M.M.MMMMMMM.M.e...e.M.M.M.M.M.M
+M.v..MeM.......M.M.M...............M.Me......M.eeeee.M.M.M.M.M.M
+MM MMM.M.MMMMMMM.M.MMM.MMMMMMMMMMMMM.MMMMMMM.M.......M.M.M.M.M.M
+M. MeM.M.........M.M...M...........M.....M...M.......M.M.M.MeM.M
+MM M.M.MMMMMMMMMMM.M.M.M.M.M.MMMMMMMMM.M.MMM.MMMMMMMMM.M.M.MMM.M
+M. M.M......e......M.M.M.M.M.M.......M.M.M.............M.M.....M
+MM M.MMM.MMMMMMMMMMM.M.M.M.M.M.MMMMM.M.M.MMMMM.MMMMMMMMM.MMMMMMM
+MeeM..e..........M.M.M.M.M.M.M.M...M.M.M.....M.M..............eM
+MMMMMMMM.MMMMMMMMM.M.M.M.M.M.M.M.MMM.MMMMMMM.M.M.MMMMMMMMMMMMMMM
+MM..e...........eM...M.M...M.M.M.............M.M...............M
+MM.MMMMMMMMMMMMMMMMMMM.MMMMM.M.MMMMMMMMMMMMMMMMMMMMMMMMMMMMMMM.M
+MM...........................M.................................M
+MMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMM
+eof

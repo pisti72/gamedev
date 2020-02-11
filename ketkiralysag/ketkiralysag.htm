@@ -1,0 +1,626 @@
+<script>
+/*
+Készítette: Szalontai István 2011-03-25 - 2011-03-27 a JFHU Villámversenyére
+E-mail:istvanszalontai@index.hu
+Honlap:http://istvanszalontai.atw.hu
+Nyersanyagok: fa,kõ,csülök
+
+Terület:
+piros: 3-fõvár-piros, 4-bánya-piros, 5-paraszt-piros, 6-erdész-piros, 7-katonaság-piros, 8-kiskatona, 9-nagykatona, 10-lovas
+kék: 35-fõvár-kék, 36-bánya-kék, 37-paraszt-kék, 38-erdész-kék, 39-katonaság-kék,40-kiskatona, 41-nagykatona, 42-lovas
+Terület: 0-fû, 1-erdõ, 2-kõhegy, 20-tó,
+
+Verzió:1.3
+*/
+var lvl=0;
+var counter=0;
+var mode=0;//0-térkép,1-épitkezes,2-katonaság,3-updateTower,4-updateWood,5-updateStone,6-pickedkatona
+var place,fn;//farmnumber
+var who,whos,whop;
+var mw=14,mh=7,dis=3,maxrow=4,fp=3;//mapwidth,mapheight,dis,maxresources limit,farmproductivity
+var m=new Array(400);//map
+var n=['MEZö','ERDÖ','HEGY','VÁR','BÁNYA','FARM','ERDÉSZ','KATONASÁG','KARDOS','IJJÁSZ','LOVAS'];//nevek
+n[20]='TÓ';
+var m2=new Array(400);//map buffer
+var rs=new Array(400);//resources or strength
+var rs2=new Array(400);//resources buffer
+var fh=new Array(400);//fight cloud
+var hv=new Array(10);//tower have
+var bld=[5,6,4,7,3];//paraszt,erdesz,bánya,katonasag,fövár
+var pop=[1,1,1,3,2];//paraszt,erdesz,bánya,katonasag,fövár
+var srg=[50,50,50,100,200, 100];//strength of buildings and soldiers
+var forder=[10,9,8,4,5,6,7,3];//fight order n=7
+var alt=['PARASZT: élelmiszert termel','ERDÉSZ: fát vág','BÁNYA: követ és ércet bányász','KATONASÁG: katonákat vehetsz','VÁR: csak a közelében épitkezhetsz'];
+var nd=[1,1, 2,0, 1,2, 3,3, 6,4];//fa,kö ami kell az épületekhez
+var army=[8,9,10];
+var armyx=[40,41,42];
+var ndar=[1,1, 2,2, 3,6];//fa,kaja
+var attd=[1,3,7];//kardos > ijjász > huszár   ...>kardos
+var th='<head><title>KÉT KIRÁLYSÁG</title></head><body style=background-image:url(b.png);>';
+th+='<center></br><img src=t.png></br></br></br>';
+var tb='</br></br>';
+tb+='<a href=http://www.w3schools.com/html5/><img src=h.png border=0></a>&nbsp;';
+tb+='<a href=http://istvanszalontai.atw.hu/games.html><img src=bb.png border=0></a>&nbsp;';
+tb+='<a href=ketkiralysag.zip><img src=dl.png border=0 alt="LETÖLTÉS"></a>&nbsp;';
+tb+='<a href=readme.htm><img src=hp.png border=0 alt="SEGÍTSÉG"></a>&nbsp;';
+tb+='<a href=http://yscik.com/jf/index.php><img src=j.png border=0></a>';
+tb+='</center></body>';
+
+function drawField()
+{
+	var a=th+'<table cellpadding=0 cellspacing=0 border=0>';
+	var j=0;
+	for(var i=0;i<mh*mw;i++)
+	{
+		if(i%mw==0)
+		{
+			a+='<tr><td id=p'+j+' onMouseDown=put('+j+') style=cursor:pointer;></td><td id=q'+j+'></td>';
+			j++;
+		}
+		if(i==mw*mh-1)
+		{
+			a+='<td id=o'+i+' onMouseDown=pause() style=cursor:pointer;></td>';
+		}
+		else
+		{
+			a+='<td id=o'+i+' onMouseDown=clicked('+i+') style=cursor:pointer;>lol</td>';
+		}
+		
+		if(i%mw==mw-1)a+='</tr>';
+	}
+	a+='<tr><td id=x onMouseDown=back() colspan='+(mw+2)+' align=center style=cursor:pointer;></td></tr>'
+	a+='</table>'+tb;
+	document.write(a);
+}
+
+function pause()
+{
+		if(mode==0){mode=7;counter=0;}//pause
+		if(mode==7 && counter>2)mode=0;//play
+}
+
+function clicked(b)//hova építünk
+{
+	var a,i,k;
+	place=b;
+	if(canbuild(b,0) && mode==0)//épitkezünk
+	{
+		mode=1;
+		for(i=0;i<mh*mw;i++)document.getElementById('o'+i).innerHTML='';
+		for(i=0;i<5;i++)
+		{
+			if(hv[0]>=nd[i*2] && hv[1]>=nd[i*2+1])
+			{
+				document.getElementById('p'+i).innerHTML='<img src='+bld[i]+'.png alt="'+alt[i]+'"></br></br>';
+				a='&nbsp;';
+				for(k=0;k<nd[i*2];k++)a+='<img src=wd.png>';
+				a+='<br>&nbsp;';
+				for(k=0;k<nd[i*2+1];k++)a+='<img src=sn.png>';
+				document.getElementById('q'+i).innerHTML=a;
+				//document.getElementById('q0').innerHTML='baszod';
+			}
+		}
+		document.getElementById('x').innerHTML='<img src=ex.png>';
+	}
+	if(m[b]=='0' && mode==6)movesoldier(b);//katonát odébb teszünk
+	if(m[b]=='3' || m[b]=='35'){mode=3;drawMenu();}//mi van a várban
+	if(m[b]=='1' || m[b]=='2'){mode=4;drawMenu();}//mennyi fa vagy szikla van
+	//if(m[b]=='4' || m[b]=='5' || m[b]=='6'){mode=5;drawMenu(m[b]);}
+	if(m[b]=='7')//katonaság
+	{
+		mode=2;
+		drawMenu();
+		a='';
+		for(i=0;i<5;i++)
+		{
+			if(hv[0]>=ndar[i*2] && hv[2]>=ndar[i*2+1])
+			{
+				document.getElementById('p'+(i+1)).innerHTML='<img src='+army[i]+'.png></br></br>';
+				a='&nbsp;';
+				for(k=0;k<ndar[i*2];k++)a+='<img src=wd.png>';
+				a+='<br>&nbsp;';
+				for(k=0;k<ndar[i*2+1];k++)a+='<img src=mt.png>';
+				document.getElementById('q'+(i+1)).innerHTML=a;
+			}
+		}
+		
+	}
+	if(m[b]=='8' || m[b]=='9' || m[b]=='10')//katonaság
+	{
+		who=m[b];//kit teszünk odébb
+		whop=b;//és honnan
+		whors=rs[b];//és mekkora energiával
+		mode=6;
+	}
+}
+
+function drawMenu()
+{
+	for(var i=0;i<mh*mw;i++)document.getElementById('o'+i).innerHTML='';
+	document.getElementById('q0').innerHTML='<center><img src='+m[place]+'.png></center><br><br>';
+	document.getElementById('x').innerHTML='<img src=ex.png>';
+}
+
+function drawValue(p)
+{
+	document.getElementById('x').innerHTML='<img src=ex.png>'+p;
+}
+
+function drawWin()
+{
+	for(var i=0;i<mh*mw;i++)document.getElementById('o'+i).innerHTML='';
+	for(i=0;i<=4;i++)document.getElementById('q'+i).innerHTML='';
+	document.getElementById('q0').innerHTML='<center><img src=wn.png></center><br><br>';
+	document.getElementById('x').innerHTML='<img src=ex.png>';
+	var a='';
+	for(i=0;i<lvl;i++)a+='<img src=ct.png>';
+	document.getElementById('q1').innerHTML=a;
+	mode=5;
+}
+
+function drawLost()
+{
+	for(var i=0;i<mh*mw;i++)document.getElementById('o'+i).innerHTML='';
+	for(i=0;i<=4;i++)document.getElementById('q'+i).innerHTML='';
+	document.getElementById('q0').innerHTML='<center><img src=ls.png></center><br><br>';
+	document.getElementById('x').innerHTML='<img src=ex.png>';
+	mode=5;
+}
+
+function put(i)
+{
+	if(mode==1)//ha épitkezésben voltunk
+	{		
+		m[place]=bld[i];
+		hv[0]-=nd[i*2];//fát levonjuk
+		hv[1]-=nd[i*2+1];//követ levonjuk
+		rs[place]=srg[i];//adunk neki kezdeti energiát
+		hv[3]+=pop[i];//nõ a lélekszám
+	}
+	if(mode==2)//ha katonaságban voltunk
+	{
+		var p;
+		p=neighbour(place,'0');
+		if(p!=-1)
+		{
+			i--;
+			m[p]=army[i];
+			hv[0]-=ndar[i*2];//csökkentjük a fát
+			hv[2]-=ndar[i*2+1];//csökkentjük a csülköt
+			rs[p]=srg[5];//kap energiát a katona
+			hv[3]++;//nõ a lélekszám
+		}
+	}
+	back();
+}
+
+function putx()
+{
+	var p,j,i,tmp;
+	//bld=[5,6,4,7,3];0-paraszt,1-erdesz,2-bánya,3-katonasag,4-fövár
+	//legyen:35%-erdész,35%-bánya,20%-fövár,10%-katonaság
+	//1. elöször meg kell mondanunk, hogy mit épitsünk
+	if(Math.random()>0.5)i=1;else i=2;			//erdész
+	
+	//ez mind szép és jó majd ezt felülbiráljuk
+	tmp=mw-1;//13%14=13
+	for(j=0;j<mw*mh;j++)
+	{
+		if(m[j]=='35' && j%mw<tmp%mw)tmp=j;
+	}
+	if(hv[4]>8 && hv[5]>5 && hv[6]>6 && Math.random()>0.7)
+	{
+		if(Math.random()>0.3 && tmp>=3)i=4; else i=3;
+	}//ha jól állunk, akkor legyen fövár
+	if(hv[5]<3)i=2;			//bánya ha kevés az érc
+	if(hv[4]<3)i=1;			//erdész ha kevés a fa
+	if((hv[7]/fp>=fn || hv[6]<=3) && hv[4]>2 && hv[5]>2)i=0;
+				//paraszt ha fogy a kaja vagy kevés a kaja, de nem megy a fa vagy az érc rovására
+	
+	//2. majd meg kell mondanunk, hogy hová építsünk
+	if(i==0)//ha paraszt. Tuti üres helyet keresünk
+	{
+		j=0;
+		do{
+			p=Math.floor(Math.random()*mw*mh);//hova?
+			j++;
+		}while(!canbuild(p,1) && j<100)
+	}
+	if(i==1)//ha erdész, akkor erdö mellé. Tuti üres helyet keresünk
+	{
+		j=0;
+		do{
+			p=Math.floor(Math.random()*mw*mh);//hova?
+			j++;
+		}while(!(canbuild(p,1) && neighbour(p,1)!=-1) && j<100)
+		if(j==100)i=-1;
+	}
+	if(i==2)//ha bányász, akkor hegy mellé. Tuti üres helyet keresünk
+	{
+		j=0;
+		do{
+			p=Math.floor(Math.random()*mw*mh);//hova?
+			j++;
+		}while(!(canbuild(p,1) && neighbour(p,2)!=-1) && j<100)
+		if(j==100)i=-1;
+	}
+	if(i==3)//ha katona, akkor üres mellé. Tuti üres helyet keresünk
+	{
+		j=0;
+		do{
+			p=Math.floor(Math.random()*mw*mh);//hova?
+			j++;
+		}while(!(canbuild(p,1) && neighbour(p,0)!=-1) && j<100)
+		if(j==100)i=-1;
+	}
+	if(i==4)//ha fövár, akkor a legjobboldalibb fövártól kettövel jobbrát
+	{
+		tmp=mw-1;//13%14=13
+		for(j=0;j<mw*mh;j++)
+		{
+			if(m[j]=='35' && j%mw<tmp%mw)tmp=j;
+		}
+		//tmp-legjobboldalibb
+		j=0;
+		do{
+			p=Math.floor(Math.random()*mw*mh);//hova?
+			j++;
+		}while(!(canbuild(p,1) && p%mw==(tmp-2)%mw) && j<100)
+	}
+	
+	if(hv[4]>=nd[i*2] && hv[5]>=nd[i*2+1] && canbuild(p,1) && i!=-1)//ha van anyagom és üres helyem
+	{
+		m[p]=bld[i]+32;
+		hv[4]-=nd[i*2];//fát levonjuk
+		hv[5]-=nd[i*2+1];//követ levonjuk
+		rs[p]=srg[i];//adunk neki kezdeti energiát
+		hv[7]+=pop[i];//nõ a lélekszám
+	}
+}
+
+function addsoldierx(i)//i-hely
+{
+	var p,i,v;
+	p=neighbour(i,'0');
+	if(p!=-1)
+	{
+		v=Math.random()*1000;
+		if(v<=500)i=0;
+		if(v>500)i=1;
+		if(v<lvl*200+200)i=2;//lvl=4 mindenki huszár lesz
+		//alert(hv[6]);
+		if(hv[4]>=ndar[i*2]+2 && hv[6]>=ndar[i*2+1]+2 && hv[6]>=10 && hv[7]/fp<fn)
+		{
+			//alert('csülök elötte:'+hv[6]);
+			m[p]=armyx[i];//megfeleö figurát oda tesszük
+			hv[4]-=ndar[i*2];//csökkentjük a fát
+			hv[6]-=ndar[i*2+1];//csökkentjük a csülköt
+			hv[7]++;//nõ a lélekszám
+			rs[p]=srg[5];//a katona kap energiát
+		}
+	}
+}
+
+function movesoldier(b)
+{
+	var a=Math.abs(b%mw-whop%mw);
+	var c=Math.abs(Math.floor(b/mw)-Math.floor(whop/mw));
+	if((a==1 && c==0) || ((a==0 && c==1)))
+	{
+		m[b]=who;
+		rs[b]=whors;
+		m[whop]='0';
+		rs[whop]=0;
+		mode=0;//térkép mód
+	}else{mode=0;}
+}
+
+function movesoldierx()
+{
+	var j,i;
+	for(i=0;i<mw*mh;i++)//buffert készítünk
+	{
+		m2[i]=m[i];
+		rs2[i]=rs[i];
+	}
+	for(i=0;i<mw*mh;i++)
+	{
+		if(m[i]=='40' || m[i]=='41' || m[i]=='42')
+		{
+		
+			var p=Math.floor(Math.random()*8);//p=0 - 7
+			j=-1;
+			if((p==0 || p==1 || p==2) && i-1>=0 && (i-1)%mw!=mw-1 && m2[i-1]=='0')j=i-1;//balra megyünk
+			if(p==3 && i+1<mw*mh && (i+1)%mw!=0 && m2[i+1]=='0')j=i+1;//jobbra megyünk
+			if((p==4 || p==5) && i-mw>=0 && m2[i-mw]=='0')j=i-mw;//fentre megyünk
+			if((p==6 || p==7) && i+mw<mw*mh && m2[i+mw]=='0')j=i+mw;//lentre megyünk
+		
+			
+			if(j!=-1)
+			{
+				m2[j]=m[i];
+				rs2[j]=rs[i];
+				m2[i]='0';
+				rs2[i]=0;
+			}
+		}
+	}
+	for(i=0;i<mw*mh;i++)//buffert visszairjuk
+	{
+		m[i]=m2[i];
+		rs[i]=rs2[i];
+	}
+}
+
+function back()
+{
+	for(var i=0;i<5;i++)
+	{
+		document.getElementById('p'+i).innerHTML='';
+		document.getElementById('q'+i).innerHTML='';
+	}
+	document.getElementById('x').innerHTML='';
+	mode=0;
+}
+
+function updateMap()
+{
+	for(var i=0;i<mh*mw-1;i++)
+	{
+		if(fh[i]=='0')document.getElementById('o'+i).innerHTML='<img src='+m[i]+'.png alt="'+n[m[i]%32]+'">';
+		if(fh[i]=='1')document.getElementById('o'+i).innerHTML='<img src=ft.gif>';
+	}
+	if(mode==0)document.getElementById('o'+i).innerHTML='<img src=pu.png>';
+	if(mode==7)document.getElementById('o'+i).innerHTML='<img src=pl.png>';
+}
+
+function updateTower()
+{
+	var i,k,a,p=0;
+	if(m[place]=='35')p=4;
+	for(k=0;k<=3;k++)
+	{
+		a='';
+		for(i=0;i<hv[k+p];i++)
+		{
+			if(k==0)a+='<img src=wd.png>';
+			if(k==1)a+='<img src=sn.png>';
+			if(k==2)a+='<img src=mt.png>';
+			if(k==3)a+='<img src=mn.png>';
+			if((i+1)%mw==0)a+='<br>';
+		}
+		document.getElementById('q'+(k+1)).innerHTML=a;
+	}
+}
+
+function updateResource()
+{
+	var i, a='';
+	for(i=0;i<rs[place];i++)
+	{
+		if(m[place]=='1')a+='<img src=wd.png>';
+		if(m[place]=='2')a+='<img src=sn.png>';
+		if((i+1)%mw==0)a+='<br>';
+	}
+	a+='<br><br>';
+	document.getElementById('q1').innerHTML=a;
+}
+
+function updateCounter()
+{
+	counter++;
+	if(counter>1000)counter=0;
+}
+
+function neighbour(p,w)//place,what  yes or no
+{
+	var q,ok=-1;
+	q=p-1;
+	if(q%mw!=mw-1 && q>=0)if(m[q]==w)ok=q;//balra
+	q=p-mw;
+	if(q>=0)if(m[q]==w)ok=q;//fent
+	q=p+1;
+	if(q%mw!=0 && q<mw*mh)if(m[q]==w)ok=q;//jobbra
+	q=p+mw;
+	if(q<mw*mh)if(m[q]==w)ok=q;//lent
+	return ok;
+}
+
+function canbuild(p,w)//p-hely,w=0-ha én w=1 ha ö
+{
+	var i;
+	var ok=false;
+	if(m[p]=='0')//ha ott semmi sincs
+		for(i=0;i<mw*mh;i++)
+		{
+			if(w==0 && m[i]=='3' && Math.abs(p%mw-i%mw)<dis && Math.abs(Math.floor(p/mw)-Math.floor(i/mw))<dis)
+				ok=true;
+			if(w==1 && m[i]=='35' && Math.abs(p%mw-i%mw)<dis && Math.abs(Math.floor(p/mw)-Math.floor(i/mw))<dis)
+				ok=true;
+		}
+	return ok;
+}
+
+function deleteHouse(p,w)//p-hely,w=0-ha én w=1 ha ö
+{
+	for(var i=0;i<=4;i++)
+		if(m[p]%32==bld[i])hv[3+w*4]-=pop[i];//kirugjuk az embereket
+	if(i==4)hv[3+w*4]--;//ezek szerint katona volt
+	m[p]='0';
+	fh[p]='0';
+	rs[p]=0;
+}
+
+function harvest(p)//p=0 én 1 ö
+{
+	var q,i;
+	fn=0;
+	for(i=0;i<mh*mw;i++)
+	{
+		if((m[i]=='4' && p==0) || (m[i]=='36' && p==1))//bánya
+		{
+			q=neighbour(i,'2');//kõhegy
+			if(q!=-1)
+			{
+				if(rs[q]>0)rs[q]--;
+				if(rs[q]<=0)m[q]='0';//mezõvé változik
+				hv[1+p*4]++;
+			}else{deleteHouse(i,p);}//mezövé változik ha kimerül
+		}
+		if((m[i]=='6' && p==0) || (m[i]=='38' && p==1))//erdész
+		{
+			q=neighbour(i,'1');//erdõ
+			if(q!=-1)
+			{
+				if(rs[q]>0)rs[q]--;
+				if(rs[q]<=0)m[q]='0';//mezõvé változik
+				hv[0+p*4]++;
+			}else{deleteHouse(i,p);}//mezövé változik ha kimerül
+		}
+		if((m[i]=='5' && p==0) || (m[i]=='37' && p==1))//paraszt
+		{
+			hv[2+p*4]++;
+			if(p==1)fn++;
+		}
+	}
+	for(i=0;i<3;i++)if(hv[i+p*4]>mw*maxrow)hv[i+p*4]=mw*maxrow;//maximalizálja a fát, a követ és a csülköt
+}
+
+function ai()
+{
+	//bulid
+	if(counter%10==0)putx();
+	//create soldier
+	//if(Math.random()*1000<(lvl+1)*5)
+	{
+		for(var i=0;i<mh*mw;i++)
+		{
+			if(m[i]=='39')addsoldierx(i);
+		}
+	}
+	//goto fight
+	movesoldierx();
+}
+
+function clsCloud()
+{
+	for(var i=0;i<mh*mw;i++)
+		fh[i]='0';//alapból kikapcsoljuk
+}
+
+function fighter()
+{
+	var q,i,j,f,k;
+	k=0;//tegyük fel, hogy nincs ellenség
+	for(i=0;i<mh*mw;i++)
+	{
+		if(m[i]=='8' || m[i]=='9' || m[i]=='10')//valamelyik katona
+		{
+			for(j=0;j<=7;j++)//megnézzük van-e mellettem ellenséges objektum
+			{
+				f=0;//nem talált semmit
+				q=neighbour(i,forder[j]+32);//ellenséges objektum 
+ 				if(q!=-1 && f==0)//talált valaki megtámadhatót
+				{
+					f=1;
+					fh[q]='1';
+					if(rs[q]>0)rs[q]-=attd[m[i]-8];
+					if(rs[q]<=0){deleteHouse(q,1);}//mezõvé változik ha vége van
+				}
+			}
+		}
+	}
+}
+
+function fighterx()
+{
+	var q,i,j,f,k;
+	k=0;//tegyük fel, hogy nincs ellenség
+	for(i=0;i<mh*mw;i++)
+	{
+		if(m[i]=='40' || m[i]=='41' || m[i]=='42')//valamelyik katona
+		{
+			for(j=0;j<=7;j++)//megnézzük, hogy van e mellette ellenséges objektum
+			{
+				f=0;//tegyük fel nem talált semmit
+				q=neighbour(i,forder[j]);//ellenséges objektum 
+ 				if(q!=-1 && f==0)//talált valaki megtámadhatót
+				{
+					f=1;
+					fh[q]='1';
+					if(rs[q]>0)rs[q]-=attd[m[i]-40];
+					if(rs[q]<=0){deleteHouse(q,0);}//mezõvé változik ha vége van
+				}
+			}
+		}
+	}
+}
+
+function isGameOver()
+{
+	var melost=1,helost=1;
+	for(i=0;i<mh*mw;i++)
+	{
+		if(m[i]=='3')melost=0;//ha megvan a föváram akkor nincs baj
+		if(m[i]=='35')helost=0;
+	}
+	if(melost==1)
+	{
+		lvl=0;
+		drawLost();
+		newGame();
+	}
+	if(helost==1 || hv[2+4]<=0)
+	{
+		lvl++;
+		drawWin();
+		newGame();
+	}
+	if(hv[2]<=0)
+	{
+		lvl=0;
+		drawLost();
+		newGame();
+	}
+}
+
+function newGame()
+{
+	counter=0;
+	hv=[6+lvl,6+lvl,10,2, 6+lvl,6+lvl,10,2];//fa,kö,kaja,ember  amivel indulunk
+	//mode=0;
+	for(var i=0;i<mh*mw;i++)
+	{
+		m[i]='0';//fû
+		fh[i]='0';//fight cloud
+		var r=Math.random()*100;
+		if(r>=60+lvl && r<100)m[i]='1';//fa ritkulnak
+		if(r>=35 && r<60)m[i]='2';//sziklák nem ritkulnak
+		if(r>=35-lvl && r<35)m[i]='20';//tó több lesz
+		rs[i]=Math.floor(Math.random()*15)+5;//nyersanyag eloszlás
+	}
+	m[1+3*mw]='3';//piros-vár
+	rs[1+3*mw]=srg[4];//energiája
+	m[mw-2+3*mw]='35';//kék-vár
+	rs[mw-2+3*mw]=srg[4];//energiája
+}
+
+function gameLoop()
+{
+	if(counter%10==0 && mode!=5 && mode!=7){hv[2]-=hv[3]/fp;hv[6]-=hv[7]/fp;}//evés
+	if(mode!=5 && mode!=7)ai();
+	if(mode==0 || mode==6 || mode==7)updateMap();//normal vagy katonára pickeltem
+	if(mode==3)updateTower();//vár készletet updatel
+	if(mode==4)updateResource();//erdö készletet updatel
+	isGameOver();
+	updateCounter();
+	if(counter%10==0 && mode!=5 && mode!=7){harvest(0);harvest(1);}
+	clsCloud();
+	fighter();
+	fighterx();
+	window.setTimeout("gameLoop();",500);//frissítés 1sec=1000
+}
+newGame();
+drawField();
+gameLoop();
+</script>

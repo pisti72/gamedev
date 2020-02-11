@@ -1,0 +1,270 @@
+<html>
+<head>
+<title>Favonatok</title>
+<style>
+body{
+	background-color:white;
+}
+div#ipad{
+	background-image:url('res/iPad_sktchs.png');
+	width:1024px;
+	height:768px;/* 140,100 -> 750x563px */
+	position:absolute;
+	left:0px;
+	top:0px;
+}
+div#empty{
+	background-image:url('res/empty.jpg');
+	width:750px;
+	height:563px;
+	scale:50%;
+	position:absolute;
+	left:140px;
+	top:100px;
+	overflow:hidden;
+}
+div#item1{
+	background-image:url('res/sun.png');
+	width:218px;
+	height:221px;
+}
+div#item2{
+	background-image:url('res/tree.png');
+	width:233px;
+	height:266px;
+}
+div#item3{
+	background-image:url('res/train.png');
+	width:314px;
+	height:238px;
+}
+div#item4{
+	background-image:url('res/cloud.png');
+	width:272px;
+	height:119px;
+}
+div.drag{
+	position:absolute;
+	cursor:pointer;
+}
+div.balloon{
+	background-image:url('res/balloon_red.png');
+	top:600px;
+	left:300px;
+	width:136px;
+	height:186px;
+	position:absolute;
+	cursor:pointer;
+}
+</style>
+</head>
+<body>
+<pre id="debug"></pre>
+<div id="ipad"></div>
+<div id="empty">
+<div class="drag" id="item1"></div>
+<div class="drag" id="item2"></div>
+<div class="drag" id="item3"></div>
+<div class="drag" id="item4"></div>
+<div class="balloon" id="b_red"></div>
+</div>
+
+
+
+
+<script>
+/*
+Projektrõl:
+============
+Projekt név: Wooden trains
+Projekt indult: 2012-08-27
+Készítette: Szalontai István 2012-09-03
+
+Feladatok:
+==========
+-libgdx telepítése SampleGame mûködésre bírása
+-android installálása a munkahelyi gépre, mert a libgdx nem mûködik enélkül
+
+- 2.pálya elkészítése
+- lufi grafika, 4 színben
+- 1.pálya libgdxben --> apk
+- 1-10.pálya elkészítése vázlatok A4 papíron
+- 1-10 pálya elkészítése Blenderben
+- 1-10 pálya szétvágása masterrelése GIMP-ben
+- indító ikon elkészítése
+- splash screen képek 2 darab fejlesztõ + publisher
+- grafikák beimportálása az Eclipsbe
+- LITE apk elkészítése
+- PRO apk elkészítése
+- PRO apk feltöltése GooglePlayre
+- LITE apk belinkelése a PRO -hoz
+- LITE apk feltöltése
+
+Program kód libgdx:
+===================
+-splash screen (2 darab fejlesztõ + publisher)
+-egy pálya
+-pálya kezelõ
+-jutalom minden pálya végén: lufi pukkasztás vagy a kész pálya animálása hangokkal??
+-kód optimalizálás
+-tesztelés
+
+Történet:
+=========
+2012-08-27 - projekt indító sörözés Danival
+2012-08-29 - 1.pálya és js+html mockup
+2012-09-03 - 2. mockup ipad kerettel :-)
+
+Linkek:
+=======
+http://luke.breuer.com/tutorial/javascript-drag-and-drop-tutorial.aspx
+http://libgdx.badlogicgames.com/
+http://www.rengelbert.com/tutorial.php?id=175
+http://www.nosoapradio.us/
+http://code.google.com/p/libgdx/wiki/TableOfContents
+http://www.w3schools.com/
+*/
+
+
+var gap = 10;
+var _startX = 0;			// mouse starting positions
+var _startY = 0;
+var _offsetX = 0;			// current element offset
+var _offsetY = 0;
+var _dragElement;			// needs to be passed from OnMouseDown to OnMouseMove
+var _oldZIndex = 0;			// we temporarily increase the z-index during drag
+var _item1 = 0; //dragable-0   not-draggable-1  
+var _item2 = 0; //dragable-0   not-draggable-1  
+var _item3 = 0; //dragable-0   not-draggable-1  
+var _item4 = 0; //dragable-0   not-draggable-1  
+var message = 0;
+var names = ['item1','item2','item3','item4'];
+var draggable = [0,0,0,0];
+var coords = [36,28,53,263,368,264,406,33];
+var y=600;
+
+InitDragDrop();
+
+function InitDragDrop()
+{
+	document.onmousedown = OnMouseDown;
+	document.onmouseup = OnMouseUp;
+}
+
+function OnMouseDown(e)
+{
+	// IE is retarded and doesn't pass the event object
+	if (e == null) 
+		e = window.event; 
+	
+	// IE uses srcElement, others use target
+	var target = e.target != null ? e.target : e.srcElement;
+	
+	//target.className = 'drag' ? 'draggable element clicked' : 'NON-draggable element clicked';
+	
+	// for IE, left click == 1
+	// for Firefox, left click == 0
+	if ((e.button == 1 && window.event != null || 
+		e.button == 0) && 
+		target.className == 'drag')
+	{
+		// grab the mouse position
+		_startX = e.clientX;
+		_startY = e.clientY;
+		
+		// grab the clicked element's position
+		_offsetX = ExtractNumber(target.style.left);
+		_offsetY = ExtractNumber(target.style.top);
+		
+		// bring the clicked element to the front while it is being dragged
+		_oldZIndex = target.style.zIndex;
+		target.style.zIndex = 10000;
+		
+		// we need to access the element in OnMouseMove
+		_dragElement = target;
+
+		// tell our code to start moving the element with the mouse
+		document.onmousemove = OnMouseMove;
+		
+		// cancel out any text selections
+		document.body.focus();
+		
+		// prevent text selection in IE
+		document.onselectstart = function () { return false; };
+		// prevent IE from trying to drag an image
+		target.ondragstart = function() { return false; };
+		
+		// prevent text selection (except IE)
+		return false;
+	}
+}
+
+function ExtractNumber(value)
+{
+	var n = parseInt(value);
+	
+	return n == null || isNaN(n) ? 0 : n;
+}
+
+function OnMouseMove(e)
+{
+	if (e == null) 
+		var e = window.event; 
+	var name = _dragElement.id;
+	for(var i=0;i<=3;i++) {
+		if ((draggable[i]==0 && name==names[i]))
+		{
+			// this is the actual "drag code"
+			_dragElement.style.left = (_offsetX + e.clientX - _startX) + 'px';
+			_dragElement.style.top = (_offsetY + e.clientY - _startY) + 'px';
+		}
+	}
+	var x = _offsetX + e.clientX - _startX;
+	var y = _offsetY + e.clientY - _startY;
+	for(var i=0;i<=3;i++) {
+		if(name==names[i] && Math.abs(x-coords[i*2+0])<gap && Math.abs(y-coords[i*2+1])<gap)
+		{
+			draggable[i]=1;
+			_dragElement.style.left = coords[i*2+0]+'px';
+			_dragElement.style.top = coords[i*2+1]+'px';;
+			_dragElement.style.cursor = 'default';
+		}
+	}
+	if(draggable[0]==1 && draggable[1]==1 && draggable[2]==1 && draggable[3]==1 && message==0)
+	{
+		message=1;
+		alert('G R A T U L Á L O K !!! \n Ügyes vagy !');
+	}
+	//document.getElementById('debug').innerHTML = name+'(' + x + ', ' + y + ') '+_item1;	
+}
+
+function OnMouseUp(e)
+{
+	if (_dragElement != null)
+	{
+		_dragElement.style.zIndex = _oldZIndex;
+
+		// we're done with these events until the next OnMouseDown
+		document.onmousemove = null;
+		document.onselectstart = null;
+		_dragElement.ondragstart = null;
+
+		// this is how we know we're not dragging
+		_dragElement = null;
+		
+		//_debug.innerHTML = 'mouse up';
+	}
+}
+
+function update()
+{
+	//var y=ExtractNumber(document.getElementById('b_red').style.top);
+	
+	document.getElementById('b_red').style.top=y+'px';
+	y-=2;
+	window.setTimeout('update();',30);
+}
+update();
+</script>
+</body>
+</html>

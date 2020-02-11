@@ -1,0 +1,40 @@
+<Project>
+	<MIDlet Name="FallingRocks" Vendor="Szalontai" Version="1.0.0" Icon="/icon.png"/>
+	<Sources>
+		<source filename="FallingRocks.mpsrc"/>
+	</Sources>
+	<Resources>
+		<resource filename="icon.png" configurations=":all:"/>
+		<resource filename="tiles16.png" configurations=":all:"/>
+		<resource filename="tiles32.png" configurations=":all:"/>
+		<resource filename="charset.png" configurations=":all:"/>
+		<resource filename="title176.png" configurations=":all:"/>
+		<resource filename="title240.png" configurations=":all:"/>
+		<resource filename="bg.png" configurations=":all:"/>
+		<resource filename="contact_info.txt" configurations=":all:"/>
+		<resource filename="levels.txt" configurations=":all:"/>
+		<resource filename="map1.txt" configurations=":all:"/>
+		<resource filename="map2.txt" configurations=":all:"/>
+		<resource filename="map3.txt" configurations=":all:"/>
+		<resource filename="map4.txt" configurations=":all:"/>
+		<resource filename="map5.txt" configurations=":all:"/>
+		<resource filename="map6.txt" configurations=":all:"/>
+		<resource filename="map7.txt" configurations=":all:"/>
+		<resource filename="map8.txt" configurations=":all:"/>
+		<resource filename="map9.txt" configurations=":all:"/>
+		<resource filename="map10.txt" configurations=":all:"/>
+		<resource filename="map11.txt" configurations=":all:"/>
+		<resource filename="map12.txt" configurations=":all:"/>
+		<resource filename="map13.txt" configurations=":all:"/>
+		<resource filename="map14.txt" configurations=":all:"/>
+		<resource filename="map15.txt" configurations=":all:"/>
+		<resource filename="map16.txt" configurations=":all:"/>
+		<resource filename="map17.txt" configurations=":all:"/>
+		<resource filename="map18.txt" configurations=":all:"/>
+		<resource filename="map19.txt" configurations=":all:"/>
+		<resource filename="map20.txt" configurations=":all:"/>
+	</Resources>
+	<BuildConfigurations>
+		<configuration name="Default" type="fullscreen" version="2" math="1"/>
+	<ActiveConfiguration index="0"/>	</BuildConfigurations>
+</Project>
