@@ -1,0 +1,193 @@
+<!doctype html>
+<html>
+<!--
+Author:		istvan.szalontai12@gmail.com
+Project: 	The sixth key
+Begin:		2013-09-01
+End:		2013-09-30 12:00
+Theme:		3D
+Link:		http://jatekfejlesztes.hu/kiemelt.php?id=2135f2950
+
+Licenc:
+http://creativecommons.org/licenses/by-nc-nd/2.5/hu/
+This work is licensed under a Creative Commons Attribution-NonCommercial-NoDerivs 3.0 Unported License.
+-->
+<head>
+	<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-2" />
+	<link rel="shortcut icon" href="gfx/favicon.ico" />
+	<script type="text/javascript" src="js/game.min.js"></script>
+	<script type="text/javascript" src="js/tiny3D.min.js"></script>
+	<script type="text/javascript" src="js/assets.js"></script>
+	<title>The Sixth Key</title>
+	<style>
+	html,body{
+		width:100%;
+		height:100%;
+		margin:0px;
+		font-family:Sans-serif;
+	}
+	#gamearea{
+		position: absolute;
+		background: BurlyWood;
+		left:0px;
+		top:0px;
+	}
+	#debug{
+		position:absolute;
+		background:LightGreen;
+		left:0px;
+		top:0px;
+		margin:0px;
+		padding:5px;
+		visibility:hidden;
+	}
+	#blur{
+		position:absolute;
+		background-image: url('gfx/mask.png');
+		background-size:100% 100%;
+		/* background-repeat: no repeat;*/
+		width:100%;
+		height:100%;
+		left:0px;
+		top:0px;
+		margin:0px;
+		padding:0px;
+		visibility:hidden;
+	}
+	#title_center{
+		position:absolute;
+		left:50%;
+		height:100%;
+	}
+	#title{
+		position: relative;
+		background-image: url('gfx/title_hu.png');
+		top: 10%;
+		left:-50%;
+		width:450px;
+		height:365px;
+	}
+	#gui_play_center{
+		position: absolute;
+		left:50%;
+		height:100%;
+	}
+	#gui_play{
+		position: relative;
+		background-image: url('gfx/gui_play.png');
+		background-size: 100%;
+		left: -50%;
+		top: 70%;
+		width: 140px;
+		height: 140px;
+		height: auto;
+		cursor: pointer;
+		visibility: hidden;
+	}
+	#gui_controller{
+		position:absolute;
+		background-image: url('gfx/gui_controller.png');
+		width:200px;
+		height:200px;
+		right:0px;
+		bottom:0px;
+		visibility:hidden;
+	}
+	#icons{
+		position:absolute;
+		right:20px;
+		top:20px;
+	}
+	#gui_exit{
+		background-image: url('gfx/gui_icons.png');
+		background-position: -458px;
+		width: 0px;
+		height: 92px;
+		float: left;
+		cursor: pointer;
+		visibility: hidden;
+	}
+	#gui_credits{
+		background-image: url('gfx/gui_icons.png');
+		background-position: -366px;
+		width: 0px;
+		height: 92px;
+		float: left;
+		cursor: pointer;
+		visibility: hidden;
+	}
+	#gui_soundon{
+		background-image: url('gfx/gui_icons.png');
+		background-position: -182px;
+		width: 0px;
+		height: 92px;
+		float: left;
+		cursor: pointer;
+		visibility: hidden;
+	}
+	#gui_soundoff{
+		background-image: url('gfx/gui_icons.png');
+		background-position: -274px;
+		width: 0px;
+		height: 92px;
+		float: left;
+		cursor: pointer;
+		visibility: hidden;
+	}
+	#gui_back{
+		background-image: url('gfx/gui_icons.png');
+		background-position: -92px;
+		width: 0px;
+		height: 92px;
+		float: left;
+		cursor: pointer;
+		visibility: hidden;
+	}
+	#zip{
+		position: absolute;
+		right: 20px;
+		bottom: 20px;
+		visibility: hidden;
+	}
+	</style>
+</head>
+<body>
+	<audio id="aaah" src="snd/aaah.ogg"></audio>
+	<audio id="door" src="snd/door.ogg"></audio>
+	<audio id="walking" src="snd/walking.ogg"></audio>
+	<audio id="walkinggravel" src="snd/walkinggravel.ogg"></audio>
+	<audio id="furniture" src="snd/furniture.ogg"></audio>
+	<audio id="cure" src="snd/cure.ogg"></audio>
+	<audio id="ouch" src="snd/ouch.ogg"></audio>
+	<audio id="phew" src="snd/phew.ogg"></audio>
+	<audio id="ghost" src="snd/ghostwhispers.ogg"></audio>
+	<audio id="choir" src="snd/choir.ogg"></audio>
+	<audio id="forest" src="snd/forest.ogg"></audio>
+	<audio id="night" src="snd/night.ogg"></audio>
+	<audio id="scream" src="snd/ghostscream.ogg"></audio>
+	<audio id="ohyeah" src="snd/ohyeah.ogg"></audio>
+	<audio id="coin" src="snd/coin.ogg"></audio>
+	<audio id="click" src="snd/click.ogg"></audio>
+	
+	<canvas id="gamearea" >Your browser does not support the canvas element.</canvas>
+	<div id="blur"></div>
+	<div id="title_center">
+		<div id="title"></div>
+	</div>
+	<div id="gui_play_center">
+		<div id="gui_play"></div>
+	</div>
+	<div id="debug">debug</div>
+	<div id="gui_controller"></div>
+	<div id="icons">
+		<div id="gui_back"></div>
+		<div id="gui_soundon"></div>
+		<div id="gui_soundoff"></div>
+		<div id="gui_credits"></div>
+		<div id="gui_exit"></div>
+	</div>
+	<div id="zip">
+		<a href="thesixthkey.zip"><img src="gfx/zip.png" border="0" alt="Download" title="Download"></a>
+	</div>
+</body>
+</html>
