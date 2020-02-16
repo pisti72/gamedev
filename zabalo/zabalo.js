@@ -1,3 +1,4 @@
+/*
 var player = {
     x: 0,
     y: 0,
@@ -6,15 +7,10 @@ var player = {
     yd: 0,
     life: 0,
     pont: 0,
-    gyors: 0,		// J�t�kos aktu�lis sebess�ge
+    gyors: 0,
     hatas_timer: 0
-}	// Gy�m�lcs hat�sa a j�t�kosra
-var enemies = [];
-var enemy = {
-    x: 0,
-    y: 0,
-    face: 1
 }
+*/
 
 const TITLE_INIC = 1;
 const TITLE = 2;
@@ -56,8 +52,6 @@ var enemy_seb_normal = seb_normal + 2;
 var enemy_seb_gyors = seb_gyors + 2;
 var screen = document.getElementById('screen');
 
-mapij = [[]];
-
 document.addEventListener("keydown", function (e) {
     keydown(e);
 });
@@ -65,14 +59,7 @@ document.addEventListener("keyup", function (e) {
     keyup(e);
 });
 
-//something();
 requestAnimationFrame(zabalo);
-
-function something() {
-    Map.copyLevelToWorking();
-    screen.innerHTML = Map.render();
-    console.log('done');
-}
 
 function keydown(e) {
     if (e.key == 'ArrowLeft') {
@@ -81,7 +68,7 @@ function keydown(e) {
         pressedkey = 2;
     } else if (e.key == 'ArrowUp') {
         pressedkey = 3;
-    } else if (e.key == 'ArrowUp') {
+    } else if (e.key == 'ArrowDown') {
         pressedkey = 4;
     } else {
         pressedkey = 5;
@@ -94,38 +81,51 @@ function keyup(e) {
 
 //sz�rnyek mozgat�sa
 function move_enemy() {
+    var actors = Map.actors;
+    //console.log(actors.length);
+    var player;
+    var enemies = [];
+    for (var i = 0; i < actors.length; i++) {
+        var actor = actors[i];
+        if (actor.name == 'player') {
+            player = actor;
+        } else if (actor.name == 'enemy') {
+            enemies.push(actor);
+        }
+    }
     for (var i = 0; i < enemies.length; i++) {
         var enemy = enemies[i];
         if (utem % enemy_gyors == 0) {
             if (
                 player.x > enemy.x &&
-                Map.getCell(enemy.x + 1, enemy.y) != "1" &&
-                !vaneszorny(enemy.x + 1, enemy.y)) {
+                Map.getBlock(enemy.x + 1, enemy.y) != "1" &&
+                thereIsNoEnemy(enemy.x + 1, enemy.y)) {
                 enemy.x++;
-            }else if (
+            } else if (
                 player.x < enemy.x &&
-                Map.getCell(enemy.x - 1,enemy.y) != "1" &&
-                !vaneszorny(enemy.x - 1, enemy.y)) {
+                Map.getBlock(enemy.x - 1, enemy.y) != "1" &&
+                thereIsNoEnemy(enemy.x - 1, enemy.y)) {
                 enemy.x--;
-            }else if (
+            } else if (
                 player.y > enemy.y &&
-                Map.getCell(enemy.x,enemy.y + 1) != "1" &&
-                !vaneszorny(enemy.x, enemy.y + 1)) {
+                Map.getBlock(enemy.x, enemy.y + 1) != "1" &&
+                thereIsNoEnemy(enemy.x, enemy.y + 1)) {
                 enemy.y++;
-            }else if (
+            } else if (
                 player.y < enemy.y &&
-                Map.getCell(enemy.x,enemy.y - 1) != "1" &&
-                !vaneszorny(enemy.x, enemy.y - 1)) {
+                Map.getBlock(enemy.x, enemy.y - 1) != "1" &&
+                thereIsNoEnemy(enemy.x, enemy.y - 1)) {
                 enemy.y--;
             }
-            animation_enemy(i);
+            //animation_enemy(i);
         }
     }
 }
 
-function vaneszorny(x, y) {
-    for (var i = 0; i < enemies.length; i++) {
-        if ((x == enemies[i].x) && (y == enemies[i].y)) { return true; }
+function thereIsNoEnemy(x, y) {
+    var actor = Map.getActorFromHere(x, y);
+    if (actor.name != 'enemy') {
+        return true;
     }
     return false;
 }
@@ -134,7 +134,8 @@ function vaneszorny(x, y) {
 function move_player() {
     var xd_proba = 0;
     var yd_proba = 0;
-    if (utem % player.gyors == 0) {
+    var player = Map.getActorByName('player');
+    if (utem % player.speed == 0) {
         //milyen gombot nyomt�l le?
         switch (pressedkey) {
             case 1: xd_proba = -1; yd_proba = 0; break;	//balra
@@ -152,34 +153,19 @@ function move_player() {
         if ((player.x != mapWidth) && (player.xd == -mapWidth)) player.xd = 1;
 
         //falon nem tudunk �tmenni
-        if (Map.getCell(player.x + xd_proba,player.y + yd_proba) != "1") {
+        if (Map.getBlock(player.x + xd_proba, player.y + yd_proba) != "1") {
             player.xd = xd_proba;
             player.yd = yd_proba;
         }
         //bogy� van el�tt�nk?
-        if (Map.getCell(player.x + player.xd,player.y + player.yd) == ".") {
-            Map.setCell(' ',player.x + player.xd,player.y + player.yd);
-            player.pont += 10;
+        if (Map.getBlock(player.x + player.xd, player.y + player.yd) == ".") {
+            Map.setBlock(' ', player.x + player.xd, player.y + player.yd);
+            player.score += 10;
             kaja--;
         }
-        if (Map.getCell(player.x + player.xd,player.y + player.yd) == " ") {
+        if (Map.getBlock(player.x + player.xd, player.y + player.yd) == " ") {
             player.x += player.xd;
             player.y += player.yd;
-            if (player.xd == -1) {
-                if (player.face == 4) {
-                    player.face = 5;
-                } else {
-                    player.face = 4;
-                }
-            }
-            if (player.xd == 1) {
-                if (player.face == 6) {
-                    player.face = 7;
-                } else {
-                    player.face = 6;
-                }
-            }
-            if ((player.yd == 1) || (player.yd == -1)) animation();
         }
 
         if (player.x < 0) player.x = mapWidth;//ha kimegy�nk a bal oldalon, visszaj�v�nk a jobb oldalon
@@ -188,6 +174,14 @@ function move_player() {
 }
 
 function utkozes() {
+    var player = Map.getActorByName('player');
+    var actors = Map.actors;
+    var enemies = [];
+    for (var i = 0; i < actors.length; i++) {
+        if (actors[i].name == 'enemy') {
+            enemies.push(actors[i]);
+        }
+    }
     for (var i = 0; i < enemies.length; i++) {
         if (player.x == enemies[i].x && player.y == enemies[i].y) {
             player.life--;
@@ -213,7 +207,7 @@ function gyumikezelo() {
         do {
             gyumi_x = rand(1000) % mapWidth;
             gyumi_y = rand(1000) % mapHeight;
-        } while (Map.getCell(gyumi_x,gyumi_y) == "1");
+        } while (Map.getCell(gyumi_x, gyumi_y) == "1");
         gyumi_timer = rand(1000) % 400 + 200;
     }
     //j�t�kos kapja el a gy�m�lcs�t
@@ -266,7 +260,7 @@ function gyumikezelo() {
     if (player.hatas_timer > 0) {
         player.hatas_timer--;
     } else {
-        player.gyors = seb_normal;
+        player.speed = seb_normal;
     }
 
     if (enemy_hatas_timer > 0) {
@@ -281,7 +275,7 @@ function gyumikezelo() {
 }
 
 function palyamegcsinalva() {
-    if (kaja == 0) {		//p�ly�t megcsin�ltuk?
+    if (Map.gems == 0) {		//p�ly�t megcsin�ltuk?
         if (palya == maxpalya - 1) {
             gamestate = CONGRATULATE;
         } else {	//esetleg ez az utols� p�lya volt? --> gratul�ci�
@@ -295,7 +289,7 @@ function jatek() {	//gamestate=5
     move_enemy();		//ellens�g mozgat�sa
     move_player();		//j�t�kos mozgat�sa
     utkozes();			//�tk�z�s figyel�se az ellens�ggel
-    gyumikezelo();		//gy�m�lcs kihelyez�se, majd a vele val� �tk�z�s figyel�se
+    //gyumikezelo();		//gy�m�lcs kihelyez�se, majd a vele val� �tk�z�s figyel�se
     palyamegcsinalva();	//p�lya megcsin�lva?
 }
 
@@ -308,23 +302,7 @@ function jatekvege() {//gamestate=8
 
 //nem kell! Törölni!
 function megegyszer_inic() {//gamestate=6
-    enemies = [];
-    for (var j = 0; j <= mapHeight; j++) {
-        for (var i = 0; i <= mapWidth; i++) {
-            var tile = map[j + palya * (mapHeight + 1)].substring(i, i + 1);
-            if (tile == "2") {
-                player.x = i;
-                player.y = j;
-            }
-            if (tile == "3") {
-                var enemy = {
-                    x: i,
-                    y: j
-                }
-                enemies.push(enemy);
-            }
-        }
-    }
+    Map.copyLevelToBlock();
     gamestate = AGAIN;
 }
 
@@ -335,36 +313,7 @@ function megegyszer() {//gamestate=7
 }
 
 function ujpalya_inic() {		//gamestate=3
-    kaja = 0;
     gyumi_timer = 0;
-    for (var j = 0; j <= mapHeight; j++) {
-        for (var i = 0; i <= mapWidth; i++) {
-            var item = Map.getCell(i, j);
-            if (item == "2") {
-                player.x = i;
-                player.y = j;
-                Map.setCell(" ", i, j);	//kit�rli az emberk�met
-            } else if (item == "3") {
-                var enemy = {
-                    x: i,
-                    y: j,
-                    face: 0
-                }
-                enemies.push(enemy);
-                Map.setCell(".", i, j);	//kit�rli a sz�rnyeket
-                kaja++;
-            } else if (item == ".") {
-                kaja++;
-            }
-        }
-    }
-    for (var i = 0; i < enemies; i++) {
-        if (palya % 2 == 0) {
-            enemies[i].face = 8 + i % 2;
-        } else {
-            enemies[i].face = 18 + i % 2;//p�ros p�ly�nk�nt m�s a sz�rny
-        }
-    }
     gamestate = NEW_LEVEL;
     console.log('NEW LEVEL');
 }
@@ -383,53 +332,22 @@ function gratulalok() {
 }
 
 function focim_inic() {//gamestate=1
+    Map.level = 4;
+    Map.copyLevelToBlock();
+    var player = Map.getActorByName('player');
     player.life = 3;
-    player.pont = 0;
-    kaja = 0;
-    palya = 1;
-    Map.level = palya;
-    Map.copyLevelToWorking();
+    player.score = 0;
     gamestate = TITLE;
-    console.log('TITLE');
-    for (var j = 0; j <= mapHeight; j++) {
-        for (var i = 0; i <= mapWidth; i++) {
-            item = Map.getCell(i, j);
-            if (item == '2') {
-                player.x = i;
-                player.y = j;
-                Map.setCell(' ', i, j);
-            } else if (item == '3') {
-                var enemy = {
-                    x: i,
-                    y: j,
-                    face: 8
-                }
-                enemies.push(enemy);
-                Map.setCell('.', i, j);
-                kaja++;
-            } else if (item == ".") {
-                kaja++;
-            }
-        }
-    }
-    player.gyors = seb_normal;
+    player.speed = seb_normal;
     enemy_gyors = enemy_seb_normal;
     player.hatas_timer = 0;
     enemy_hatas_timer = 0;
     gyumi_timer = 0;
-    for (var i = 0; i < enemies.length; i++) {
-        if ((i % 2) == 0) {
-            enemies[i].face = 8;
-        } else {
-            enemies[i].face = 9;
-        }
-    }
 }
 
 function focim() {//2
     if (pressedkey == 5) {
         gamestate = NEW_LEVEL_INIC;
-        palya = 1;
     }
 }
 
@@ -445,38 +363,14 @@ function zabalo() {
         case GAMEOVER: jatekvege(); break;
         case CONGRATULATE: gratulalok(); break;
     }
+
     utem++;
     if (utem >= 255) {
         utem = 0;
     }
-    Map.setCell('2', player.x, player.y);
-    for (var i = 0; i < enemies.length; i++) {
-        Map.setCell('3', enemies[i].x, enemies[i].y);
-    }
+
     screen.innerHTML = Map.render();
     requestAnimationFrame(zabalo);
-}
-
-function drawMap() {
-    for (var j = 0; j <= mapHeight; j++) {//P�lya kirajzol�sa
-        for (var i = 0; i <= mapWidth; i++) {
-            if (mapij[i][j] == "1") {
-                sprite(g, palya % 4, i * tile, j * tile);
-            } else if (mapij[i][j] == ".") {
-                sprite(g, 10, i * tile, j * tile);
-            }
-        }
-    }
-}
-
-function drawActors() {
-    sprite(g, face, player.x * tile, player.y * tile);//J�t�kos kirajzol�sa
-    for (var i = 0; i < enemies.length; i++) {//Sz�rnyek kirajzol�sa
-        sprite(g, enemies[i].face, enemies[i].x * tile, enemies[i].y * tile);
-    }
-    if (gyumi_timer > 0) {
-        sprite(g, gyumi_micsoda + 11, gyumi_x * tile, gyumi_y * tile);
-    }
 }
 
 function drawOthers() {
@@ -530,32 +424,4 @@ function drawOthers() {
         g.drawImage(elemek, (appletsize_x - 205) / 2, (appletsize_y - 83) / 2 - 152, this);
     }
 }
-
-function drawAll() {
-    drawMap();
-    drawActors();
-    //drawOthers();
-}
-
-function sprite(g, n, x, y) {
-    g.setClip(x, y, tile, tile);
-    g.drawImage(elemek, x - tile * n, y, this);
-}
-function animation() {
-    switch (face) {
-        case 4: face = 5; break;
-        case 5: face = 4; break;
-        case 6: face = 7; break;
-        case 7: face = 6; break;
-    }
-}
-function animation_enemy(i) {
-    switch (enemies[i].face) {
-        case 9: enemies[i].face = 8; break;
-        case 8: enemies[i].face = 9; break;
-        case 19: enemies[i].face = 18; break;
-        case 18: enemies[i].face = 19; break;
-    }
-}
-
 

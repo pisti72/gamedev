@@ -1,94 +1,126 @@
 var Map = {
     level: 1,
-    working: [],
-    display: [],
+    blocks: [],
+    actors: [],
+    gems: 0,
     item: {
         wall: '&#128997;',
+        //wall: '&#9607;',
         gem: '&#128312;',
+        //gem: '.',
         player: '&#128526',
+        //player: '&#9786',
         enemy: '&#128027',
-        //space:'&nbsp;
-        space:'&#128313;'
+        //enemy: '&#9787',
+        space:'&#12288;',
+        //space:'&nbsp;',
+        //space: '&#128313;'
     },
-    copyLevelToWorking: function () {
-        this.working = [];
+    copyLevelToBlock: function () {
+        this.blocks = [];
+        this.gems = 0;
+        this.actors = [];
         var level = this.levels[this.level - 1];
-        for (var i = 0; i < level.length; i++) {
-            this.working.push(level[i]);
-        }
-    },
-    render: function () {
-        this.display = [];
-        for (var i = 0; i < this.working.length; i++) {
-            this.display.push(this.working[i]);
-        }
-        var s = '';
-        for (var i = 0; i < this.display.length; i++) {
-            var row = this.display[i];
-            var newrow = '';
-            for (var j = 0; j < row.length; j++) {
-                var char = row.charAt(j);
-                if (char == '1') {
-                    newrow += this.item.wall;
-                } else if (char == '2') {
-                    newrow += this.item.player;
-                } else if (char == '3') {
-                    newrow += this.item.enemy;
-                } else if (char == '.') {
-                    newrow += this.item.gem;
-                } else if (char == ' ') {
-                    newrow += this.item.space;
-                } else {
-                    newrow += char;
-                }
-            }
-            s += newrow + '</br>';
-        }
-        return s;
-    },
-    renderRaw: function () {
-        var level = this.levels[this.level - 1];
-        var s = '';
-        for (var i = 0; i < level.length; i++) {
-            s += level[i] + '</br>';
-        }
-        return s;
-    },
-    renderLevel: function () {
-        var level = this.levels[this.level - 1];
-        var s = '';
         for (var i = 0; i < level.length; i++) {
             var row = level[i];
             var newrow = '';
             for (var j = 0; j < row.length; j++) {
                 var char = row.charAt(j);
-                if (char == '1') {
-                    newrow += this.item.wall;
-                } else if (char == '2') {
-                    newrow += this.item.player;
+                if (char == '2') {
+                    this.addActor('player', j, i);
+                    char = '.';
+                    this.gems++;
                 } else if (char == '3') {
-                    newrow += this.item.enemy;
-                } else if (char == '.') {
-                    newrow += this.item.gem;
+                    this.addActor('enemy', j, i);
+                    char = '.';
+                    this.gems++;
+                }
+                newrow += char;
+            }
+            this.blocks.push(newrow);
+        }
+    },
+    addActor: function (name, x, y) {
+        var actor = {
+            name: name,
+            x: x,
+            y: y,
+            score: 0,
+            life: 3,
+            xd: 0,
+            yd: 0,
+            speed: 0,
+        }
+        this.actors.push(actor);
+    },
+    isActorHere: function (x, y) {
+        for (var i = 0; i < this.actors.length; i++) {
+            var actor = this.actors[i];
+            if (actor.x == x && actor.y == y) {
+                return true;
+            }
+        }
+        return false;
+    },
+    getActorFromHere: function (x, y) {
+        for (var i = 0; i < this.actors.length; i++) {
+            var actor = this.actors[i];
+            if (actor.x == x && actor.y == y) {
+                return actor;
+            }
+        }
+        return false;
+    },
+    getActorByName: function (name) {
+        for (var i = 0; i < this.actors.length; i++) {
+            var actor = this.actors[i];
+            if (actor.name == name) {
+                return actor;
+            }
+        }
+        return false;
+    },
+    render: function () {
+        var s = '';
+        for (var i = 0; i < this.blocks.length; i++) {
+            var row = this.blocks[i];
+            var newrow = '';
+            for (var j = 0; j < row.length; j++) {
+                if (this.isActorHere(j, i)) {
+                    actor = this.getActorFromHere(j, i);
+                    if (actor.name == 'player') {
+                        newrow += this.item.player;
+                    } else if (actor.name == 'enemy') {
+                        newrow += this.item.enemy;
+                    }
                 } else {
-                    newrow += char;
+                    var char = row.charAt(j);
+                    if (char == '1') {
+                        newrow += this.item.wall;
+                    } else if (char == '.') {
+                        newrow += this.item.gem;
+                    } else if (char == ' ') {
+                        newrow += this.item.space;
+                    } else {
+                        newrow += char;
+                    }
                 }
             }
             s += newrow + '</br>';
         }
         return s;
     },
-    get: function () {
-        return this.levels[this.level - 1];
-    },
-    getCell: function (x, y) {
-        var row = this.working[y];
+    getBlock: function (x, y) {
+        var row = this.blocks[y];
         return row.charAt(x);
     },
-    setCell: function (n, x, y) {
-        var row = this.working[y];
-        newrow = row.substr(0, x ) + n + row.substr(x +1, row.length - x -1);
-        this.working[y] = newrow;
+    setBlock: function (n, x, y) {
+        var row = this.blocks[y];
+        newrow = row.substr(0, x) + n + row.substr(x + 1, row.length - x - 1);
+        this.blocks[y] = newrow;
+    },
+    setActor: function (n, x, y) {
+
     },
     levels: [
         [									//ebben a t�mbben t�roljuk az �sszes p�ly�t
