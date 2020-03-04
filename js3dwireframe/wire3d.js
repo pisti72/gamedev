@@ -4,7 +4,10 @@ var Wire3d = {
         RUN: 1,
         FLY: 2
     },
-    debug: true,
+    debug: false,
+    wasd: false,
+    sky: '#EEE',
+    ground: '#AAA',
     ctx: {},
     objects: [],
     meshes: [],
@@ -40,6 +43,7 @@ var Wire3d = {
         if (e.key == 'w') {
             if (this.player.ctrlMode == this.mode.WALK) {
                 this.playerForward();
+                console.log('w pressed');
             } else if (this.player.ctrlMode == this.mode.FLY) {
                 this.playerPushDown();
             }
@@ -49,7 +53,7 @@ var Wire3d = {
             } else if (this.player.ctrlMode == this.mode.FLY) {
                 this.playerPullUp();
             }
-            
+
         }
         if (e.key == 'a') {
             this.playerLeft();
@@ -63,7 +67,7 @@ var Wire3d = {
                 this.playerNotForward();
             } else if (this.player.ctrlMode == this.mode.FLY) {
                 this.playerNotPull();
-            } 
+            }
         }
         if (e.key == 'a' || e.key == 'd') {
             this.playerDoNotRot();
@@ -75,8 +79,6 @@ var Wire3d = {
         this.w = canvas.width = document.body.clientWidth;
         this.h = canvas.height = document.body.clientHeight;
         this.player.fov = this.w / 2;
-        this.player.ctrlMode = this.mode.WALK;
-        this.player.ctrlMode = this.mode.FLY;
         this.player.z = this.player.height;
         this.meshes = [];
         //key handling
@@ -140,6 +142,9 @@ var Wire3d = {
     addPyramid: function (scale, x, y, z) {
         this.addObject('pyramid', scale, x, y, z);
     },
+    addTree: function (x, y) {
+        this.addObject('tree', 1, x, y, 0);
+    },
     print: function (n, line) {
         this.ctx.fillStyle = '#000';
         this.ctx.font = "30px Arial";
@@ -171,38 +176,47 @@ var Wire3d = {
                 }
             }
         }
-        this.drawWASD();
-        this.drawDebug();
+        if (this.wasd) {
+            this.drawWASD();
+        }
+        if (this.debug) {
+            this.drawDebug();
+        }
     },
-    drawDebug: function() {
-        if(this.debug){
+    renderRectangles: function () {
+        this.drawHorizon();
+        this.playerUpdate();
+        if (this.debug) {
+            this.drawDebug();
+        }
+    },
+    drawDebug: function () {
         this.print('speed: ' + this.getPlayerSpeed(), 40);
         this.print('rotation: ' + this.getPlayerDegree(), 80);
-        }
     },
     drawHorizon: function () {
-        this.ctx.fillStyle = '#EEE';
+        this.ctx.fillStyle = this.sky;
         //this.ctx.clearRect(0, 0, this.w, this.h);
         this.ctx.fillRect(0, 0, this.w, this.h);
-        this.ctx.fillStyle = '#AAA';
+        this.ctx.fillStyle = this.ground;
         //this.ctx.fillRect(0, this.h / 2, this.w, this.h / 2);
         var p11 = {
-            x:-this.w,
-            y:this.player.fov,
-            z:0
+            x: -this.w,
+            y: this.player.fov,
+            z: 0
         }
-        var p12 = this.rotateAxisY(p11,this.player.roll);
+        var p12 = this.rotateAxisY(p11, this.player.roll);
         var p4 = this.rotateAxisX(p12, this.player.pull);
-        var left ={};
+        var left = {};
         var right = {};
         left.x = p4.x * this.player.fov / p4.y + this.w / 2;// x/z=xs/f
         left.y = this.h / 2 - p4.z * this.player.fov / p4.y;
         p11 = {
-            x:this.w,
-            y:this.player.fov,
-            z:0
+            x: this.w,
+            y: this.player.fov,
+            z: 0
         }
-        p12 = this.rotateAxisY(p11,this.player.roll);
+        p12 = this.rotateAxisY(p11, this.player.roll);
         p4 = this.rotateAxisX(p12, this.player.pull);
         right.x = p4.x * this.player.fov / p4.y + this.w / 2;// x/z=xs/f
         right.y = this.h / 2 - p4.z * this.player.fov / p4.y;
@@ -285,7 +299,7 @@ var Wire3d = {
         var p2 = this.addPoints(p1, object);
         var p3 = this.subPoints(p2, this.player);
         var p11 = this.rotateAxisZ(p3, this.player.rot);
-        var p12 = this.rotateAxisY(p11,this.player.roll);
+        var p12 = this.rotateAxisY(p11, this.player.roll);
         var p4 = this.rotateAxisX(p12, this.player.pull);
         if (p4.y <= 0) {
             p4.y = .001;
@@ -310,9 +324,9 @@ var Wire3d = {
     },
     playerUpdate: function () {
         var speed = {
-            x:0,
-            y:0,
-            z:0
+            x: 0,
+            y: 0,
+            z: 0
         };
         speed.y = this.player.speed;
         var speed2 = this.rotateAxisZ(speed, -this.player.rot);
@@ -322,11 +336,11 @@ var Wire3d = {
         this.player.z += speed3.z;
         this.player.rot += this.player.speedOfRot;
         this.player.pull += this.player.speedOfPull;
-        
 
-        if(this.player.ctrlMode == this.mode.WALK){
+
+        if (this.player.ctrlMode == this.mode.WALK) {
             this.player.speed *= this.player.loss;
-        }else if(this.player.ctrlMode == this.mode.FLY){
+        } else if (this.player.ctrlMode == this.mode.FLY) {
             this.player.roll = this.player.speedOfRot * 4;
         }
         this.player.speedOfRot *= this.player.loss;
@@ -454,6 +468,11 @@ var Wire3d = {
                 1, 4,
                 2, 4,
                 3, 4]
+        },
+        {
+            name: 'tree',
+            width: 10,
+            height: 10
         },
         {
             name: 'null',
