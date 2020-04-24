@@ -1,0 +1,48 @@
+var canvas;
+var ctx;
+var img;
+var w, h;
+window.onload = function () {
+    canvas = f('c');
+    level = 0;
+    img = f('tiles');
+    engine.init(canvas, img);
+    engine.createActors(levels[level].data);
+    document.addEventListener('keydown', function (e) {
+        //console.log(e.key);
+        if (e.key == 'd' || e.key == 'ArrowRight') {
+            engine.getActorByName('P').xforce = 1.5;
+        } else if (e.key == 'a' || e.key == 'ArrowLeft') {
+            engine.getActorByName('P').xforce = -1.5;
+        }
+        if (e.key == ' ' || e.key == 'w') {
+            engine.getActorByName('P').mustJump = true;
+        }
+        if (e.key == 'o'){
+            engine.nextBlock();
+        }
+    });
+    document.addEventListener('keyup', function (e) {
+        if (e.key == 'a' || e.key == 'd' || e.key == 'ArrowRight' || e.key == 'ArrowLeft') {
+            engine.getActorByName('P').xforce = 0;
+        }
+        if (e.key == ' ' || e.key == 'w') {
+            engine.getActorByName('P').mustJump = false;
+        }
+        if (e.key == 'o'){
+            //engine.nextBlock();
+        }
+    })
+    requestAnimationFrame(update);
+}
+function update() {
+
+    if (engine.isDone) {
+        engine.createActors(levels[++level].data);
+    }
+    engine.update();
+    requestAnimationFrame(update);
+}
+function f(n) {
+    return document.getElementById(n);
+}
