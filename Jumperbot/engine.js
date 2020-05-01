@@ -180,6 +180,31 @@ var engine = {
             this.cursor.offset = this.block[this.cursor.block].offset;
         }
     },
+    putBlock: function () {
+        var block = this.block[this.cursor.block];
+        this.addActor(
+            block.char,
+            block.offset,
+            block.fixed,
+            block.wall,
+            block.collectable,
+            block.mob,
+            block.player,
+            this.cursor.x,
+            this.cursor.y);
+    },
+    moveRight: function () {
+        this.cursor.x += this.tile;
+    },
+    moveLeft: function () {
+        this.cursor.x -= this.tile;
+    },
+    moveUp: function () {
+        this.cursor.y -= this.tile;
+    },
+    moveDown: function () {
+        this.cursor.y += this.tile;
+    },
     isOverlapped: function (actor, other) {
         var xdistance = Math.abs((actor.x + actor.xv) - (other.x + other.xv));
         var ydistance = Math.abs((actor.y + actor.yv) - (other.y + other.yv));
@@ -306,7 +331,7 @@ var engine = {
 
         this.ctx.fillStyle = '#AAF';
         this.ctx.fillRect(0, 0, this.display.w, this.display.h);
-        if(this.cursor.enabled){
+        if (this.cursor.enabled) {
             this.drawCursor();
         }
         this.drawActors();

@@ -18,8 +18,21 @@ window.onload = function () {
         if (e.key == ' ' || e.key == 'w') {
             engine.getActorByName('P').mustJump = true;
         }
-        if (e.key == 'o'){
+        if (e.key == 'o') {
             engine.nextBlock();
+        }
+        if (e.key == 'u') {
+            engine.putBlock();
+        }
+        if (e.key == 'l') {
+            engine.moveRight();
+        } else if (e.key == 'j') {
+            engine.moveLeft();
+        }
+        if (e.key == 'i') {
+            engine.moveUp();
+        } else if (e.key == 'k') {
+            engine.moveDown();
         }
     });
     document.addEventListener('keyup', function (e) {
@@ -28,9 +41,6 @@ window.onload = function () {
         }
         if (e.key == ' ' || e.key == 'w') {
             engine.getActorByName('P').mustJump = false;
-        }
-        if (e.key == 'o'){
-            //engine.nextBlock();
         }
     })
     requestAnimationFrame(update);
