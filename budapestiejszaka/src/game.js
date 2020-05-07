@@ -1,7 +1,7 @@
 var id = 0;
 
-jQuery(document).ready(function($) {
-    $('body').terminal(function(command, term) {
+jQuery(document).ready(function ($) {
+    $('body').terminal(function (command, term) {
         if (command == 'help') {
             term.echo("Lehetséges parancsok:\n'n' - Észak felé indulás\n's' - Dél felé indulás\n'w' - Nyugat felé indulás\n'e' - Kelet felé indulás\n'help' - Segítség kérése\n'map' - Térkép\n'download' - Forrás letőltése");
         } else if (command == 'n') {
@@ -13,7 +13,7 @@ jQuery(document).ready(function($) {
         } else if (command == 'w') {
             term.echo(moveRoom('w'));
         } else if (command == 'map') {
-            window.open('budnightmap.png','_blank');
+            window.open('budnightmap.png', '_blank');
         } else if (command == 'download') {
             window.open('BUDNIGHT_JF2016.ZIP');
         } else {
@@ -21,7 +21,7 @@ jQuery(document).ready(function($) {
         }
     }, {
         greetings: "BUDAPESTI ÉJSZAKA\n\nKészítette: Szalontai István JFHU 2016 alkalmából\n\nÜdvözöllek ebben a szöveges kalandjátékban.\nA játék célja, hogy megfejtsd mi történt veled az éjszaka.\n\n" + getRoom(),
-        onBlur: function() {
+        onBlur: function () {
             // prevent loosing focus
             return false;
         }
