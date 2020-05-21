@@ -3,6 +3,7 @@
 
 <head>
     <title>PixelEditor</title>
+    <meta charset="UTF-8">
     <style>
         html,
         body {
@@ -10,21 +11,35 @@
             margin: 0;
         }
 
-        #c {
-            margin: 0;
-            display: block;
+        #small {
+            display: none;
         }
 
-        #t {
-            display: none;
+        #transparent,
+        #main {
+            margin: 0;
+            position: absolute;
+            left:0px;
+            right:0px;
+        }
+
+        #container {
+            position: relative;
+            width: 100%;
         }
     </style>
 </head>
 
 <body>
-    <canvas id="c"></canvas>
-    <canvas id="t"></canvas>
-    <img id="i" />
+    hello
+    <div id="container">
+        <canvas id="transparent"></canvas>
+        <canvas id="main"></canvas>
+    </div>
+    <canvas id="small"></canvas>
+    <div id="container">
+        <img id="i" />
+    </div>
     <script src="palettes.js"></script>
     <script src="pixeleditor.js"></script>
 </body>
