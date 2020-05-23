@@ -1,7 +1,23 @@
+/**
+ * VGDL
+ */
+
 BS = {
     MIDDLE: 0,
-    RED: '#d22',
-    GREEN: '#2d2',
+    color: [
+        {
+            name: 'RED',
+            rgb: '#d22',
+            letter: 'r'
+        },
+        {
+            name: 'GREEN',
+            rgb: '#2d2',
+            letter: 'g'
+        },
+    ],
+    tile:{},
+    stage: 'title',
     GRAY: '#888',
     GREY: '#888',
     CYAN: '#2eb',
@@ -16,6 +32,7 @@ BS = {
     BLACK: '#222',
     WHITE: '#fff',
     KEY_A: 'a',
+    KEY_D: 'd',
     hero: {},
     paper: {},
     size: {},
@@ -27,7 +44,37 @@ BS = {
         this.ctx.fillRect(0, 0, this.size.w, this.size.h);
         this.hero.x = this.size.w / 2;
         this.hero.y = this.size.h / 2;
+        this.hero.xmove = 0;
+        var hero = this.hero;
+        document.addEventListener("keydown", function (e) {
+            if (e.key == hero.left) {
+                hero.xmove = -1;
+            } else if (e.key == hero.right) {
+                hero.xmove = 1;
+            }
+        });
+        document.addEventListener("keyup", function (e) {
+            if (e.key == hero.left || e.key == hero.right) {
+                hero.xmove = 0;
+            }
+        });
+    },
+    update: function () {
+        this.clearHero();
+        if (this.hero.xmove == -1) {
+            this.hero.x -= this.hero.speed * this.size.pixel;
+        } else if (this.hero.xmove == 1) {
+            this.hero.x += this.hero.speed * this.size.pixel;
+        }
         this.drawHero();
+    },
+    clearHero: function () {
+        this.ctx.fillStyle = this.paper.color;
+        this.ctx.fillRect(
+            this.hero.x,
+            this.hero.y,
+            this.size.tile + this.size.pixel,
+            this.size.tile + this.size.pixel);
     },
     drawHero: function () {
         //this.ctx.fillStyle = '#444';
@@ -41,8 +88,8 @@ BS = {
                     this.ctx.fillRect(
                         this.hero.x + i * this.size.pixel,
                         this.hero.y + j * this.size.pixel,
-                        this.size.pixel+1,
-                        this.size.pixel+1);
+                        this.size.pixel + 1,
+                        this.size.pixel + 1);
                 }
             }
         }
