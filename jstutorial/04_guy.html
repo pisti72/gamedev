@@ -1,0 +1,25 @@
+<img id="Peter" src="guy.png">
+<script>
+    var x = 0;
+    var xd = 0;
+    var force = 0;
+
+    document.addEventListener('keydown', function (e) {
+        if (e.key == "d") force = .2;
+        if (e.key == "a") force = -.2;
+    });
+
+    document.addEventListener('keyup', function (e) {
+        force = 0;
+    });
+
+    update();
+    function update() {
+        var guy = document.getElementById('Peter');
+        guy.style.marginLeft = x;
+        xd = xd + force;
+        x = x + xd;
+        xd = xd * 0.98;
+        requestAnimationFrame(update);
+    }
+</script>
