@@ -59,8 +59,10 @@ BS.text = [
 BS.stage = [
     {
         name: 'title',
-        paper: 'b',
+        paper: 'B',
         shape: [
+            '                               ',
+            '                               ',
             '                               ',
             '                               ',
             ' 0 000 0 0 000 00  000 00  000 ',
@@ -69,7 +71,11 @@ BS.stage = [
             ' 3 3 3 3 3 333 3 3 3   3 3   3 ',
             ' 4 4 4  4  4 4 44  444 4 4 444 ',
             '                               ',
+            '                               ',
             '              t                ',
+            '                               ',
+            '                               ',
+            '                               ',
         ],
         run: function(){
             if(BS.KEY_SPACE){
@@ -113,7 +119,7 @@ BS.enemies = [
     }
 ];
 BS.start();
-BS.stage = 'title';
+BS.state = 'title';
 update();
 function update() {
     BS.update();

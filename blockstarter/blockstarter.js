@@ -15,22 +15,68 @@ BS = {
             rgb: '#2d2',
             letter: 'g'
         },
+        {
+            name: 'GRAY',
+            rgb: '#888',
+            letter: 'G'
+        },
+        {
+            name: 'GREY',
+            rgb: '#888',
+            letter: 'G'
+        },
+        {
+            name: 'CYAN',
+            rgb: '#2eb',
+            letter: 'c'
+        }, {
+            name: 'MAGENTA',
+            rgb: '#f2f',
+            letter: 'm'
+        }, {
+            name: 'ROSE',
+            rgb: '#f7b',
+            letter: 'R'
+        }, {
+            name: 'SKIN',
+            rgb: '#da6',
+            letter: 's'
+        },
+        {
+            name: 'PINK',
+            rgb: '#d06',
+            letter: 'p'
+        }, {
+            name: 'BROWN',
+            rgb: '#842',
+            letter: 'B'
+        }, {
+            name: 'BLUE',
+            rgb: '#22d',
+            letter: 'b'
+        }, {
+            name: 'ORANGE',
+            rgb: '#f82',
+            letter: 'o'
+        },
+        {
+            name: 'YELLOW',
+            rgb: '#dd2',
+            letter: 'y'
+        }, {
+            name: 'DARK',
+            rgb: '#222',
+            letter: 'd'
+        },
+        {
+            name: 'WHITE',
+            rgb: '#fff',
+            letter: 'w'
+        }
     ],
-    tile:{},
-    stage: 'title',
-    GRAY: '#888',
-    GREY: '#888',
-    CYAN: '#2eb',
-    MAGENTA: '#f2f',
-    ROSE: '#f7b',
-    BODY: '#da6',
-    PINK: '#d06',
-    BROWN: '#842',
-    BLUE: '#22d',
-    ORANGE: '#f82',
-    YELLOW: '#dd2',
-    BLACK: '#222',
-    WHITE: '#fff',
+    tile: {},
+    state: 'title',
+    stage: [],
     KEY_A: 'a',
     KEY_D: 'd',
     hero: {},
@@ -40,12 +86,11 @@ BS = {
     start: function () {
         console.log('Started');
         this.createCanvas();
-        this.ctx.fillStyle = this.paper.color;
-        this.ctx.fillRect(0, 0, this.size.w, this.size.h);
-        this.hero.x = this.size.w / 2;
-        this.hero.y = this.size.h / 2;
-        this.hero.xmove = 0;
-        var hero = this.hero;
+        this.drawStage();
+        //this.hero.x = this.size.w / 2;
+        //this.hero.y = this.size.h / 2;
+        //this.hero.xmove = 0;
+        //var hero = this.hero;
         document.addEventListener("keydown", function (e) {
             if (e.key == hero.left) {
                 hero.xmove = -1;
@@ -58,6 +103,41 @@ BS = {
                 hero.xmove = 0;
             }
         });
+    },
+    drawStage: function () {
+        var stage = this.getStageByName(this.state);
+        console.log(this.getColorByName('w').rgb);
+        this.ctx.fillStyle = this.getColorByName(stage.paper).rgb;
+        this.ctx.fillRect(0, 0, this.size.width, this.size.height);
+        stage.height = stage.shape.length;
+        stage.tile = Math.floor(this.size.height / stage.height);
+        for (var j = 0; j < stage.shape.length; j++) {
+            var row = stage.shape[j];
+            for (var i = 0; i < row.length; i++) {
+                if (row.charAt(i) != ' ') {
+                    this.ctx.fillStyle = '#fff';
+                    this.ctx.fillRect(i * stage.tile, j * stage.tile, stage.tile, stage.tile);
+                }
+            }
+        }
+        //console.log(stage.tile);
+    },
+    getStageByName: function (name) {
+        for (var i = 0; i < this.stage.length; i++) {
+            if (this.stage[i].name == name) {
+                return this.stage[i];
+            }
+        }
+        return false;
+    },
+    getColorByName: function (name) {
+        for (var i = 0; i < this.color.length; i++) {
+            var color = this.color[i];
+            if (color.name == name || color.letter == name) {
+                return color;
+            }
+        }
+        return false;
     },
     update: function () {
         this.clearHero();
@@ -103,9 +183,9 @@ BS = {
         canvas.style.top = '0px';
         canvas.style.left = '0px';
         this.ctx = canvas.getContext('2d');
-        this.size.w = canvas.width = window.innerWidth;
-        this.size.h = canvas.height = window.innerHeight;
-        this.size.pixel = Math.floor(this.size.h / 12 / 8);
-        this.size.tile = this.size.pixel * 8;
+        this.size.width = canvas.width = window.innerWidth;
+        this.size.height = canvas.height = window.innerHeight;
+        //this.size.pixel = Math.floor(this.size.h / 12 / 8);
+        //this.size.tile = this.size.pixel * 8;
     }
 }
