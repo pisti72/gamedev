@@ -1,0 +1,15 @@
+
+<input id="elso"> + <input id="masodik"> = <span id="eredmeny"></span>
+<br>
+<button onclick="osszead()">Szamolj</button>
+<script>
+function osszead() {
+	a = f('elso').value;
+	b = f('masodik').value;
+	f('eredmeny').innerHTML = a * 1 + b * 1;
+}
+
+function f(n) {
+	return document.getElementById(n);
+}
+</script>

@@ -1,0 +1,28 @@
+<body>
+<button onclick="lekapcsol()">Lekapcsol</button>
+<button onclick="felkapcsol()">Felkapcsol</button>
+<br><br>
+<button onclick="kapcsolgat()">Kapcsolo</button>
+<script>
+var felkapcsolva = true;
+
+function lekapcsol(){
+    document.body.bgColor = '#008';
+}
+
+function felkapcsol(){
+    document.body.bgColor = '#ff8';
+}
+
+function kapcsolgat() {
+    if(felkapcsolva) {
+        lekapcsol();
+        felkapcsolva = false;
+    }else{
+        felkapcsol();
+        felkapcsolva = true;
+    }
+}
+
+</script>
+</body>
