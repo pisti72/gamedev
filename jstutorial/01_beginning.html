@@ -1,6 +1,8 @@
-
-<p id="a">A</p>
+<input id="myname" oninput="welcome()" style="font-size: xx-large;"/>
+<h1 id="hello" style="text-align: center;"></h1>
 <script>
-var x=0;
-
+    function welcome() {
+        var name = document.getElementById('myname').value;
+        document.getElementById('hello').innerHTML = 'Hello ' + name + '!';
+    }
 </script>
