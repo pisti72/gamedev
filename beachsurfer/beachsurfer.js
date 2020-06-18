@@ -1,6 +1,6 @@
 Surf.tiles = [
     {
-        id: 'player',
+        id: 'surf',
         x: 0,
         y: 0,
         width: 32,
@@ -8,16 +8,33 @@ Surf.tiles = [
     }
 ];
 
+
+Surf.init();
+
+for (var i = 0; i < 10; i++) {
+    var random = Surf.getRandomXY();
+    Surf.addActor(
+        {
+            name: 'wave',
+            tile: 'surf',
+            x: random.x,
+            y: random.y,
+            yd: 4,
+            friction: 0
+        }
+    );
+}
+
 Surf.addActor(
     {
-        tile: 'player',
-        x: 20,
-        y: 20,
-        xd: 2,
-        yd: 1,
+        name: 'player',
+        tile: 'surf',
+        x: Surf.getCenter().x,
+        y: Surf.getCenter().y * 1.5,
+        friction: 0.02
     }
 );
-Surf.init();
+
 update();
 function update() {
     Surf.update();

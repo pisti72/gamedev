@@ -7,8 +7,8 @@ Surf = {
     image: {},
     tiles: [],
     pressed: {
-        leftKeys: ['a', 'j', 'ArrowLeft'],
-        righKeys: ['d', 'l', 'ArrowRight'],
+        leftKeys: ['a', 'j', 'A', 'ArrowLeft'],
+        rightKeys: ['d', 'l', 'D', 'ArrowRight'],
         upKeys: ['w', 'i', 'ArrowUp'],
         downKeys: ['s', 'k', 'ArrowDown']
     },
@@ -20,7 +20,7 @@ Surf = {
     init: function () {
         this.createCanvas();
         this.image = document.getElementsByTagName('IMG')[0];
-        document.addEventListener("keydown", function (e) {
+        document.addEventListener('keydown', function (e) {
             if (Surf.pressed.leftKeys.includes(e.key)) {
                 Surf.pressed.left = true;
             } else if (Surf.pressed.rightKeys.includes(e.key)) {
@@ -31,7 +31,13 @@ Surf = {
             } else if (Surf.pressed.downKeys.includes(e.key)) {
                 Surf.pressed.down = true;
             }
-        });
+        })
+        document.addEventListener('keyup', function (e) {
+            if (Surf.pressed.leftKeys.includes(e.key) || Surf.pressed.rightKeys.includes(e.key)) {
+                Surf.pressed.left = false;
+                Surf.pressed.right = false;
+            }
+        })
         this.fillAll();
     },
     createCanvas: function () {
@@ -50,27 +56,82 @@ Surf = {
 
     },
     print: function (line) {
-        this.debug.text += line + ' - ';
+        this.debug.text += line;
     },
     addActor: function (obj) {
         var tile = this.getTile(obj.tile);
         obj.tile = tile;
+        if(!obj.xd){
+            obj.xd = 0;
+        }
+        if(!obj.yd){
+            obj.yd = 0;
+        }
+        obj.xforce = 0;
+        obj.yforce = 0;
+        obj.width = obj.tile.width * this.size.pixel;
         this.actors.push(obj);
+    },
+    getRandomXY: function () {
+        return {
+            x: Math.floor(Math.random() * this.size.width),
+            y: Math.floor(Math.random() * this.size.height)
+        }
+    },
+    getCenter: function () {
+        return {
+            x: Math.floor(this.size.width / 2),
+            y: Math.floor(this.size.height / 2)
+        }
     },
     update: function () {
         this.clearActors();
-        this.print('Hello');
-        this.print('Szabi');
+        this.print('DEMO');
+        this.movePlayer();
+        this.spawnWaves();
         this.moveActors();
         //this.drawRect();
         this.drawActors();
         this.drawDebug();
     },
+    spawnWaves: function() {
+        //TBD
+    },
+    movePlayer: function () {
+        var player = this.getActorByName('player');
+        if (this.pressed.right) {
+            player.xforce = .3;
+        }
+        if (this.pressed.left) {
+            player.xforce = -.3;
+        }
+        if (!this.pressed.left && !this.pressed.right) {
+            player.xforce = 0;
+        }
+        if (player.x < 0) {
+            player.xd = 0;
+            player.x = 0;
+        } else if (player.x + player.width > this.size.width) {
+            player.xd = 0;
+            player.x = this.size.width - player.width;
+        }
+    },
+    getActorByName: function (name) {
+        for (var i = 0; i < this.actors.length; i++) {
+            var actor = this.actors[i];
+            if (actor.name == name) return actor;
+        }
+        return false;
+    },
     moveActors: function () {
         for (var i = 0; i < this.actors.length; i++) {
             var actor = this.actors[i];
+            actor.xd += actor.xforce;
+            actor.yd += actor.yforce;
             actor.x += actor.xd;
             actor.y += actor.yd;
+            actor.xd *= 1 - actor.friction;
+            actor.yd *= 1 - actor.friction;
         }
     },
     drawActors: function () {
