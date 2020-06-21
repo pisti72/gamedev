@@ -6,6 +6,7 @@ Surf = {
     paper: '#66f',
     image: {},
     tiles: [],
+    tickcounter: 0,
     pressed: {
         leftKeys: ['a', 'j', 'A', 'ArrowLeft'],
         rightKeys: ['d', 'l', 'D', 'ArrowRight'],
@@ -15,7 +16,7 @@ Surf = {
     actors: [],
     ctx: {},
     size: {
-        heightInPixel: 128
+        heightInPixel: 150
     },
     init: function () {
         this.createCanvas();
@@ -44,18 +45,18 @@ Surf = {
         document.addEventListener('mousemove', function (e) {
             Surf.mousemove(e);
         })
-        document.addEventListener('mouseup', function(e){
+        document.addEventListener('mouseup', function (e) {
             Surf.mouseup();
         })
         this.fillAll();
     },
-    mousemove: function(e) {
+    mousemove: function (e) {
         var x = e.clientX;
         var y = e.clientY;
         var actor = this.getActorByDragged();
         if (actor) {
-            actor.xd = x-actor.x;
-            actor.yd = y-actor.y;
+            actor.xd = x - actor.x;
+            actor.yd = y - actor.y;
             //actor.x = x;
             //actor.y = y;
         }
@@ -69,7 +70,7 @@ Surf = {
             console.log('dragged');
             return;
         }
-        console.log('actor not: ' + x + ','+y);
+        console.log('actor not: ' + x + ',' + y);
     },
     mouseup: function () {
         for (var i = 0; i < this.actors.length; i++) {
@@ -131,9 +132,25 @@ Surf = {
         //this.drawRect();
         this.drawActors();
         this.drawDebug();
+        this.tickcounter++;
+    },
+    tick: function (n) {
+        return this.tickcounter % n == 0;
     },
     spawnWaves: function () {
         //TBD
+    },
+    spawn: function (name) {
+        var actor = this.getActorByName(name);
+        var coord = this.getRandomXY();
+        var newactor = {
+            name: name,
+            tile: actor.tile.id,
+            x: coord.x,
+            y: coord.y,
+            friction: 0.5
+        }
+        this.addActor(newactor);
     },
     movePlayer: function () {
         var player = this.getActorByName('player');
@@ -158,15 +175,15 @@ Surf = {
         for (var i = 0; i < this.actors.length; i++) {
             var actor = this.actors[i];
             var isX = (x >= actor.x) && (x <= actor.x + actor.tile.width * this.size.pixel);
-            var isY = (y >= actor.y) && (y <= actor.y + actor.tile.height *  this.size.pixel);
+            var isY = (y >= actor.y) && (y <= actor.y + actor.tile.height * this.size.pixel);
             if (isX && isY) return actor;
         }
         return false;
     },
-    getActorByDragged: function (){
+    getActorByDragged: function () {
         for (var i = 0; i < this.actors.length; i++) {
             var actor = this.actors[i];
-            if(actor.dragged) return actor;
+            if (actor.dragged) return actor;
         }
         return false;
     },
