@@ -1,0 +1,40 @@
+<canvas></canvas>
+<script>
+    var canvas = document.getElementsByTagName('canvas')[0];
+    var ctx = canvas.getContext('2d');
+    var scale = 150;
+    var iteration = 5;
+    document.body.style.margin = '0px';
+    document.title = 'hello';
+    canvas.width = document.body.clientWidth;
+    canvas.height = document.body.clientHeight;
+    for (var x = -2; x < 2; x += 1 / scale) {
+        for (var c = -1; c < 1; c += 1 / scale) {
+            ctx.fillStyle = getMandelbrotColor(x, c);
+            ctx.fillRect(
+                x * scale + canvas.width / 2,
+                c * scale + canvas.height / 2,
+                1, 1);
+        }
+    }
+    function getMandelbrotColor(x, c) {
+        var v = 1;
+        var u = x;
+        var y = c;
+        for (var n = 0; n < iteration; n++) {
+            //var z2 = z * z + 2 * z + i + c * i;
+            //i = 2 * z + i + 1;
+            //z = z2;
+            //v = 2 * u * v + y;
+            //u = u2 - v2 + x;
+            //u2 = u * u;
+            //v2 = v * v;
+        }
+        u = Math.sqrt(x * x + c * c );
+        if (u < 1) {
+            return '#000';
+        } else {
+            return '#eee';
+        }
+    }
+</script>

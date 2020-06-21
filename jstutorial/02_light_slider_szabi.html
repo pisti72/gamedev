@@ -1,0 +1,9 @@
+<input type="range" min="0" max="255">
+<script>
+    var input = document.querySelector('input');
+    document.addEventListener('input', changeColor);
+    function changeColor() {
+        n = input.value;
+        document.body.style.backgroundColor = 'rgb(' + n + ',' + n + ',' + n + ')';
+    }
+</script>
