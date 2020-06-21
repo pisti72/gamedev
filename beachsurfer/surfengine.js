@@ -38,7 +38,44 @@ Surf = {
                 Surf.pressed.right = false;
             }
         })
+        document.addEventListener('mousedown', function (e) {
+            Surf.mousedown(e);
+        })
+        document.addEventListener('mousemove', function (e) {
+            Surf.mousemove(e);
+        })
+        document.addEventListener('mouseup', function(e){
+            Surf.mouseup();
+        })
         this.fillAll();
+    },
+    mousemove: function(e) {
+        var x = e.clientX;
+        var y = e.clientY;
+        var actor = this.getActorByDragged();
+        if (actor) {
+            actor.xd = x-actor.x;
+            actor.yd = y-actor.y;
+            //actor.x = x;
+            //actor.y = y;
+        }
+    },
+    mousedown: function (e) {
+        var x = e.clientX;
+        var y = e.clientY;
+        var actor = this.getActorByCoord(x, y);
+        if (actor) {
+            actor.dragged = true;
+            console.log('dragged');
+            return;
+        }
+        console.log('actor not: ' + x + ','+y);
+    },
+    mouseup: function () {
+        for (var i = 0; i < this.actors.length; i++) {
+            var actor = this.actors[i];
+            actor.dragged = false;
+        }
     },
     createCanvas: function () {
         var canvas = document.createElement('canvas');
@@ -61,15 +98,16 @@ Surf = {
     addActor: function (obj) {
         var tile = this.getTile(obj.tile);
         obj.tile = tile;
-        if(!obj.xd){
+        if (!obj.xd) {
             obj.xd = 0;
         }
-        if(!obj.yd){
+        if (!obj.yd) {
             obj.yd = 0;
         }
         obj.xforce = 0;
         obj.yforce = 0;
         obj.width = obj.tile.width * this.size.pixel;
+        obj.dragged = false;
         this.actors.push(obj);
     },
     getRandomXY: function () {
@@ -94,7 +132,7 @@ Surf = {
         this.drawActors();
         this.drawDebug();
     },
-    spawnWaves: function() {
+    spawnWaves: function () {
         //TBD
     },
     movePlayer: function () {
@@ -115,6 +153,22 @@ Surf = {
             player.xd = 0;
             player.x = this.size.width - player.width;
         }
+    },
+    getActorByCoord: function (x, y) {
+        for (var i = 0; i < this.actors.length; i++) {
+            var actor = this.actors[i];
+            var isX = (x >= actor.x) && (x <= actor.x + actor.tile.width * this.size.pixel);
+            var isY = (y >= actor.y) && (y <= actor.y + actor.tile.height *  this.size.pixel);
+            if (isX && isY) return actor;
+        }
+        return false;
+    },
+    getActorByDragged: function (){
+        for (var i = 0; i < this.actors.length; i++) {
+            var actor = this.actors[i];
+            if(actor.dragged) return actor;
+        }
+        return false;
     },
     getActorByName: function (name) {
         for (var i = 0; i < this.actors.length; i++) {
