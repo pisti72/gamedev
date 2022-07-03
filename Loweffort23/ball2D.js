@@ -1,8 +1,11 @@
 var Ball2D = {
 	version:0.1,
 	balls:[],
+	rods:[],
 	friction:.7,
 	gravity:.3,
+	id:0,
+	hardness:.5,//0.1-very soft, 0.5-good, 1-rigid
 	AABB:{
 		left:-9999,
 		right:9999,
@@ -15,8 +18,9 @@ var Ball2D = {
 		this.AABB.top = top;
 		this.AABB.bottom = bottom;
 	},
-	add:function(x,y,d,fixed,name,offset){
-		var ball={
+	addBall:function(x,y,d,fixed,name,offset){
+		let ball={
+			id:this.id,
 			x:x,
 			y:y,
 			d:d,
@@ -30,15 +34,27 @@ var Ball2D = {
 			spin:0,
 			spinv:0
 		}
+		this.id++;
 		this.balls.push(ball);
+		return ball;
 	},
-	remove:function(ball){
-				for(let i=0;i<this.balls.length;i++){
-					if(ball.x == this.balls[i].x && ball.y == this.balls[i].y){
-						this.balls.splice(i,1);
-					}
-				}
-			},
+	removeBall:function(ball){
+		for(let i=0;i<this.balls.length;i++){
+			if(ball.id == this.balls[i].id){
+				this.balls.splice(i,1);
+			}
+		}
+	},
+	addRod:function(ball1,ball2){
+		let xd = ball1.x - ball2.x;
+		let yd = ball1.y - ball2.y;
+		let rod={
+			ball1:ball1,
+			ball2:ball2,
+			distance:Math.sqrt(xd*xd+yd*yd)
+		}
+		this.rods.push(rod);
+	},
 	notvisible:function(){
 		this.balls[this.balls.length-1].visible = false;
 	},
@@ -46,8 +62,19 @@ var Ball2D = {
 		this.balls[n].x = x;
 		this.balls[n].y = y;
 	},
-	getAll:function(){
+	getAllBalls:function(){
 		return this.balls;
+	},
+	getBallById:function(id){
+		for(let i=0;i<this.balls.length;i++){
+			if(this.balls[i].id == id){
+				return this.balls[i];
+			}
+		}
+		return false;
+	},
+	getAllRods:function(){
+		return this.rods;
 	},
 	update:function(){
 		//forces
@@ -56,8 +83,14 @@ var Ball2D = {
 			for(let j=0;j<this.balls.length;j++){
 				let ball2 = this.balls[j];
 				if(j!=i){
-					if(this.overlapped(ball,ball2)){
-						let force = this.force(ball,ball2);
+					let connected = this.getRod(ball,ball2);
+					if(this.overlapped(ball,ball2) || connected.result){
+						let force;
+						if(connected.result){
+							force = this.force(ball,ball2,true,connected.distance);
+						}else{
+							force = this.force(ball,ball2,false,0);
+						}
 						ball2.xv += force.x * this.friction;
 						ball2.yv += force.y * this.friction;
 						ball2.spinv = (ball.spinv + ball2.spinv)/2;
@@ -115,15 +148,32 @@ var Ball2D = {
 		let rd = a.r + b.r;
 		return xd*xd+yd*yd<rd*rd;
 	},
-	force:function(a,b){
+	getRod:function(a,b){
+		for(let i=0;i<this.rods.length;i++){
+			let b1 = this.rods[i].ball1;
+			let b2 = this.rods[i].ball2;			
+			if((b1.id == a.id) && (b2.id == b.id)){
+				return {result:true, distance:this.rods[i].distance};
+			}else if((b1.id == b.id) && (b2.id == a.id)){
+				//return {result:false};
+				return {result:true, distance:this.rods[i].distance};
+			}
+		}
+		return {result:false};
+	},
+	force:function(a,b,connected,required_distance){
 		let xd = a.x - b.x;
 		let yd = a.y - b.y;
 		let distance = Math.sqrt(xd*xd+yd*yd);//small
 		let min_distance = a.r + b.r;
+		if(connected){
+			console.log("faszom");
+			min_distance = required_distance;
+		}
 		let diff_distance = min_distance - distance;
 		let ratio = diff_distance/distance;
-		let x = -xd*ratio/2;
-		let y = -yd*ratio/2;
+		let x = -xd*ratio*this.hardness;
+		let y = -yd*ratio*this.hardness;
 		return {x:x,y:y}
 	},
 	debug:function(){

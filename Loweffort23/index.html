@@ -32,8 +32,9 @@ const DEBUG = false;
 //const DEBUG = true;
 const WIDTH = 800;
 const HEIGHT= 800;
+const FIXED = true;
 const TILE = 128;
-const GAMEINGTIME = 60;
+const GAMEINGTIME = 600;
 const SENSOR = {x:620+(760-620)/2,y:452,r:20,yv:5};
 const BASKETBALL={name:"basketball",fixed:true,offset:0};
 const SOCCER    ={name:"soccer",fixed:false,offset:TILE};
@@ -48,7 +49,6 @@ const BASKET = [
 ];
 
 let canvas = get("canvas1987");
-let debug = get("debug1987");
 let ctx = canvas.getContext("2d");
 let rect = canvas.getBoundingClientRect();
 let score = 0;
@@ -70,14 +70,25 @@ let mouse_y = 0;
 Ball2D.setAABB(0,WIDTH,-200,HEIGHT);
 
 //player
-Ball2D.add(0,0,100,BASKETBALL.fixed,BASKETBALL.name,BASKETBALL.offset);
+Ball2D.addBall(0,0,100,BASKETBALL.fixed,BASKETBALL.name,BASKETBALL.offset);
 //basket
 for(let i=0;i<BASKET.length;i++){
-	Ball2D.add(BASKET[i].x,BASKET[i].y,40,BOWLING.fixed,BOWLING.name,BOWLING.offset);
+	Ball2D.addBall(BASKET[i].x,BASKET[i].y,40,BOWLING.fixed,BOWLING.name,BOWLING.offset);
 	Ball2D.notvisible();
 }
+//pendulum1
+let b1=Ball2D.addBall(WIDTH/2-100,20,10,FIXED,BASKETBALL.name,BASKETBALL.offset);
+Ball2D.notvisible();
+let b2=Ball2D.addBall(WIDTH/2-100,500,100,!FIXED,BOWLING.name,BOWLING.offset);
+Ball2D.addRod(b1,b2);
+//pendulum2
+let b3=Ball2D.addBall(WIDTH/2+100,20,10,FIXED,BASKETBALL.name,BASKETBALL.offset);
+Ball2D.notvisible();
+let b4=Ball2D.addBall(WIDTH/2+100,500,100,!FIXED,BOWLING.name,BOWLING.offset);
+Ball2D.addRod(b3,b4);
+Ball2D.addRod(b2,b4);
 
-//Ball2D.add(SENSOR.x,SENSOR.y,SENSOR.r,BOWLING.fixed,SOCCER.name,SOCCER.offset);
+//Ball2D.addBall(SENSOR.x,SENSOR.y,SENSOR.r,BOWLING.fixed,SOCCER.name,SOCCER.offset);
 
 document.addEventListener("mousemove", function(event){
 	mouse_x = event.pageX - rect.left;
@@ -94,8 +105,19 @@ function update(){
 		player.x=WIDTH;
 	}
 	Ball2D.set(0,player.x,player.y);
-	var balls = Ball2D.getAll();
-	
+	var balls = Ball2D.getAllBalls();
+	var rods = Ball2D.getAllRods();
+	//draw rods
+	for(let i=0;i<rods.length;i++){
+		ctx.fillStyle = "#000";
+		let b1 = Ball2D.getBallById(rods[i].ball1.id);
+		let b2 = Ball2D.getBallById(rods[i].ball2.id);
+		ctx.beginPath();
+		ctx.moveTo(b1.x, b1.y);
+		ctx.lineTo(b2.x, b2.y);
+		ctx.stroke(); 
+	}
+	//draw balls
 	for(let i=0;i<balls.length;i++){
 		let ball = balls[i];
 		if(ball.visible){
@@ -105,7 +127,7 @@ function update(){
 			ctx.drawImage(img_balls,ball.offset,0,TILE,TILE,-ball.d/2,-ball.d/2,ball.d,ball.d);
 			ctx.restore();
 			if(ball.name == COLORBALL.name && Ball2D.overlapped(ball,SENSOR) && ball.yv > SENSOR.yv){
-				Ball2D.remove(ball);
+				Ball2D.removeBall(ball);
 				score++;
 				if(score>hiscore){
 					hiscore=score;
@@ -134,7 +156,7 @@ function update(){
 	}
 	Ball2D.update()
 	if(t%100 == 0){
-		Ball2D.add(Math.random()*100-50+WIDTH/2-40,-100,80,COLORBALL.fixed,COLORBALL.name,COLORBALL.offset);
+		Ball2D.addBall(Math.random()*100-50+WIDTH/2-40,-100,80,COLORBALL.fixed,COLORBALL.name,COLORBALL.offset);
 	}
 	if(t%60 == 0){
 		time--;
@@ -145,7 +167,7 @@ function update(){
 				for(let i=0;i<balls.length;i++){
 					let ball = balls[i];
 					if(ball.name == COLORBALL.name){
-						Ball2D.remove(ball);
+						Ball2D.removeBall(ball);
 					}
 				}
 			}
