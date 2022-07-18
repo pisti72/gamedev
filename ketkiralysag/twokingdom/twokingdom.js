@@ -1,3 +1,5 @@
+const VERSION = "version: 0.3";
+const START_LEVEL = 1;
 const DEBUG = false;
 //const DEBUG = true;
 
@@ -9,6 +11,9 @@ const TILE_REAL = PIXEL * TILE;
 const WIDTH = MAP_WIDTH * TILE_REAL;
 const HEIGHT= MAP_HEIGHT * TILE_REAL;
 const DISTANCE = 3;
+const TICK = 301;
+const LEVEL_TICK_MULTIPLIER = 30
+const SOLDIER_SPEED = 20;
 
 const NONE_SIDE = 0;
 const RED_SIDE = 1;
@@ -53,7 +58,8 @@ const HUNGER = 0.001;
 const CANIBALISM = 0.002;
 const PRODUCTIVITY = 0.01;
 const FARM_PRODUCTIVITY = 2;
-const SAFE_AMOUNT = 3;
+const SAFE_AMOUNT = 10;
+const CRITICAL_FOOD = 6;
 
 const WHITE = "#FFF";
 const GRAY = "#DDD";
@@ -70,7 +76,7 @@ const SELECTSOLDIER = 3;
 const SHOWRESOURCE = 4;
 const SHOWCASTLE = 5;
 const GAMEOVER = 6;
-const PAUSE = 7;
+const SHOWLEVEL = 7;
 const MOVESOLDIER = 8;
 const YOUWON = 9;
 
@@ -148,7 +154,7 @@ const ITEMS = [
     },
     {
         id:BLUE_FLAG_CASTLE,
-        res_x:40,
+        res_x:42,
         res_y:25,
         res_w:6,
         res_h:7
@@ -266,9 +272,9 @@ const ITEMS = [
         img_y:16,
         images:[
             {x:48,y:16,flag_x:5,flag_y:4},
-            {x:64,y:16,flag_x:5,flag_y:4},
-            {x:48,y:32,flag_x:8,flag_y:4},
-            {x:64,y:32,flag_x:8,flag_y:4}
+            {x:64,y:16,flag_x:4,flag_y:4},
+            {x:48,y:32,flag_x:5,flag_y:4},
+            {x:64,y:32,flag_x:4,flag_y:4}
         ],
         resource:false,
         wood:1,
@@ -286,7 +292,7 @@ const ITEMS = [
             {x:80,y:16,flag_x:4,flag_y:2},
             {x:96,y:16,flag_x:5,flag_y:2},
             {x:80,y:32,flag_x:4,flag_y:2},
-            {x:96,y:32,flag_x:4,flag_y:2}
+            {x:96,y:32,flag_x:5,flag_y:2}
         ],
         resource:false,
         wood:2,
@@ -304,9 +310,9 @@ const ITEMS = [
         img_y:16,
         images:[
             {x:112,y:16,flag_x:5,flag_y:0},
-            {x:128,y:16,flag_x:5,flag_y:-1},
+            {x:128,y:16,flag_x:6,flag_y:-1},
             {x:112,y:32,flag_x:5,flag_y:0},
-            {x:128,y:32,flag_x:5,flag_y:-1}
+            {x:128,y:32,flag_x:6,flag_y:-1}
         ],
         resource:false,
         wood:6,
@@ -393,7 +399,7 @@ let hand = {
     }
 };
 let map = [];
-let level = 1;
+let level = START_LEVEL;
 let state = TITLE;
 let selected_item = {}
 let selected_soldier = {}
@@ -410,55 +416,59 @@ document.addEventListener("mousemove", function(event){
 document.addEventListener("mousedown", function(event){
     snd_click.play();
 	if(state == TITLE){
-        newGame();
-    }else if(state == PLAY){
-        selected_item = getItemByCursor();
-        if(isSoldier(selected_item, RED_SIDE)){
-            state = MOVESOLDIER;
-            hand.item = CURSOR_TARGET;
-        }else if(canBuild(selected_item, RED_SIDE)){
-            state = SELECTBUILDING;
-        }else if(selected_item.item == CASTLE){
-            state = SHOWCASTLE;
-        }else if(selected_item.item == BARRACKS){
-            state = SELECTSOLDIER;
-        }else{
-            state = SHOWRESOURCE;
-        }
-    }else if(state == SHOWRESOURCE || state == SHOWCASTLE){
-        state = PLAY;
-    }else if(state == SELECTBUILDING){
-        if(selected_menuitem.id != GRASS){
-            setMapAt(selected_menuitem.id, selected_item.x, selected_item.y, RED_SIDE);
-            let castle = getCastleBySide(RED_SIDE);
-            castle.wood -= selected_menuitem.wood;
-            castle.ore -= selected_menuitem.ore;
-            castle.workers += selected_menuitem.workers;
-        }
-        state = PLAY;
-    }else if(state == SELECTSOLDIER){
-        if(selected_menuitem.id != GRASS){
-            let item = getFirstClosestEmpty(selected_item);
-            if(item.item != INVALID){
-                addSoldier(map[item.id],selected_menuitem.id, RED_SIDE);
-                let castle = getCastleBySide(RED_SIDE);
-                castle.wood -= selected_menuitem.wood;
-                castle.ore -= selected_menuitem.ore;
-                castle.workers += selected_menuitem.workers;
-            }
-        }
-        state = PLAY;
-    }else if(state == MOVESOLDIER){
-        hand.item = CURSOR_NORMAL;
-        selected_soldier.moveTo.x = hand.x;
-        selected_soldier.moveTo.y = hand.y;
-        state = PLAY;
-    }else if(state == GAMEOVER){
-        state = TITLE;
-    }else if(state == YOUWON){
-        level++;
-        newGame();
-    }
+    newGame();
+    state = SHOWLEVEL;
+  }else if(state == SHOWLEVEL){
+    state = PLAY;
+  }else if(state == PLAY){
+      selected_item = getItemByCursor();
+      if(isSoldier(selected_item, RED_SIDE)){
+          state = MOVESOLDIER;
+          hand.item = CURSOR_TARGET;
+      }else if(canBuild(selected_item, RED_SIDE)){
+          state = SELECTBUILDING;
+      }else if(selected_item.item == CASTLE){
+          state = SHOWCASTLE;
+      }else if(selected_item.item == BARRACKS){
+          state = SELECTSOLDIER;
+      }else{
+          state = SHOWRESOURCE;
+      }
+  }else if(state == SHOWRESOURCE || state == SHOWCASTLE){
+      state = PLAY;
+  }else if(state == SELECTBUILDING){
+      if(selected_menuitem.id != GRASS){
+          setMapAt(selected_menuitem.id, selected_item.x, selected_item.y, RED_SIDE);
+          let castle = getCastleBySide(RED_SIDE);
+          castle.wood -= selected_menuitem.wood;
+          castle.ore -= selected_menuitem.ore;
+          castle.workers += selected_menuitem.workers;
+      }
+      state = PLAY;
+  }else if(state == SELECTSOLDIER){
+      if(selected_menuitem.id != GRASS){
+          let item = getFirstClosestEmpty(selected_item);
+          if(item.item != INVALID){
+              addSoldier(item, selected_menuitem.id, RED_SIDE);
+              let castle = getCastleBySide(RED_SIDE);
+              castle.wood -= selected_menuitem.wood;
+              castle.ore -= selected_menuitem.ore;
+              castle.workers += selected_menuitem.workers;
+          }
+      }
+      state = PLAY;
+  }else if(state == MOVESOLDIER){
+      hand.item = CURSOR_NORMAL;
+      selected_soldier.moveTo.x = hand.x;
+      selected_soldier.moveTo.y = hand.y;
+      state = PLAY;
+  }else if(state == GAMEOVER){
+      state = TITLE;
+  }else if(state == YOUWON){
+      level++;
+      newGame();
+      state = SHOWLEVEL;
+  }
 });
 
 inicMap();
@@ -477,6 +487,7 @@ function addSoldier(map, id, side){
     let soldier = {
         id:id,
         side:side,
+        flip:0,
         shield:item.shield,
         attack:item.attack,
         fighting:false,
@@ -547,7 +558,7 @@ function update(){
         ctx.fillText(selected_item.id, 5, 90);
         //ctx.fillText(soldiers[0].fighting, 5, 110);
     }
-    if(state==SHOWRESOURCE){
+    if(state == SHOWRESOURCE){
         drawRect(7,4);
         let item = getItemById(selected_item.item);
         drawTile(item,4,2);
@@ -562,8 +573,7 @@ function update(){
             let item = getItemById(SHIELD);
             drawResource(item, 4, 4);
         }
-    }
-    if(state == SHOWCASTLE){
+    }else if(state == SHOWCASTLE){
         drawRect(8,6);
         let item = getItemById(selected_item.item);
         drawTile(item,4,1);
@@ -601,23 +611,23 @@ function update(){
             ctx.fillText("="+Math.floor(array[i].value*10)/10, (x+1)*TILE_REAL, (y+0.5)*TILE_REAL);
             j++;
         }
-    }
-    if(state == SELECTBUILDING){
+    }else if(state == SELECTBUILDING){
         creatorMenu("Select building",BUILDINGS);
-    }
-    if(state == SELECTSOLDIER){
+    }else if(state == SELECTSOLDIER){
         creatorMenu("Select soldier",SOLDIERS);
-    }
-    if(state==TITLE){
+    }else if(state == TITLE){
         drawTextMiddle("Battle Of Two Kings","60px RetroGaming",160);
         drawTextMiddle("Developed by Istvan Szalontai for RTS JAM 1998","20px RetroGaming",208);
         drawTextMiddle("Click to play","40px RetroGaming",420);
-    }
-    if(state == GAMEOVER){
-        drawTextMiddle("Game Over","40px RetroGaming",420);
-    }
-    if(state == YOUWON){
-        drawTextMiddle("YOU WON! LEVEL:"+level,"40px RetroGaming",420);
+        drawVersion();
+    }else if(state == SHOWLEVEL){
+      drawTextMiddle("Prepare for level","50px RetroGaming",200);
+      drawTextMiddle(level,"80px RetroGaming",280);
+      drawTextMiddle("Click to play","40px RetroGaming",420);
+    }else if(state == GAMEOVER){
+        drawTextMiddle("Game Over","50px RetroGaming",200);
+    }else if(state == YOUWON){
+        drawTextMiddle("GLORIOUS VICTORY!","60px RetroGaming",180);
     }
     
     window.requestAnimationFrame(update);
@@ -644,18 +654,12 @@ function drawSoldiers(){
     for(let i=0; i<soldiers.length; i++){
         let soldier = soldiers[i];
         let item = getItemById(soldier.id);
-        let flip = 0;
-        if(soldier.x < soldier.moveTo.x){
-          flip = 0;
-        }
-        if(soldier.x > soldier.moveTo.x){
-          flip = 2;
-        }
+        
         let anim = 0;
-        if(soldier.fighting && t%20>10){
+        if(soldier.fighting && t%SOLDIER_SPEED > SOLDIER_SPEED/2){
           anim = 1;
         }
-        ctx.drawImage(gfx, item.images[flip + anim].x, item.images[flip + anim].y,
+        ctx.drawImage(gfx, item.images[soldier.flip + anim].x, item.images[soldier.flip + anim].y,
           TILE, TILE,
           TILE_REAL*soldier.x, TILE_REAL*soldier.y,
           TILE_REAL, TILE_REAL);
@@ -663,48 +667,66 @@ function drawSoldiers(){
         if(soldier.side == BLUE_SIDE){
           flag = getItemById(BLUE_FLAG_SOLDIER);
         }
-        ctx.drawImage(gfx, flag.images[flip/2].x, flag.images[flip/2].y,
-            flag.res_w, flag.res_h,
-            PIXEL*(soldier.x * TILE+ item.images[flip + anim].flag_x), PIXEL*(soldier.y * TILE + item.images[flip + anim].flag_y),
-            flag.res_w * PIXEL, flag.res_h * PIXEL);
-    }
-}
-
-function drawMap(){
-    ctx.fillStyle = GREEN;
-    ctx.fillRect(0, 0, MAP_WIDTH * TILE_REAL, MAP_HEIGHT * TILE_REAL);
-    for(let i=0; i<map.length; i++){
-        drawMapTile(map[i]);
-    }
-}
-
-function drawDust(){
-    for(let i=0; i<dusts.length; i++){
-        let dust = getItemById(DUST);
-        ctx.drawImage(gfx, dust.res_x, dust.res_y,
-            dust.res_w, dust.res_h,
-            dusts[i].x, dusts[i].y,
-            dust.res_w * PIXEL, dust.res_h * PIXEL);
-        if(dusts[i].life <= 0){
-            dusts.splice(i,1);
+        if(soldier.flip == 0){
+          ctx.drawImage(gfx, flag.images[0].x, flag.images[0].y,
+              flag.res_w, flag.res_h,
+              PIXEL*(soldier.x * TILE + item.images[anim].flag_x), PIXEL*(soldier.y * TILE + item.images[anim].flag_y),
+              flag.res_w * PIXEL, flag.res_h * PIXEL);
         }else{
-            dusts[i].life--;
+          ctx.drawImage(gfx, flag.images[1].x, flag.images[1].y,
+              flag.res_w, flag.res_h,
+              PIXEL*(soldier.x * TILE + TILE - flag.res_w - item.images[anim].flag_x), PIXEL*(soldier.y * TILE + item.images[anim].flag_y),
+              flag.res_w * PIXEL, flag.res_h * PIXEL);
         }
     }
 }
 
+function drawMap(){
+  ctx.fillStyle = GREEN;
+  ctx.fillRect(0, 0, MAP_WIDTH * TILE_REAL, MAP_HEIGHT * TILE_REAL);
+  for(let i=0; i<map.length; i++){
+    drawMapTile(map[i]);
+  }
+}
+
+function drawDust(){
+  for(let i=0; i<dusts.length; i++){
+    let dust = getItemById(DUST);
+    ctx.drawImage(gfx, dust.res_x, dust.res_y,
+      dust.res_w, dust.res_h,
+      dusts[i].x, dusts[i].y,
+      dust.res_w * PIXEL, dust.res_h * PIXEL);
+    if(dusts[i].life <= 0){
+      dusts.splice(i,1);
+    }else{
+      dusts[i].life--;
+    }
+  }
+}
+
 function drawTextMiddle(txt,font,y){
-    ctx.font = font;
-    let w = ctx.measureText(txt).width;
-    let x = Math.floor((WIDTH-w)/2);
-    ctx.fillStyle = BLACK;
-    ctx.fillText(txt, x+PIXEL, y);
-    ctx.fillStyle = YELLOW;
-    ctx.fillText(txt, x, y);
+  ctx.font = font;
+  let w = ctx.measureText(txt).width;
+  let x = Math.floor((WIDTH-w)/2);
+  ctx.fillStyle = BLACK;
+  ctx.fillText(txt, x+PIXEL, y);
+  ctx.fillStyle = YELLOW;
+  ctx.fillText(txt, x, y);
+}
+
+function drawVersion(){
+  ctx.font="20px RetroGaming";
+  let w = Math.floor(ctx.measureText(VERSION).width);
+  let x = WIDTH-w - PIXEL;
+  let y = HEIGHT-PIXEL;
+  ctx.fillStyle = BLACK;
+  ctx.fillText(VERSION, x+PIXEL, y);
+  ctx.fillStyle = YELLOW;
+  ctx.fillText(VERSION, x, y);
 }
 
 function move_soldiers(){
-    if(t%10 == 0){
+    if(t%SOLDIER_SPEED == 0){
         for(let i=0;i<soldiers.length;i++){
             let soldier = soldiers[i];
             if(soldier.x != soldier.moveTo.x || soldier.y != soldier.moveTo.y){
@@ -718,6 +740,12 @@ function move_soldiers(){
                     soldier.y--;
                 }
             }
+            if(soldier.x < soldier.moveTo.x){
+              soldier.flip = 0;
+            }
+            if(soldier.x > soldier.moveTo.x){
+              soldier.flip = 2;
+            }
         }
     }
     for(let i=0;i<soldiers.length;i++){
@@ -725,18 +753,19 @@ function move_soldiers(){
         soldier.fighting = false;
         let map = getClosestEnemyBuilding(soldier);
         if(map.item != INVALID){
-            if(t%10 == 0){
+            if(t%SOLDIER_SPEED == 0){
                 map.shield -= soldier.attack;
             }
             soldier.fighting = true;
             addDust(map);
             if(map.shield < 0){
-                setMapAt(GRASS, map.x, map.y, NONE_SIDE);
+              state = PLAY;
+              setMapAt(GRASS, map.x, map.y, NONE_SIDE);
             }
         }
         let soldier_enemy = getClosestEnemySoldier(soldier);
         if(soldier_enemy.id != INVALID){
-            if(t%10 == 0){
+            if(t%SOLDIER_SPEED == 0){
                 soldier_enemy.shield -= soldier.attack;
             }
             soldier.fighting = true;
@@ -762,7 +791,7 @@ function getClosestEnemyBuilding(soldier){
 }
 
 function getClosestEnemySoldier(soldier){
-    let diff = Math.abs(soldier.x-soldier.moveTo.x) + Math.abs(soldier.y-soldier.moveTo.y);
+    let diff = Math.abs(soldier.x - soldier.moveTo.x) + Math.abs(soldier.y - soldier.moveTo.y);
     if(diff == 1){
         for(let i=0; i<soldiers.length; i++){
             let soldier_enemy = soldiers[i];
@@ -836,14 +865,15 @@ function creatorMenu(title,array){
 }
 
 function ai(){
-    let castle = getCastleBySide(BLUE_SIDE);
-    let selected_menuitem = getItemById(GRASS);
-    let selected_item = getItemById(GRASS);
-    if(t%castle.tick==0){
+  let castle = getCastleBySide(BLUE_SIDE);
+  let selected_menuitem = getItemById(GRASS);
+  let selected_item = getItemById(GRASS);
+  if(t%castle.tick==0){
         selected_item = getItemForAI();
         if(selected_item.item == GRASS && isEmptyAt(selected_item.x, selected_item.y)){
             
             let cube = random(0,100)
+            
             if(isClosest(selected_item,FOREST)){
                 selected_menuitem = getItemById(LUMBERMAN);
             }
@@ -851,27 +881,38 @@ function ai(){
                 selected_menuitem = getItemById(STONECUTTER);
             }
             
-            if(castle.food_before > castle.food){
-                selected_menuitem = getItemById(FARM);
-            }                   
+            let farm = getItemById(FARM);
+            if(castle.wood >= farm.wood+2 && castle.ore >= farm.ore+2){
+                if(castle.food_before > castle.food || castle.food < CRITICAL_FOOD){
+                    selected_menuitem = farm;
+                }
+            }
             
-            if(cube>85 && castle.wood >= SAFE_AMOUNT*5 && castle.ore >= SAFE_AMOUNT*5){
+            if(cube>80 && castle.wood >= SAFE_AMOUNT && castle.ore >= SAFE_AMOUNT){
                 selected_menuitem = getItemById(BARRACKS);
             }
-            if(cube>90 && castle.wood >= SAFE_AMOUNT*5 && castle.ore >= SAFE_AMOUNT*5){
+            if(cube>90 && castle.wood >= SAFE_AMOUNT && castle.ore >= SAFE_AMOUNT){
                 selected_menuitem = getItemById(CASTLE);
             }
-            if(castle.food <= SAFE_AMOUNT){
-                selected_menuitem = getItemById(FARM);
-            }
-            if(castle.wood <= SAFE_AMOUNT || castle.ore <= SAFE_AMOUNT){
+            
+            let lumberman = getItemById(LUMBERMAN);
+            if(castle.wood <= lumberman.wood || castle.ore <= lumberman.ore){
                 if(isClosest(selected_item,FOREST)){
-                    selected_menuitem = getItemById(LUMBERMAN);
-                }
-                if(random(0,100)>50 && isClosest(selected_item,STONE)){
-                    selected_menuitem = getItemById(STONECUTTER);
+                    selected_menuitem = lumberman;
                 }
             }
+            
+            let stonecutter = getItemById(STONECUTTER);
+            if(castle.wood <= stonecutter.wood || castle.ore <= stonecutter.ore){
+                if(isClosest(selected_item,STONE)){
+                    selected_menuitem = stonecutter;
+                }
+            }
+            
+            if(isClosest(selected_item,BARRACKS)){
+              selected_menuitem = getItemById(GRASS);
+            }
+                
             if(selected_menuitem.id != GRASS){
                 if(castle.wood >= selected_menuitem.wood && castle.ore >= selected_menuitem.ore){
                     setMapAt(selected_menuitem.id, selected_item.x, selected_item.y, BLUE_SIDE);
@@ -881,35 +922,67 @@ function ai(){
                 }
             }   
         }
+        
+     
     }
-    //create soldier
-    selected_item = map[random(0,map.length)];
-    if(selected_item.item == BARRACKS && selected_item.side == BLUE_SIDE){
-        //console.log("barracks found");
-        let soldier_picked = SOLDIERS[random(0,SOLDIERS.length)];
-        selected_menuitem = getItemById(soldier_picked);
-        //console.log(selected_menuitem.id);
-        if(castle.wood >= selected_menuitem.wood + 2 && castle.ore >= selected_menuitem.ore + 2){
-            let item = getFirstClosestEmpty(selected_item);
-            if(item.item != INVALID){
-                addSoldier(map[item.id], selected_menuitem.id, BLUE_SIDE);
-                castle.wood -= selected_menuitem.wood;
-                castle.ore -= selected_menuitem.ore;
-                castle.workers += selected_menuitem.workers;
-            }
-        }
+  //create soldier
+  selected_item = map[random(0,map.length)];
+  if(selected_item.item == BARRACKS && selected_item.side == BLUE_SIDE){
+      console.log("Soldier can be added");
+      let soldier_picked = SOLDIERS[random(0,SOLDIERS.length)];
+      selected_menuitem = getItemById(soldier_picked);
+      
+      if(castle.wood >= selected_menuitem.wood + 2 && castle.ore >= selected_menuitem.ore + 2 && castle.food > 2){
+          let m = getFirstClosestEmpty(selected_item);
+          if(m.item != INVALID){
+              console.log("Adding soldier");
+              addSoldier(m, selected_menuitem.id, BLUE_SIDE);
+              castle.wood -= selected_menuitem.wood;
+              castle.ore -= selected_menuitem.ore;
+              castle.workers += selected_menuitem.workers;
+          }
+      }else{
+        console.log("Not enough resource to add soldier");
+      }
+  }
+  //move blue soldiers to buildings
+  if(selected_item.side == RED_SIDE){
+      for(let i=0; i<soldiers.length; i++){
+          let soldier = soldiers[i];
+          let diff = Math.abs(soldier.x-soldier.moveTo.x)+Math.abs(soldier.y-soldier.moveTo.y)
+          if(soldier.side == BLUE_SIDE /*&& diff != 1*/){
+              soldier.moveTo.x = selected_item.x;
+              soldier.moveTo.y = selected_item.y;
+          }
+      }
+  }
+  //fight soldier
+  for(let i=0; i<soldiers.length; i++){
+    let soldier = soldiers[i];
+    if(soldier.side == BLUE_SIDE){
+      let soldier_red = getClosestEnemySoldierToFight(soldier);
+      if(soldier_red.id != INVALID){
+        soldier.moveTo.x = soldier_red.x;
+        soldier.moveTo.y = soldier_red.y;
+      }
     }
-    //move blue soldiers
-    if(selected_item.side == RED_SIDE){
-        for(let i=0; i<soldiers.length; i++){
-            let soldier = soldiers[i];
-            let diff = Math.abs(soldier.x-soldier.moveTo.x)+Math.abs(soldier.y-soldier.moveTo.y)
-            if(soldier.side == BLUE_SIDE /*&& diff != 1*/){
-                soldier.moveTo.x = selected_item.x;
-                soldier.moveTo.y = selected_item.y;
-            }
-        }
+  }
+}
+
+function getClosestEnemySoldierToFight(mysoldier){
+  let enemy = {id:INVALID}
+  let distance_min = 9999;
+  for(let i=0; i<soldiers.length; i++){
+    let soldier = soldiers[i];
+    if(mysoldier.side != soldier.side){
+      let distance = Math.abs(mysoldier.x-soldier.x)+Math.abs(mysoldier.y-soldier.y);
+      if(distance<distance_min){
+        distance_min = distance;
+        enemy = soldier;
+      }
     }
+  }
+  return enemy;
 }
 
 function getItemForAI(){
@@ -1083,22 +1156,21 @@ function drawRect(width,height){
 }
 
 function drawTile(item,x,y){
-    if(item.id != GRASS){
-        ctx.drawImage(gfx,item.img_x,item.img_y,TILE,TILE,TILE_REAL*x,TILE_REAL*y,TILE_REAL,TILE_REAL);
-    }
-    
+  if(item.id != GRASS){
+    ctx.drawImage(gfx,item.img_x,item.img_y,TILE,TILE,TILE_REAL*x,TILE_REAL*y,TILE_REAL,TILE_REAL);
+  }
 }
 
 function drawCursor(x,y){
-    let item = getItemById(hand.item);
-    drawTile(item,x,y);
+  let item = getItemById(hand.item);
+  drawTile(item,x,y);
 }
 
 function drawResource(item,x,y){
-    ctx.drawImage(gfx, item.res_x, item.res_y,
-        item.res_w, item.res_h,
-        TILE_REAL*x, TILE_REAL*y,
-        item.res_w * PIXEL, item.res_h * PIXEL);
+  ctx.drawImage(gfx, item.res_x, item.res_y,
+    item.res_w, item.res_h,
+    TILE_REAL*x, TILE_REAL*y,
+    item.res_w * PIXEL, item.res_h * PIXEL);
 }
 
 function drawMapTile(map){
@@ -1138,14 +1210,13 @@ function drawMapTile(map){
 
 function newGame(){	
   t = 0;
-  state = PLAY;
   for(let i=0;i<castles.length;i++){
       let castle = castles[i];
-      castle.wood = 6+level;
-      castle.ore = 6+level;
+      castle.wood = 6 + level;
+      castle.ore = 6 + level;
       castle.food = 10;
       castle.workers = 2;
-      castle.tick = 400 - level * 10;
+      castle.tick = TICK - level * LEVEL_TICK_MULTIPLIER;
   }
  
 	inicMap();
@@ -1153,6 +1224,9 @@ function newGame(){
   //addSoldier(getMapAt(2,4),KNIGHT,RED_SIDE);
   //setMapAt(GRASS,2,4, NONE_SIDE);
   //setMapAt(GRASS,3,4, NONE_SIDE);
+  //setMapAt(GRASS,4,4, NONE_SIDE);
+  //addSoldier(getMapAt(4,4),SWORDSMAN,BLUE_SIDE);
+  //setMapAt(FARM,2,3, BLUE_SIDE);
   //setMapAt(FARM,4,4, BLUE_SIDE);
   
   //setMapAt(BARRACKS,MAP_WIDTH - 2,4, BLUE_SIDE);
@@ -1161,40 +1235,48 @@ function newGame(){
 }
 
 function inicMap(){
-    map = [];
-    soldiers = [];
-    for(let i=0;i<MAP_WIDTH*MAP_HEIGHT;i++)
-	{
+  map = [];
+  soldiers = [];
+  for(let i=0;i<MAP_WIDTH*MAP_HEIGHT;i++){
 		let item = GRASS;
 		let animation = EMPTY;
 		let r = random(0,100);
-		if(r >= 60+level && r<100)item = FOREST;//fa ritkulnak
-		if(r >= 35 && r<60)item = STONE;//sziklák nem ritkulnak
-		if(r >= 35-level && r<35)item = LAKE;///tó több lesz
-		let amount = random(5,20);//nyersanyag eloszlás
-        //TODO addToMap(id,x,y)
-        let field={
-            id:i,
-            x:i%MAP_WIDTH,
-            y:Math.floor(i/MAP_WIDTH),
-            item:item,
-            side:NONE_SIDE,
-            amount:amount,
-            underattack:false
-        }
-        map.push(field);
+		if(r >= 60+level){
+      //less forest
+      item = FOREST;
+    }else if(r >= 35){
+      //stones always same
+      item = STONE;
+    }else	if(r >= 30){
+      //more lake
+      item = LAKE;
+    }
+		let amount = random(5,20+level);//nyersanyag eloszlás
+    addToMap(item, i%MAP_WIDTH, Math.floor(i/MAP_WIDTH), amount);
 	}
-    setMapAt(CASTLE,           1,3,RED_SIDE);
-    setMapAt(CASTLE, MAP_WIDTH-2,3,BLUE_SIDE);
+  setMapAt(CASTLE,           1, 3, RED_SIDE);
+  setMapAt(CASTLE, MAP_WIDTH-2, 3, BLUE_SIDE);
+  //setMapAt(CASTLE, 3, 3, BLUE_SIDE);
+}
+
+function addToMap(item,x,y,amount){
+  let field={
+    x:x,
+    y:y,
+    item:item,
+    side:NONE_SIDE,
+    amount:amount
+  }
+  map.push(field);
 }
 
 function getItemById(id){
-    for(let i=0;i<ITEMS.length;i++){
-        if(id == ITEMS[i].id){
-            return ITEMS[i];
-        }
+  for(let i=0;i<ITEMS.length;i++){
+    if(id == ITEMS[i].id){
+      return ITEMS[i];
     }
-    return false;
+  }
+  return false;
 }
 
 function random(i,j){
