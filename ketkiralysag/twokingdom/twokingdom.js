@@ -1,4 +1,4 @@
-const VERSION = "version: 0.3";
+const VERSION = "version: 0.4";
 const START_LEVEL = 1;
 const DEBUG = false;
 //const DEBUG = true;
@@ -18,6 +18,8 @@ const SOLDIER_SPEED = 20;
 const NONE_SIDE = 0;
 const RED_SIDE = 1;
 const BLUE_SIDE = 2;
+const YELLOW_SIDE = 3;
+const CYAN_SIDE = 4;
 
 const ONE_SECOND = 50;
 const TWO_SECONDS = ONE_SECOND * 2;
@@ -52,7 +54,13 @@ const RED_FLAG_SOLDIER = 72;
 const BLUE_FLAG = 73;
 const BLUE_FLAG_CASTLE = 74;
 const BLUE_FLAG_SOLDIER = 75;
-const DUST = 76;
+const YELLOW_FLAG = 76;
+const YELLOW_FLAG_CASTLE = 77;
+const YELLOW_FLAG_SOLDIER = 78;
+const CYAN_FLAG = 79;
+const CYAN_FLAG_CASTLE = 80;
+const CYAN_FLAG_SOLDIER = 81;
+const DUST = 82;
 
 const HUNGER = 0.001;
 const CANIBALISM = 0.002;
@@ -123,26 +131,26 @@ const ITEMS = [
     {
         id:RED_FLAG,
         res_x:36,
-        res_y:19,
+        res_y:20,
         res_w:3,
         res_h:4
     },
     {
         id:RED_FLAG_CASTLE,
         res_x:42,
-        res_y:16,
+        res_y:17,
         res_w:6,
         res_h:7
     },
     {
         id:RED_FLAG_SOLDIER,
         res_x:32,
-        res_y:21,
+        res_y:20,
         res_w:3,
         res_h:2,
         images:[
-          {x:32,y:21},
-          {x:32,y:19}
+          {x:32,y:22},
+          {x:32,y:20}
         ]
     },
     {
@@ -168,6 +176,56 @@ const ITEMS = [
         images:[
           {x:32,y:30},
           {x:32,y:28}
+        ]
+    },
+    {
+        id:YELLOW_FLAG,
+        res_x:36,
+        res_y:36,
+        res_w:3,
+        res_h:4
+    },
+    {
+        id:YELLOW_FLAG_CASTLE,
+        res_x:42,
+        res_y:33,
+        res_w:6,
+        res_h:7
+    },
+    {
+        id:YELLOW_FLAG_SOLDIER,
+        res_x:32,
+        res_y:38,
+        res_w:3,
+        res_h:2,
+        images:[
+          {x:32,y:38},
+          {x:32,y:36}
+        ]
+    },
+    {
+        id:CYAN_FLAG,
+        res_x:36,
+        res_y:44,
+        res_w:3,
+        res_h:4
+    },
+    {
+        id:CYAN_FLAG_CASTLE,
+        res_x:42,
+        res_y:41,
+        res_w:6,
+        res_h:7
+    },
+    {
+        id:CYAN_FLAG_SOLDIER,
+        res_x:32,
+        res_y:46,
+        res_w:3,
+        res_h:2,
+        images:[
+          {x:32,y:46},
+          {x:32,y:44}
         ]
     },
     {
@@ -266,7 +324,7 @@ const ITEMS = [
     {
         id:SWORDSMAN,
         name:"Swordsman",
-        shield:200,
+        shield:20,
         attack:1,
         img_x:48,
         img_y:16,
@@ -284,7 +342,7 @@ const ITEMS = [
     {
         id:ARCHER,
         name:"Archer",
-        shield:200,
+        shield:30,
         attack:2,
         img_x:80,
         img_y:16,
@@ -304,7 +362,7 @@ const ITEMS = [
     {
         id:KNIGHT,
         name:"Knight",
-        shield:200,
+        shield:50,
         attack:6,
         img_x:112,
         img_y:16,
@@ -336,6 +394,10 @@ const ITEMS = [
 let castles = [
     {
         side: RED_SIDE,
+        name: "Your castle",
+        flag: RED_FLAG,
+        flag_big: RED_FLAG_CASTLE,
+        flag_soldier: RED_FLAG_SOLDIER,
         wood: 0,
         ore: 0,
         food:0,
@@ -347,6 +409,10 @@ let castles = [
     },
     {
         side: BLUE_SIDE,
+        name: "Blue castle",
+        flag: BLUE_FLAG,
+        flag_big: BLUE_FLAG_CASTLE,
+        flag_soldier: BLUE_FLAG_SOLDIER,
         wood: 0,
         ore: 0,
         food:0,
@@ -356,6 +422,36 @@ let castles = [
         farms:0,
         tick:500
     },
+    {
+        side: YELLOW_SIDE,
+        name: "Yellow castle",
+        flag: YELLOW_FLAG,
+        flag_big: YELLOW_FLAG_CASTLE,
+        flag_soldier: YELLOW_FLAG_SOLDIER,
+        wood: 0,
+        ore: 0,
+        food:0,
+        food_before:0,
+        workers:0,
+        towers:0,
+        farms:0,
+        tick:500
+    },
+    {
+        side: CYAN_SIDE,
+        name: "Cyan castle",
+        flag: CYAN_FLAG,
+        flag_big: CYAN_FLAG_CASTLE,
+        flag_soldier: CYAN_FLAG_SOLDIER,
+        wood: 0,
+        ore: 0,
+        food:0,
+        food_before:0,
+        workers:0,
+        towers:0,
+        farms:0,
+        tick:500
+    }
 ];
 
 const BUILDINGS = [LUMBERMAN,STONECUTTER,FARM,BARRACKS,CASTLE];
@@ -364,6 +460,7 @@ const SOLDIERS = [SWORDSMAN,ARCHER,KNIGHT];
 let gfx = get("gfx");
 let canvas = get("canvas1987");
 let snd_click = get("snd_click");
+let snd_yessir = get("snd_yessir");
 
 let ctx = canvas.getContext("2d");
 let rect = canvas.getBoundingClientRect();
@@ -414,13 +511,15 @@ document.addEventListener("mousemove", function(event){
 });
 
 document.addEventListener("mousedown", function(event){
-    snd_click.play();
 	if(state == TITLE){
+    snd_click.play();
     newGame();
     state = SHOWLEVEL;
   }else if(state == SHOWLEVEL){
+    snd_click.play();
     state = PLAY;
   }else if(state == PLAY){
+      snd_click.play();
       selected_item = getItemByCursor();
       if(isSoldier(selected_item, RED_SIDE)){
           state = MOVESOLDIER;
@@ -437,6 +536,7 @@ document.addEventListener("mousedown", function(event){
   }else if(state == SHOWRESOURCE || state == SHOWCASTLE){
       state = PLAY;
   }else if(state == SELECTBUILDING){
+    snd_click.play();
       if(selected_menuitem.id != GRASS){
           setMapAt(selected_menuitem.id, selected_item.x, selected_item.y, RED_SIDE);
           let castle = getCastleBySide(RED_SIDE);
@@ -446,6 +546,7 @@ document.addEventListener("mousedown", function(event){
       }
       state = PLAY;
   }else if(state == SELECTSOLDIER){
+    snd_click.play();
       if(selected_menuitem.id != GRASS){
           let item = getFirstClosestEmpty(selected_item);
           if(item.item != INVALID){
@@ -458,13 +559,16 @@ document.addEventListener("mousedown", function(event){
       }
       state = PLAY;
   }else if(state == MOVESOLDIER){
+      snd_yessir.play();
       hand.item = CURSOR_NORMAL;
       selected_soldier.moveTo.x = hand.x;
       selected_soldier.moveTo.y = hand.y;
       state = PLAY;
   }else if(state == GAMEOVER){
+    snd_click.play();
       state = TITLE;
   }else if(state == YOUWON){
+    snd_click.play();
       level++;
       newGame();
       state = SHOWLEVEL;
@@ -523,7 +627,7 @@ function isSoldier(map, side){
 
 function canBuild(item, side){
 	if(item.item == GRASS){
-		for(let i=0;i<map.length;i++){
+		for(let i=0; i<map.length; i++){
 			if(map[i].item == CASTLE && map[i].side == side && Math.abs(item.x - map[i].x) < DISTANCE && Math.abs(item.y - map[i].y) < DISTANCE){
 				return true;
             }
@@ -579,8 +683,9 @@ function update(){
         drawTile(item,4,1);
         ctx.fillStyle = BLACK;
         ctx.font = "40px RetroGaming";
-        ctx.fillText(item.name, 5*TILE_REAL, 2*TILE_REAL);
+        
         let castle = getCastleBySide(selected_item.side);
+        ctx.fillText(castle.name, 5*TILE_REAL, 2*TILE_REAL);
         let array=[
             {
                 icon:getItemById(FOREST),
@@ -663,10 +768,9 @@ function drawSoldiers(){
           TILE, TILE,
           TILE_REAL*soldier.x, TILE_REAL*soldier.y,
           TILE_REAL, TILE_REAL);
-        let flag = getItemById(RED_FLAG_SOLDIER);
-        if(soldier.side == BLUE_SIDE){
-          flag = getItemById(BLUE_FLAG_SOLDIER);
-        }
+        let castle = getCastleBySide(soldier.side);
+        let flag = getItemById(castle.flag_soldier);
+        
         if(soldier.flip == 0){
           ctx.drawImage(gfx, flag.images[0].x, flag.images[0].y,
               flag.res_w, flag.res_h,
@@ -683,6 +787,7 @@ function drawSoldiers(){
 
 function drawMap(){
   ctx.fillStyle = GREEN;
+  //ctx.fillStyle = WHITE;
   ctx.fillRect(0, 0, MAP_WIDTH * TILE_REAL, MAP_HEIGHT * TILE_REAL);
   for(let i=0; i<map.length; i++){
     drawMapTile(map[i]);
@@ -781,9 +886,7 @@ function getClosestEnemyBuilding(soldier){
     let diff = Math.abs(soldier.x-soldier.moveTo.x) + Math.abs(soldier.y-soldier.moveTo.y);
     if(diff == 1){
         let map = getMapAt(soldier.moveTo.x, soldier.moveTo.y);
-        if(map.side == RED_SIDE && soldier.side == BLUE_SIDE){
-            return map;
-        }else if(map.side == BLUE_SIDE && soldier.side == RED_SIDE){
+        if(map.side != soldier.side && map.side != NONE_SIDE){
             return map;
         }
     }
@@ -865,110 +968,109 @@ function creatorMenu(title,array){
 }
 
 function ai(){
-  let castle = getCastleBySide(BLUE_SIDE);
-  let selected_menuitem = getItemById(GRASS);
-  let selected_item = getItemById(GRASS);
-  if(t%castle.tick==0){
-        selected_item = getItemForAI();
-        if(selected_item.item == GRASS && isEmptyAt(selected_item.x, selected_item.y)){
-            
-            let cube = random(0,100)
-            
-            if(isClosest(selected_item,FOREST)){
-                selected_menuitem = getItemById(LUMBERMAN);
-            }
-            if(isClosest(selected_item,STONE)){
-                selected_menuitem = getItemById(STONECUTTER);
-            }
-            
-            let farm = getItemById(FARM);
-            if(castle.wood >= farm.wood+2 && castle.ore >= farm.ore+2){
-                if(castle.food_before > castle.food || castle.food < CRITICAL_FOOD){
-                    selected_menuitem = farm;
-                }
-            }
-            
-            if(cube>80 && castle.wood >= SAFE_AMOUNT && castle.ore >= SAFE_AMOUNT){
-                selected_menuitem = getItemById(BARRACKS);
-            }
-            if(cube>90 && castle.wood >= SAFE_AMOUNT && castle.ore >= SAFE_AMOUNT){
-                selected_menuitem = getItemById(CASTLE);
-            }
-            
-            let lumberman = getItemById(LUMBERMAN);
-            if(castle.wood <= lumberman.wood || castle.ore <= lumberman.ore){
-                if(isClosest(selected_item,FOREST)){
-                    selected_menuitem = lumberman;
-                }
-            }
-            
-            let stonecutter = getItemById(STONECUTTER);
-            if(castle.wood <= stonecutter.wood || castle.ore <= stonecutter.ore){
-                if(isClosest(selected_item,STONE)){
-                    selected_menuitem = stonecutter;
-                }
-            }
-            
-            if(isClosest(selected_item,BARRACKS)){
-              selected_menuitem = getItemById(GRASS);
-            }
+  for(let i=0; i<castles.length; i++){
+    let castle = castles[i];
+    if(castle.side != RED_SIDE){
+      let selected_menuitem = getItemById(GRASS);
+      let selected_item = getItemById(GRASS);
+      if(t%castle.tick == 0){
+            selected_item = getItemForAI(castle);
+            if(selected_item.item == GRASS && isEmptyAt(selected_item.x, selected_item.y)){
                 
-            if(selected_menuitem.id != GRASS){
-                if(castle.wood >= selected_menuitem.wood && castle.ore >= selected_menuitem.ore){
-                    setMapAt(selected_menuitem.id, selected_item.x, selected_item.y, BLUE_SIDE);
-                    castle.wood -= selected_menuitem.wood;
-                    castle.ore -= selected_menuitem.ore;
-                    castle.workers += selected_menuitem.workers;
+                let dice = random(0,100)
+                
+                if(isClosest(selected_item,FOREST)){
+                    selected_menuitem = getItemById(LUMBERMAN);
                 }
-            }   
+                if(isClosest(selected_item,STONE)){
+                    selected_menuitem = getItemById(STONECUTTER);
+                }
+                
+                let farm = getItemById(FARM);
+                if(castle.wood >= farm.wood+2 && castle.ore >= farm.ore+2){
+                    if(castle.food_before > castle.food || castle.food < CRITICAL_FOOD){
+                        selected_menuitem = farm;
+                    }
+                }
+                
+                if(dice>80 && castle.wood >= SAFE_AMOUNT && castle.ore >= SAFE_AMOUNT){
+                    selected_menuitem = getItemById(BARRACKS);
+                }
+                if(dice>90 && castle.wood >= SAFE_AMOUNT && castle.ore >= SAFE_AMOUNT){
+                    selected_menuitem = getItemById(CASTLE);
+                }
+                //Ez mi?
+                let lumberman = getItemById(LUMBERMAN);
+                if(castle.wood <= lumberman.wood || castle.ore <= lumberman.ore){
+                    if(isClosest(selected_item,FOREST)){
+                        selected_menuitem = lumberman;
+                    }
+                }
+                //Ez mi?
+                let stonecutter = getItemById(STONECUTTER);
+                if(castle.wood <= stonecutter.wood || castle.ore <= stonecutter.ore){
+                    if(isClosest(selected_item,STONE)){
+                        selected_menuitem = stonecutter;
+                    }
+                }
+                
+                //Ez mi?
+                if(isClosest(selected_item,BARRACKS)){
+                  selected_menuitem = getItemById(GRASS);
+                }
+                    
+                if(selected_menuitem.id != GRASS){
+                    if(castle.wood >= selected_menuitem.wood && castle.ore >= selected_menuitem.ore){
+                        setMapAt(selected_menuitem.id, selected_item.x, selected_item.y, castle.side);
+                        castle.wood -= selected_menuitem.wood;
+                        castle.ore -= selected_menuitem.ore;
+                        castle.workers += selected_menuitem.workers;
+                    }
+                }   
+            }
         }
-        
-     
+      //create soldier
+      selected_item = map[random(0,map.length)];
+      if(selected_item.item == BARRACKS && selected_item.side == castle.side){
+          let soldier_picked = SOLDIERS[random(0,SOLDIERS.length)];
+          selected_menuitem = getItemById(soldier_picked);
+          if(castle.wood >= selected_menuitem.wood + 2 && castle.ore >= selected_menuitem.ore + 2 && castle.food > 2){
+              let m = getFirstClosestEmpty(selected_item);
+              if(m.item != INVALID){
+                  addSoldier(m, selected_menuitem.id, castle.side);
+                  castle.wood -= selected_menuitem.wood;
+                  castle.ore -= selected_menuitem.ore;
+                  castle.workers += selected_menuitem.workers;
+              }
+          }
+      }
+      //set moveTo enemy soldiers toward building to destroy
+      /*
+      if(selected_item.side != castle.side && selected_item.side != NONE_SIDE){
+        for(let j=0; j<soldiers.length; j++){
+          let soldier = soldiers[j];
+          if(soldier.side == castle.side){
+            soldier.moveTo.x = selected_item.x;
+            soldier.moveTo.y = selected_item.y;
+          }
+        }
+      }
+      */
     }
-  //create soldier
-  selected_item = map[random(0,map.length)];
-  if(selected_item.item == BARRACKS && selected_item.side == BLUE_SIDE){
-      console.log("Soldier can be added");
-      let soldier_picked = SOLDIERS[random(0,SOLDIERS.length)];
-      selected_menuitem = getItemById(soldier_picked);
-      
-      if(castle.wood >= selected_menuitem.wood + 2 && castle.ore >= selected_menuitem.ore + 2 && castle.food > 2){
-          let m = getFirstClosestEmpty(selected_item);
-          if(m.item != INVALID){
-              console.log("Adding soldier");
-              addSoldier(m, selected_menuitem.id, BLUE_SIDE);
-              castle.wood -= selected_menuitem.wood;
-              castle.ore -= selected_menuitem.ore;
-              castle.workers += selected_menuitem.workers;
-          }
-      }else{
-        console.log("Not enough resource to add soldier");
-      }
-  }
-  //move blue soldiers to buildings
-  if(selected_item.side == RED_SIDE){
-      for(let i=0; i<soldiers.length; i++){
-          let soldier = soldiers[i];
-          let diff = Math.abs(soldier.x-soldier.moveTo.x)+Math.abs(soldier.y-soldier.moveTo.y)
-          if(soldier.side == BLUE_SIDE /*&& diff != 1*/){
-              soldier.moveTo.x = selected_item.x;
-              soldier.moveTo.y = selected_item.y;
-          }
-      }
   }
   //fight soldier
   for(let i=0; i<soldiers.length; i++){
     let soldier = soldiers[i];
-    if(soldier.side == BLUE_SIDE){
-      let soldier_red = getClosestEnemySoldierToFight(soldier);
-      if(soldier_red.id != INVALID){
-        soldier.moveTo.x = soldier_red.x;
-        soldier.moveTo.y = soldier_red.y;
+    if(soldier.side != RED_SIDE){
+      let enemy_map = getClosestEnemyBuildingToFight(soldier);
+      if(enemy_map.id != INVALID){
+        soldier.moveTo.x = enemy_map.x;
+        soldier.moveTo.y = enemy_map.y;
       }
     }
   }
 }
-
+/*
 function getClosestEnemySoldierToFight(mysoldier){
   let enemy = {id:INVALID}
   let distance_min = 9999;
@@ -984,11 +1086,51 @@ function getClosestEnemySoldierToFight(mysoldier){
   }
   return enemy;
 }
+*/
+function getClosestEnemyBuildingToFight(mysoldier){
+  let enemy_map = {id:INVALID}
+  let distance_min = 9999;
+  for(let i=-5; i<=5; i++){
+    let map1 = getMapAt(mysoldier.x+i, mysoldier.y);
+    if(map1.item != INVALID){
+      if(map1.side != mysoldier.side && map1.side != NONE_SIDE){
+        let distance = Math.abs(mysoldier.x-map1.x)+Math.abs(mysoldier.y-map1.y);
+        if(distance<distance_min){
+          distance_min = distance;
+          enemy_map = map1;
+        }
+      }
+    }
+  }
+  for(let i=-5; i<=5; i++){
+    let map1 = getMapAt(mysoldier.x, mysoldier.y+i);
+    if(map1.item != INVALID){
+      if(map1.side != mysoldier.side && map1.side != NONE_SIDE){
+        let distance = Math.abs(mysoldier.x-map1.x)+Math.abs(mysoldier.y-map1.y);
+        if(distance<distance_min){
+          distance_min = distance;
+          enemy_map = map1;
+        }
+      }
+    }
+  }
+  for(let i=0; i<soldiers.length; i++){
+    let soldier = soldiers[i];
+    if(mysoldier.side != soldier.side){
+      let distance = Math.abs(mysoldier.x-soldier.x)+Math.abs(mysoldier.y-soldier.y);
+      if(distance<distance_min){
+        distance_min = distance;
+        enemy_map = soldier;
+      }
+    }
+  }
+  return enemy_map;
+}
 
-function getItemForAI(){
+function getItemForAI(castle){
     for(let i=0;i<100;i++){
         let selected_item = map[random(0,map.length)];
-        if(canBuild(selected_item, BLUE_SIDE)){
+        if(canBuild(selected_item, castle.side)){
             return selected_item;
         }
     }
@@ -1063,10 +1205,20 @@ function harvest(){
       castle.towers++;
     }
 	}
-  if(getCastleBySide(RED_SIDE).towers <= 0){
-    state = GAMEOVER;
+  
+  let enemy_castle_towers = 0;
+  for(let i=0; i<castles.length; i++){
+    let castle = castles[i];
+    if(castle.side == RED_SIDE){
+      if(castle.towers <= 0){
+        state = GAMEOVER;
+      }
+    }else{
+      enemy_castle_towers += castle.towers;
+    }
   }
-  if(getCastleBySide(BLUE_SIDE).towers <= 0){
+  
+  if(enemy_castle_towers <= 0){
     state = YOUWON;
   }
 }
@@ -1183,28 +1335,20 @@ function drawMapTile(map){
         TILE, TILE,
         TILE_REAL*map.x, TILE_REAL*map.y,
         TILE_REAL, TILE_REAL);
-    if(map.side == RED_SIDE){
-        let flag = getItemById(RED_FLAG);
-        
-        if(map.item == CASTLE || map.item == BARRACKS){
-            flag = getItemById(RED_FLAG_CASTLE);
-        }
-        ctx.drawImage(
-            gfx, flag.res_x, flag.res_y,
-            flag.res_w, flag.res_h,
-            TILE_REAL*map.x+PIXEL*item.flag_x, TILE_REAL*map.y+PIXEL*item.flag_y,
-            flag.res_w * PIXEL, flag.res_h * PIXEL);
-    }else if(map.side == BLUE_SIDE){
-        let flag = getItemById(BLUE_FLAG);
-        //let flag = getItemById(BLUE_FLAG_CASTLE);
-        if(map.item == CASTLE || map.item == BARRACKS){
-            flag = getItemById(BLUE_FLAG_CASTLE);
-        }
-        ctx.drawImage(
-            gfx, flag.res_x, flag.res_y,
-            flag.res_w, flag.res_h,
-            TILE_REAL*map.x+PIXEL*item.flag_x, TILE_REAL*map.y+PIXEL*item.flag_y,
-            flag.res_w * PIXEL, flag.res_h * PIXEL);
+    
+    //drawing flag on buildings
+    if(map.side != NONE_SIDE){
+      let castle = getCastleBySide(map.side);
+      let flag = getItemById(castle.flag);
+      
+      if(map.item == CASTLE || map.item == BARRACKS){
+          flag = getItemById(castle.flag_big);
+      }
+      ctx.drawImage(
+          gfx, flag.res_x, flag.res_y,
+          flag.res_w, flag.res_h,
+          TILE_REAL*map.x+PIXEL*item.flag_x, TILE_REAL*map.y+PIXEL*item.flag_y,
+          flag.res_w * PIXEL, flag.res_h * PIXEL);
     }
 }
 
@@ -1256,6 +1400,8 @@ function inicMap(){
 	}
   setMapAt(CASTLE,           1, 3, RED_SIDE);
   setMapAt(CASTLE, MAP_WIDTH-2, 3, BLUE_SIDE);
+  setMapAt(CASTLE, MAP_WIDTH-2, 5, YELLOW_SIDE);
+  setMapAt(CASTLE, Math.floor(MAP_WIDTH/2), 3, CYAN_SIDE);
   //setMapAt(CASTLE, 3, 3, BLUE_SIDE);
 }
 
