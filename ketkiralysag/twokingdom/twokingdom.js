@@ -1,5 +1,6 @@
 const VERSION = "version: 0.4";
 const START_LEVEL = 1;
+const TITLE_TEXT = "Kings Battle";
 const DEBUG = false;
 //const DEBUG = true;
 
@@ -81,12 +82,13 @@ const TITLE = 0;
 const PLAY = 1;
 const SELECTBUILDING = 2;
 const SELECTSOLDIER = 3;
-const SHOWRESOURCE = 4;
-const SHOWCASTLE = 5;
-const GAMEOVER = 6;
-const SHOWLEVEL = 7;
-const MOVESOLDIER = 8;
-const YOUWON = 9;
+const SHOWSOLDIER = 4;
+const SHOWRESOURCE = 5;
+const SHOWCASTLE = 6;
+const GAMEOVER = 7;
+const SHOWLEVEL = 8;
+const MOVESOLDIER = 9;
+const YOUWON = 10;
 
 const INVALID = 9999;
 
@@ -524,16 +526,18 @@ document.addEventListener("mousedown", function(event){
       if(isSoldier(selected_item, RED_SIDE)){
           state = MOVESOLDIER;
           hand.item = CURSOR_TARGET;
+      }else if(isEnemySoldier(selected_item)){
+          state = SHOWSOLDIER;
       }else if(canBuild(selected_item, RED_SIDE)){
           state = SELECTBUILDING;
       }else if(selected_item.item == CASTLE){
           state = SHOWCASTLE;
-      }else if(selected_item.item == BARRACKS){
+      }else if(selected_item.item == BARRACKS && selected_item.side == RED_SIDE){
           state = SELECTSOLDIER;
       }else{
           state = SHOWRESOURCE;
       }
-  }else if(state == SHOWRESOURCE || state == SHOWCASTLE){
+  }else if(state == SHOWRESOURCE || state == SHOWCASTLE || state == SHOWSOLDIER){
       state = PLAY;
   }else if(state == SELECTBUILDING){
     snd_click.play();
@@ -547,17 +551,17 @@ document.addEventListener("mousedown", function(event){
       state = PLAY;
   }else if(state == SELECTSOLDIER){
     snd_click.play();
-      if(selected_menuitem.id != GRASS){
-          let item = getFirstClosestEmpty(selected_item);
-          if(item.item != INVALID){
-              addSoldier(item, selected_menuitem.id, RED_SIDE);
-              let castle = getCastleBySide(RED_SIDE);
-              castle.wood -= selected_menuitem.wood;
-              castle.ore -= selected_menuitem.ore;
-              castle.workers += selected_menuitem.workers;
-          }
+    if(selected_menuitem.id != GRASS){
+      let item = getFirstClosestEmpty(selected_item);
+      if(item.item != INVALID){
+        addSoldier(item, selected_menuitem.id, RED_SIDE);
+        let castle = getCastleBySide(RED_SIDE);
+        castle.wood -= selected_menuitem.wood;
+        castle.ore -= selected_menuitem.ore;
+        castle.workers += selected_menuitem.workers;
       }
-      state = PLAY;
+    }
+    state = PLAY;
   }else if(state == MOVESOLDIER){
       snd_yessir.play();
       hand.item = CURSOR_NORMAL;
@@ -605,6 +609,16 @@ function addSoldier(map, id, side){
     soldiers.push(soldier);
 }
 
+function getSoldierAt(map){
+  for(let i=0;i<soldiers.length;i++){
+    let soldier = soldiers[i];
+    if(map.x == soldier.x && map.y == soldier.y){
+      return soldier;
+    }
+  }
+  return {id:INVALID};
+}
+
 function addDust(map){
     let dust={
         x:map.x * TILE_REAL + random(-3,TILE - getItemById(DUST).res_w + 4) * PIXEL ,
@@ -615,14 +629,25 @@ function addDust(map){
 }
 
 function isSoldier(map, side){
-    for(let i=0;i<soldiers.length;i++){
-        let soldier = soldiers[i];
-        if(map.x == soldier.x && map.y == soldier.y && soldier.side == side){
-            selected_soldier = soldier;
-            return true;
-        }
+  for(let i=0;i<soldiers.length;i++){
+    let soldier = soldiers[i];
+    if(map.x == soldier.x && map.y == soldier.y && soldier.side == side){
+      selected_soldier = soldier;
+      return true;
     }
-    return false;
+  }
+  return false;
+}
+
+function isEnemySoldier(map){
+  for(let i=0;i<soldiers.length;i++){
+    let soldier = soldiers[i];
+    if(map.x == soldier.x && map.y == soldier.y && soldier.side != RED_SIDE){
+      selected_soldier = soldier;
+      return true;
+    }
+  }
+  return false;
 }
 
 function canBuild(item, side){
@@ -663,20 +688,33 @@ function update(){
         //ctx.fillText(soldiers[0].fighting, 5, 110);
     }
     if(state == SHOWRESOURCE){
-        drawRect(7,4);
-        let item = getItemById(selected_item.item);
-        drawTile(item,4,2);
-        ctx.fillStyle = BLACK;
-        ctx.font = "40px RetroGaming";
-        ctx.fillText(item.name, 330, 3*TILE_REAL);
-        if(item.resource){
-            ctx.fillText("=" + Math.floor(selected_item.amount*10)/10, 330, 286);
-            drawResource(item, 4, 4);
-        }else if(isBuilding(item.id)){
-            ctx.fillText("=" + selected_item.shield, 330, 286);
-            let item = getItemById(SHIELD);
-            drawResource(item, 4, 4);
-        }
+      drawRect(7,4);
+      let item = getItemById(selected_item.item);
+      drawTile(item,4,2);
+      ctx.fillStyle = BLACK;
+      ctx.font = "40px RetroGaming";
+      ctx.fillText(item.name, 330, 3*TILE_REAL);
+      if(item.resource){
+          ctx.fillText("=" + Math.floor(selected_item.amount*10)/10, 330, 286);
+          drawResource(item, 4, 4);
+      }else if(isBuilding(item.id)){
+          ctx.fillText("=" + selected_item.shield, 330, 286);
+          let item = getItemById(SHIELD);
+          drawResource(item, 4, 4);
+      }
+    }else if(state == SHOWSOLDIER){
+      drawRect(7,4);
+      let soldier = getSoldierAt(selected_item);
+      let item = getItemById(soldier.id);
+      drawTile(item,4,2);
+      ctx.fillStyle = BLACK;
+      ctx.font = "40px RetroGaming";
+      ctx.fillText(item.name, TILE_REAL * 5, 3 * TILE_REAL);
+      ctx.fillText("=" + soldier.shield, TILE_REAL * 5, TILE_REAL * 4);
+      ctx.fillText(soldier.x + "," + soldier.y + "->"
+       + soldier.moveTo.x + "," + soldier.moveTo.y, TILE_REAL * 4.5, TILE_REAL * 5);
+      item = getItemById(SHIELD);
+      drawResource(item, 4.5, 3.5);
     }else if(state == SHOWCASTLE){
         drawRect(8,6);
         let item = getItemById(selected_item.item);
@@ -717,11 +755,14 @@ function update(){
             j++;
         }
     }else if(state == SELECTBUILDING){
-        creatorMenu("Select building",BUILDINGS);
+      creatorMenu("Select building",BUILDINGS);
     }else if(state == SELECTSOLDIER){
-        creatorMenu("Select soldier",SOLDIERS);
+      creatorMenu("Select soldier",SOLDIERS);
+      item = getItemById(SHIELD);
+      ctx.fillText("=" + selected_item.shield, TILE_REAL * 8, TILE_REAL * 4.5);
+      drawResource(item, 7.5, 4);
     }else if(state == TITLE){
-        drawTextMiddle("Battle Of Two Kings","60px RetroGaming",160);
+        drawTextMiddle(TITLE_TEXT,"60px RetroGaming",160);
         drawTextMiddle("Developed by Istvan Szalontai for RTS JAM 1998","20px RetroGaming",208);
         drawTextMiddle("Click to play","40px RetroGaming",420);
         drawVersion();
@@ -864,7 +905,7 @@ function move_soldiers(){
             soldier.fighting = true;
             addDust(map);
             if(map.shield < 0){
-              state = PLAY;
+              //state = PLAY;
               setMapAt(GRASS, map.x, map.y, NONE_SIDE);
             }
         }
@@ -1044,18 +1085,6 @@ function ai(){
               }
           }
       }
-      //set moveTo enemy soldiers toward building to destroy
-      /*
-      if(selected_item.side != castle.side && selected_item.side != NONE_SIDE){
-        for(let j=0; j<soldiers.length; j++){
-          let soldier = soldiers[j];
-          if(soldier.side == castle.side){
-            soldier.moveTo.x = selected_item.x;
-            soldier.moveTo.y = selected_item.y;
-          }
-        }
-      }
-      */
     }
   }
   //fight soldier
@@ -1070,23 +1099,7 @@ function ai(){
     }
   }
 }
-/*
-function getClosestEnemySoldierToFight(mysoldier){
-  let enemy = {id:INVALID}
-  let distance_min = 9999;
-  for(let i=0; i<soldiers.length; i++){
-    let soldier = soldiers[i];
-    if(mysoldier.side != soldier.side){
-      let distance = Math.abs(mysoldier.x-soldier.x)+Math.abs(mysoldier.y-soldier.y);
-      if(distance<distance_min){
-        distance_min = distance;
-        enemy = soldier;
-      }
-    }
-  }
-  return enemy;
-}
-*/
+
 function getClosestEnemyBuildingToFight(mysoldier){
   let enemy_map = {id:INVALID}
   let distance_min = 9999;
@@ -1365,7 +1378,12 @@ function newGame(){
  
 	inicMap();
   //setMapAt(BARRACKS,1,4, RED_SIDE);
-  //addSoldier(getMapAt(2,4),KNIGHT,RED_SIDE);
+  setMapAt(GRASS,3,4, NONE_SIDE);
+  addSoldier(getMapAt(3,4),SWORDSMAN,YELLOW_SIDE);
+  setMapAt(FARM,3,5, CYAN_SIDE);
+  //setMapAt(GRASS,3,5, NONE_SIDE);
+  setMapAt(FARM,3,6, CYAN_SIDE);
+  setMapAt(FARM,3,3, BLUE_SIDE);
   //setMapAt(GRASS,2,4, NONE_SIDE);
   //setMapAt(GRASS,3,4, NONE_SIDE);
   //setMapAt(GRASS,4,4, NONE_SIDE);
