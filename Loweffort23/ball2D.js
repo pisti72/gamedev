@@ -167,7 +167,6 @@ var Ball2D = {
 		let distance = Math.sqrt(xd*xd+yd*yd);//small
 		let min_distance = a.r + b.r;
 		if(connected){
-			console.log("faszom");
 			min_distance = required_distance;
 		}
 		let diff_distance = min_distance - distance;
