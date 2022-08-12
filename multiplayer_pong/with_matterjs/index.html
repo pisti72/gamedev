@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="UTF-8">
+        <title>Pong Duel</title>
+        <style>
+        body{
+            background-color: #444;
+            margin:0;
+        }
+        .hidden{
+            display:none;
+        }
+        @font-face {
+          font-family: Gamer;
+          src: url(assets/Gamer.ttf);
+        }
+        </style>
+    </head>
+    <body>
+        <audio src="assets/ball.ogg" id="snd_left" class="hidden"></audio>
+        <audio src="assets/ball.ogg" id="snd_right" class="hidden"></audio>
+        <audio src="assets/goal.ogg" id="snd_goal" class="hidden"></audio>
+        <canvas id="canvas1972" width="1000" height="600"></canvas>
+        <script src="assets/matter.min.js" type='text/javascript'></script>
+        <script src="pong.js" type='text/javascript'></script>
+    </body>
+</html>
