@@ -1,0 +1,18 @@
+[gd_scene load_steps=3 format=2]
+
+[ext_resource path="res://gray_env.tres" type="Environment" id=1]
+[ext_resource path="res://assets/hammer.dae" type="PackedScene" id=2]
+
+[node name="Title" type="Spatial"]
+
+[node name="hammer" parent="." instance=ExtResource( 2 )]
+transform = Transform( 1.4, 0, 0, 0, 1.16302, -0.779342, 0, 0.779342, 1.16302, -0.350918, 0.932221, -1.64616 )
+
+[node name="DirectionalLight" type="DirectionalLight" parent="."]
+transform = Transform( 0.742549, 0.520239, 0.421868, -0.669792, 0.576751, 0.467694, 0, -0.629849, 0.776717, 0, 5.52077, 0 )
+
+[node name="Camera" type="Camera" parent="."]
+transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 7.06699 )
+
+[node name="WorldEnvironment" type="WorldEnvironment" parent="."]
+environment = ExtResource( 1 )
