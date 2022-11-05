@@ -1,0 +1,51 @@
+<!doctype html>
+<html>
+<head><title>Converter</title></head>
+<body style="background-color:bisque;">
+<h1>Wavefront .obj to .js converter</h1>
+<textarea cols="40" rows="20" id="t"></textarea>
+<button onclick="trimcrlf()">Convert !</button>
+<script type="text/javascript" >
+function trimcrlf()
+{
+	var a=document.getElementById('t').value;
+	var b="var res='";
+	var n=0;
+	//CRLF to space
+	for(var i=0;i<a.length;i++)
+	{
+		
+			
+			
+		if(a[i]=='\n')
+		{
+			n++;
+			if(n>5)
+			{
+				b+="';\nres+='";
+				n=0;
+			}
+			b+=' ';
+		}else
+		{
+			b+=a[i];
+		}
+	}
+	b+="o';";
+	//delete last 3 digits
+	var c='';
+	var k=0;
+	for(var i=0;i<b.length;i++)
+	{
+		if(b[i]=='.')k=7;
+		if(k==0 || k==7 || k==6 || k==5 /* || k==4*/)
+		{
+			c+=b[i];
+		}
+		if(k>0)k--;
+	}
+	document.getElementById('t').value=c;// b or c
+}
+</script>
+</body>
+</html>

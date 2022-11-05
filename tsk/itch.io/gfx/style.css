@@ -1,0 +1,102 @@
+html,body{
+	width:100%;
+	height:100%;
+	margin:0px;
+	font-family:Sans-serif;
+}
+
+@font-face {
+  font-family: CaviarDreams;
+  src: url(CaviarDreams.ttf);
+}
+
+#gamearea{
+	position: absolute;
+	left:0px;
+	top:0px;
+}
+#debug{
+	position:absolute;
+	background:LightGreen;
+	left:0px;
+	top:0px;
+	margin:0px;
+	padding:5px;
+	visibility:hidden;
+}
+#gui_play_center{
+	position: absolute;
+	left:50%;
+	height:100%;
+}
+#gui_play{
+	position: relative;
+	background-image: url('gui_play.png');
+	background-size: 100%;
+	left: -50%;
+	top: 60%;
+	width: 140px;
+	height: 140px;
+	height: auto;
+	cursor: pointer;
+	visibility: hidden;
+}
+#gui_controller{
+	position:absolute;
+	background-image: url('gui_controller.png');
+	width:200px;
+	height:200px;
+	right:0px;
+	bottom:0px;
+	visibility:hidden;
+}
+#icons{
+	position:absolute;
+	right:20px;
+	top:20px;
+}
+#gui_exit{
+	background-image: url('gui_icons.png');
+	background-position: -458px;
+	width: 0px;
+	height: 92px;
+	float: left;
+	cursor: pointer;
+	visibility: hidden;
+}
+#gui_credits{
+	background-image: url('gui_icons.png');
+	background-position: -366px;
+	width: 0px;
+	height: 92px;
+	float: left;
+	cursor: pointer;
+	visibility: hidden;
+}
+#gui_soundon{
+	background-image: url('gui_icons.png');
+	background-position: -182px;
+	width: 0px;
+	height: 92px;
+	float: left;
+	cursor: pointer;
+	visibility: hidden;
+}
+#gui_soundoff{
+	background-image: url('gui_icons.png');
+	background-position: -274px;
+	width: 0px;
+	height: 92px;
+	float: left;
+	cursor: pointer;
+	visibility: hidden;
+}
+#gui_back{
+	background-image: url('gui_icons.png');
+	background-position: -92px;
+	width: 0px;
+	height: 92px;
+	float: left;
+	cursor: pointer;
+	visibility: hidden;
+}
