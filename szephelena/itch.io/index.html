@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+
+<html>
+
+<head>
+    <meta charset="UTF-8">
+    <title>One button game</title>
+    <style>
+html,body{
+    margin:0px;
+    height:100%;
+}
+#tiles{
+    display:none;
+}
+@font-face {
+  font-family: RobotoBold;
+  src: url(gfx/Roboto-Bold.ttf);
+}
+    </style>
+</head>
+<body onLoad="inic()">
+    <img src="gfx/tiles.png" id="tiles">
+    <canvas id="canvas"></canvas>
+    <script type="text/javascript" src="js/data.js"></script>
+    <script type="text/javascript" src="js/mario.js"></script>
+    <script type="text/javascript" src="js/game.js"></script>
+</body>
+</html>

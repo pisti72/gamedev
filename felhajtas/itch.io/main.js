@@ -1,5 +1,11 @@
-const DEBUG = true;
-const VERSION = '1.3';
+//const DEBUG = true;
+const DEBUG = false;
+const VERSION = '1.4';
+const WIDTH = 900;
+const HEIGHT = 500;
+
+const VISIBLE = 0;
+const HIDDEN = 1;
 
 const TITLE = 5;
 const WALK = 0;
@@ -7,26 +13,35 @@ const CAR = 1;
 const FLY = 2;
 const FALL = 3;
 const LIFT = 4;
+const GAMEOVER = 6;
+const CONGRAT = 7;
 
 const KEY_SPACE = 32;
 const KEY_W = 87;
 const KEY_A = 65;
 const KEY_S = 83;
 const KEY_D = 68;
+const KEY_ESC = 27;
+const KEY_ENTER = 13;
 
-const WIDTH = 900;
-const HEIGHT = 400;
-const ARMAGEDDON_SPEED = .11;
+const ARMAGEDDON_SPEED = .05;
 const ARMAGEDDON_BEGIN = -900;
-const SHOW_MESSAGE = 150;
-const DAY_SPEED = .0003;
+const SHOW_MESSAGE = 200;
+const DAY_SPEED = .0002;
 const DAY_BEGIN = .5;//-1 night --> 1 day
 const MAG = 400;
+const TALL = 480;
 const SMALLSIZE = 3;
 const MARGIN = 10;
 const WALK_SPEED = 50;
 const CAR_SPEED = 100;
+const FLIGHT_SPEED = 300;
 const CAR_ACCELERATION = 1;
+const MAX_HEIGHT_TO_DIE = 400;
+const GRAVITY = 1;
+const MARGIN_VIEW = 20000;
+const GLIDER_ROTX_CRASHED = 0.25;
+const GLIDER_PROTECTED = 80;
 
 const DEEP = 10;
 const INVISIBLE = 200;
@@ -39,9 +54,8 @@ var canvasLeft;
 var canvasTop;
 
 var w, h;
-var behind, margin, tall, head;
-var flight_speed;
-var message1, message2, counter, counter1, counter2, counter3;
+var head;
+var counter, glider_cannot_crash;
 var pplace;
 var state;
 var vehicle;
@@ -54,56 +68,77 @@ var bbox = [];//bounding boxes w,h
 var fov;
 var day, color;
 var mouse={};
-var temp;
 var cx, sx, cy, sy, cz, sz;//sinuses and cosinuses for all axes
 var player={}
-var my_pos_x, my_pos_y, my_pos_z;
-var my_vel_x, my_vel_y, my_vel_z;
-var my_way;
-var my_rot_x, my_rot_y, my_rot_z;
 var title = new Image();
 var wall = new Image();
 var tunnel = new Image();
 var truck_cockpit = new Image();
 var car_key = new Image();
 var rope = new Image();
+var glider_dashboard = new Image();
+var snd_walking, snd_engine, snd_pickup, snd_explosion, snd_flying, snd_error;
 
 function start() {
+    state = TITLE;
     canvas = document.getElementById('canvas');
     canvas.width = WIDTH;
     canvas.height = HEIGHT;
+    
+    window.addEventListener('resize',function(e){
+        w = canvas.width = document.body.clientWidth;
+        h = canvas.height = document.body.clientHeight;
+        fov = w/2;
+    });
     window.addEventListener('mousemove', onMouseMove);
     document.addEventListener('keydown',function(e){
         //debug=e.which;
-        if(e.which == KEY_SPACE && state == TITLE){
-            state = WALK;
-            inic();
-            addMessage(MSG_LOOKBEHIND);
-            addMessage(MSG_ENDOFWORLD);
-        }else if(e.which == KEY_W && state == CAR){
-            player.forward += CAR_ACCELERATION;
-            if(player.forward > CAR_SPEED){
-                player.forward = CAR_SPEED;
+        if(state == TITLE){
+            if(e.which == KEY_SPACE){
+                state = WALK;
+                inic();
+                addMessage(MSG_LOOKBEHIND);
+                addMessage(MSG_ENDOFWORLD);
             }
-        }else if(e.which == KEY_S && state == CAR){
-            player.forward -= CAR_ACCELERATION*2;
-            if(player.forward < -CAR_SPEED/5){
-                player.forward = -CAR_SPEED/5;
+        }else if(state == CAR){
+            if(e.which == KEY_W){
+                player.forward += CAR_ACCELERATION;
+                if(player.forward > CAR_SPEED){
+                    player.forward = CAR_SPEED;
+                }
+            }else if(e.which == KEY_S && state == CAR){
+                player.forward -= CAR_ACCELERATION*2;
+                if(player.forward < -CAR_SPEED/5){
+                    player.forward = -CAR_SPEED/5;
+                }
             }
-        }
-        if(state == WALK){
+        }else if(state == WALK){
             if(e.which == KEY_W){
                 player.forward = WALK_SPEED;
+                snd_walking.play();
             }else if(e.which == KEY_S){
                 player.forward = -WALK_SPEED;
+                snd_walking.play();
             }
             if(e.which == KEY_A){
                 player.side = -WALK_SPEED/2;
+                snd_walking.play();
             }else if(e.which == KEY_D){
                 player.side = WALK_SPEED/2;
+                snd_walking.play();
+            }
+        }else if(state == GAMEOVER){
+            if(e.which == KEY_SPACE){
+                inic();
+                state = TITLE;
             }
         }
-        
+        if(state == WALK || state == CAR || state == FLY){
+            if(e.which == KEY_ESC){
+                inic();
+                state = TITLE;
+            }
+        }
     });
     document.addEventListener('keyup',function(e){
         if(state == WALK){
@@ -116,39 +151,45 @@ function start() {
         }
     })
     document.addEventListener('click',function(e){
-        console.log('clicked');
         if(state == TITLE){
             state = WALK;
             inic();
             addMessage(MSG_LOOKBEHIND);
             addMessage(MSG_ENDOFWORLD);
+        }else if(state == GAMEOVER){
+            state = TITLE;
+            inic();
+        }else if(state == CONGRAT){
+            state = TITLE;
+            inic();
         }
     })
 	ctx = canvas.getContext('2d');
 	w = WIDTH;
 	h = HEIGHT;
+    fov = w / 2;
 	canvasLeft = canvas.offsetLeft;
 	canvasTop = canvas.offsetTop;
-    state = TITLE;
-	temp = 0;
-	behind = -2000;
-	margin = 20000;
-	gravity = 1;
-	flight_speed = MAG;
-	
-	
-    //border=counter*armageddon_speed+armageddon_begin;
-	//1900=25000*x-900 --> 1000/25000=x
-	
-	fov = w / 2;
+
 	title.src = 'gfx/title.png';
 	wall.src = 'gfx/wall.png';
 	tunnel.src = 'gfx/tunnel.png';
     truck_cockpit.src = 'gfx/truck_cockpit.png';
     car_key.src = 'gfx/car_key.png';
     rope.src = 'gfx/rope.png';
-	inic();
+    glider_dashboard.src = 'gfx/glider_dashboard.png';
+    
+    snd_walking = document.getElementById('snd_walking');
+    snd_engine = document.getElementById('snd_engine');
+    snd_pickup = document.getElementById('snd_pickup');
+    snd_explosion = document.getElementById('snd_explosion');
+    snd_flying = document.getElementById('snd_flying');
+    snd_error = document.getElementById('snd_error');
+    
+    
 	createBoundingBoxes();
+    inic();
+    
     gameLoop();
 }
 
@@ -177,8 +218,8 @@ function drawObject(j, xg, yg, zg) {
 	do {
 		//translate
 		x = obj[i * 3 + 0 + offset] * MAG - player.pos_x + xg * MAG;
-		y = -obj[i * 3 + 2 + offset] * MAG - my_pos_y + yg * MAG;
-		z = obj[i * 3 + 1 + offset] * MAG - my_pos_z + zg * MAG;
+		y = -obj[i * 3 + 2 + offset] * MAG - player.pos_y + yg * MAG;
+		z = obj[i * 3 + 1 + offset] * MAG - player.pos_z + zg * MAG;
 		//rotate axis-z
 		x2 = x * cz - y * sz;
 		y2 = x * sz + y * cz;
@@ -197,17 +238,19 @@ function drawObject(j, xg, yg, zg) {
 		vt[i * 3 + 2] = z2;
 		//yout=y2;
 		small = 100000;
-		v[i * 3 + 2] = 0;//on screen
+		v[i * 3 + 2] = VISIBLE;//on screen
 		//ha a pont mg�tt�nk van akkor rejtett lesz
 		if (y2 <= 0) {
 			y2 = -y2;
 			x2 = 100 * x2;
 			z2 = 100 * z2;
-			v[i * 3 + 2] = 1;//hide
+			v[i * 3 + 2] = HIDDEN;//hide
 		} else {
 			small = (bbox[j * 2 + 0] * MAG * fov) / y2;
 			x = (bbox[j * 2 + 1] * MAG * fov) / y2;
-			if (x > small) small = x;
+			if (x > small){
+                small = x;
+            }
 		}
 		//projection
 		xp = (x2 * fov) / y2 + w / 2;
@@ -216,7 +259,9 @@ function drawObject(j, xg, yg, zg) {
 		v[i * 3 + 0] = xp;
 		v[i * 3 + 1] = yp;
 
-		if (xp < -margin || xp > w + margin || yp < -margin || yp > h + margin) v[i * 3 + 2] = 1;//hide
+		if (xp < -MARGIN_VIEW || xp > w + MARGIN_VIEW || yp < -MARGIN_VIEW || yp > h + MARGIN_VIEW){
+            v[i * 3 + 2] = HIDDEN;
+        }
 
 		i++;
 	} while (obj[i * 3 + 0 + offset] != END_OF_POINTS && small > SMALLSIZE);
@@ -256,11 +301,14 @@ function drawObject(j, xg, yg, zg) {
 				bx = vt[p0 + 0];
 				by = vt[p0 + 1];
 				bz = vt[p0 + 2];
-				axb2 = .3 * nz / nabs + 0.7;//0.7 -> 1.0
+				axb2 = .3 * nz / nabs + .7;//0.7 -> 1.0
 				if (color == 16 && day < .5) {
 					ink(1, 1, 0);//light
 				} else {
-					ink(axb2 * palette[color * 3 + 0] * day / 16, axb2 * palette[color * 3 + 1] * day / 16, axb2 * palette[color * 3 + 2] * day / 16);
+                    var r = axb2 * palette[color * 3 + 0] * day / 16;
+                    var g = axb2 * palette[color * 3 + 1] * day / 16;
+                    var b = axb2 * palette[color * 3 + 2] * day / 16;
+					ink(r,g,b);
 				}
 				axb = (nx * bx + ny * by + nz * bz);
 				if (axb < 0) {
@@ -282,7 +330,9 @@ function drawObject(j, xg, yg, zg) {
 					p3y = v[p3 + 1];
 					p3e = v[p3 + 2];
 
-					if (p0e == 0 && p1e == 0 && p2e == 0 && p3e == 0) drawQuad(p0x, p0y, p1x, p1y, p2x, p2y, p3x, p3y);
+					if (p0e == 0 && p1e == 0 && p2e == 0 && p3e == 0){
+                        drawQuad(p0x, p0y, p1x, p1y, p2x, p2y, p3x, p3y);
+                    }
 				}
 				i += 4;
 			} else {
@@ -367,7 +417,7 @@ function drawGround() {
     yp2 = h / 2 - (z2 * fov) / y2;
 	ink((7 * (-(day - 1) * (day - 1) + 1)) / 16, (15 * day) / 16, (7 * day) / 16);
 	ctx.beginPath();
-	if (my_rot_y > -.5 && my_rot_y < .5) {
+	if (player.rot_y > -.5 && player.rot_y < .5) {
 		ctx.moveTo(0, h);
 		ctx.lineTo(xp1, yp1);
 		ctx.lineTo(xp2, yp2);
@@ -387,19 +437,27 @@ function armageddon() {
 	var i = 0
 	var border = counter * ARMAGEDDON_SPEED + ARMAGEDDON_BEGIN;
 	do {
-		if (border > world[i + 2])//y
-		{
+		if (border > world[i + 2]) {
 			if (world[i] == OBJ_TREE){
                 world[i] = OBJ_TREE_WITH_ROOT;//ha fa volt
             }
-			if (world[i] == OBJ_TREE_WITH_ROOT || world[i] == OBJ_HOUSE ||
-				world[i] == 2 || world[i] == 3 ||
-				world[i] == 4 || world[i] == OBJ_BUILDING ||
-				world[i] == 7 || world[i] == 11) {
-                    world[i + 3] += gravity;
+            
+            if (world[i] == OBJ_TREE_WITH_ROOT || world[i] == OBJ_HOUSE ||
+				world[i] == OBJ_GLIDER || world[i] == OBJ_TRUCK ||
+				world[i] == OBJ_PARKING || world[i] == OBJ_BUILDING ||
+				world[i] == OBJ_BALLOON || world[i] == OBJ_JFHU_LOGO) {
+                    world[i + 3] += GRAVITY;
                 }
 		}
-		if (border > my_pos_y / MAG && state != LIFT) state = FALL;//felsz�llt�l
+        if(state == WALK || state == CAR || state == FLY){
+            if (border > player.pos_y / MAG){
+                state = FALL;
+                player.forward = 0;
+                addMessage(MSG_FALLENUP);
+                addMessage(MSG_YOUWILLDIE);
+            }
+        }
+		
 		if (world[i + 3] > 300) world[i] = INVISIBLE;
 		i += 4;
 	} while (i < world.length);
@@ -411,7 +469,7 @@ function drawObjects() {
 	var ordery = [];
 	do {
 		ordern[n] = n;
-		ordery[n] = (world[i + 1] * MAG - player.pos_x) * sz + (world[i + 2] * MAG - my_pos_y) * cz;//rotate axis-z
+		ordery[n] = (world[i + 1] * MAG - player.pos_x) * sz + (world[i + 2] * MAG - player.pos_y) * cz;//rotate axis-z
 		n++;
 		i += 4;
 	} while (i < world.length);
@@ -432,29 +490,15 @@ function drawObjects() {
 	do {
 		j = ordern[i] * 4;
 		if (world[j] < INVISIBLE && ordery[i] > 0){
+            
             drawObject(world[j], world[j + 1], world[j + 2], world[j + 3]);
         }
 	} while ((++i) != n);
 }
 
-function drawText() {
-	ctx.fillStyle = '#fff';
-	ctx.font = 'bold 30px courier';
-	ctx.textBaseline = 'bottom';
-	ctx.textAlign = 'center';
-	if (counter1 > 0) {
-		ctx.fillText(message1, w / 2, h - 10);
-		counter1--;
-	}
-	if (counter1 <= 0 && counter2 > 0) {
-		ctx.fillText(message2, w / 2, h - 10);
-		counter2--;
-	}
-}
-
 function drawMessage(){
     
-	ctx.font = 'bold 22px RetroGaming';
+	ctx.font = 'bold 22px RobotoBold';
 	ctx.textBaseline = 'bottom';
 	ctx.textAlign = 'center';
     
@@ -462,7 +506,7 @@ function drawMessage(){
         var message = textArray[i];
         if(message.counter > 0){
             message.counter--;
-            ctx.fillStyle = '#0008';
+            ctx.fillStyle = '#4448';
             ctx.fillRect(0,h-40,w,40);
             ctx.fillStyle = '#fff';
             ctx.fillText(message.txt, w / 2, h - 10);
@@ -471,15 +515,6 @@ function drawMessage(){
         }
         return;
     }
-}
-
-function sendMessage(m1, c1, m2, c2) {
-	if (counter2 == 0) {
-		counter1 = c1;
-		counter2 = c2;
-		message1 = m1;
-		message2 = m2;
-	}
 }
 
 function addMessage(msg){
@@ -518,8 +553,8 @@ function createBoundingBoxes() {
 		if (obj[i + 1] > zmax) zmax = obj[i + 1];
 		i += 3;
 	} while (i <= obj.length);
-	//lek�t�z�tt toronyh�z kiv�tel
-	bbox[9 * 2 + 0] = bbox[8 * 2 + 0];
+
+	bbox[OBJ_BUILDING_WITH_WIRE * 2 + 0] = bbox[OBJ_BUILDING * 2 + 0];
 }
 
 function elapseTime() {
@@ -530,27 +565,31 @@ function elapseTime() {
 function update() {
 	elapseTime();
 	//rotate axis
-	cx = Math.cos(my_rot_x);
-	sx = Math.sin(my_rot_x);
-	cy = Math.cos(my_rot_y);
-	sy = Math.sin(my_rot_y);
-	cz = Math.cos(my_rot_z);
-	sz = Math.sin(my_rot_z);
+	cx = Math.cos(player.rot_x);
+	sx = Math.sin(player.rot_x);
+	cy = Math.cos(player.rot_y);
+	sy = Math.sin(player.rot_y);
+	cz = Math.cos(player.rot_z);
+	sz = Math.sin(player.rot_z);
 	drawSky();
 	drawGround();
 	drawObjects();
 
 	if (state == TITLE) {
-		ctx.drawImage(title, Math.floor((w - title.width) / 2), Math.floor((h - title.height) / 2));
-		ctx.fillStyle = '#fff';
-		ctx.font = 'bold 10px courier';
-		ctx.textBaseline = 'bottom';
-		ctx.textAlign = 'right';
-		ctx.fillText('v' + VERSION, w - 10, h - 10);
-	}
-    if(state == CAR){
+		var x = Math.floor((w - title.width) / 2);
+        var y = Math.floor((h - title.height) / 2);
+        ctx.drawImage(title, x, y);
+        addMessage(MSG_SHORTDESCRIPTION);
+        addMessage(MSG_PRESSFIRE);
+        addMessage(MSG_CREDITS);
+	}else if(state == CAR){
+        snd_engine.play();
         var truck_cockpit_height = Math.floor((w/truck_cockpit.width)*truck_cockpit.height);
         ctx.drawImage(truck_cockpit, 0, h - truck_cockpit.height*1.2, w, truck_cockpit_height);
+    }else if(state == FLY){
+        snd_flying.play();
+        var glider_dashboard_height = Math.floor((w/glider_dashboard.width)*glider_dashboard.height);
+        ctx.drawImage(glider_dashboard, (w-glider_dashboard.width)/2, h - glider_dashboard.height);
     }
     if(hand_key == 1 && state == WALK){
         ctx.drawImage(car_key, w - car_key.width - MARGIN, h - car_key.height - MARGIN);
@@ -560,27 +599,32 @@ function update() {
             ctx.drawImage(rope, w - car_key.width - MARGIN - rope.width * (i+1), h - rope.height - MARGIN);
         }
     }
-	if (my_pos_y > pplace * MAG && my_pos_y < pplace * (MAG + 1) && state == CAR){
+	if (player.pos_y > pplace * MAG && player.pos_y < pplace * (MAG + 1) && state == CAR){
         addMessage(MSG_NEARPARKING);
         addMessage(MSG_PUTCAR);
     }
-	if (state == FALL) sendMessage('Felzuhant�l! Meg fogsz halni...', 200, 'Felzuhansz az �rbe, ahol majd megfulladsz :(', 1000);
-	if (state == LIFT) {
-		sendMessage('Siker�lt megmentened n�h�ny lakost,', 200, '�s k�zt�k magadat is. Gratul�lok!', 1000);
-		if (0 < h / 2 + my_pos_z + wall.height * DEEP - 1) {
-			my_pos_z -= 4;
-		} else inic();
+	if (state == LIFT || state == CONGRAT) {
+		addMessage('You successfully saved the city!');
+        addMessage('Congratulations!');
+        var wall_height = Math.floor((w/wall.width)*wall.height);
+        if (0 <= h / 2 + player.pos_z + wall_height * DEEP - 1) {
+			player.pos_z -= 4; 
+		}else{
+            state = CONGRAT;
+        }
 		for (var i = 0; i < DEEP; i++) {
-			ctx.drawImage(wall, 0, h / 2 + my_pos_z + wall.height * i);
+			ctx.drawImage(wall, 0, h / 2 + player.pos_z + wall_height * i,w,wall_height);
 		}
-		ctx.drawImage(tunnel, 0, h / 2 + my_pos_z + wall.height * i);
+        var tunnel_height = Math.floor((w/tunnel.width)*tunnel.height);
+		ctx.drawImage(tunnel, 0, h / 2 + player.pos_z + wall_height * i,w,tunnel_height);
 	}
-	//drawText();
     drawMessage();
-	if (state == FALL && my_pos_z >= 1){
-        inic();   
+	if (player.pos_z / MAG >= MAX_HEIGHT_TO_DIE){
+        state = GAMEOVER;
+        addMessage(MSG_GAMEOVER);
+        addMessage(MSG_PRESSFIRE);
     }
-    debug = player.forward;
+    //debug = 'DEMO';
     if(DEBUG){
         ctx.fillStyle = '#fff';
         ctx.fillText(debug, w/2, 30);
@@ -591,70 +635,93 @@ function playerControl() {
 	//turning
     if(state == WALK){
         if(mouse.x <= 0){
-            my_rot_z -= 0.01;
+            player.rot_z -= 0.02;
         }else if(mouse.x >= w){
-            my_rot_z += 0.01;
+            player.rot_z += 0.02;
         }else{
-            my_rot_z += mouse.dx * 0.01;
+            player.rot_z += mouse.dx * 0.01;
         }
         mouse.dx = 0;
     }else if(state == CAR){
-        my_rot_z += (mouse.x - w / 2)*player.forward / 400000;
+        player.rot_z += (mouse.x - w / 2)*player.forward / 1000 / w;
     }else if(state == FLY){
-        my_rot_z += (mouse.x - w / 2) / 4000;
+        player.rot_z += (mouse.x - w / 2) / 10 / w;
     }else if(state == FALL){
-        my_rot_z -= (mouse.x - w / 2) / 4000;
+        if(mouse.x <= 0){
+            player.rot_z += 0.02;
+        }else if(mouse.x >= w){
+            player.rot_z -= 0.02;
+        }else{
+            player.rot_z -= mouse.dx * 0.01;
+        }
+        mouse.dx = 0;
     }
 	//rolling
-	if (state == FLY) my_rot_y = (mouse.x - w / 2) / 1000;
-	if (state == CAR) {
-        //my_rot_y = -(mouse.x - w / 2) / 4000;
-        my_rot_y = -(mouse.x - w / 2)*player.forward / 400000
-    }
-	if (state == FALL) my_rot_y = (mouse.x - w / 2) / 2000 + Math.PI;
+	if (state == FLY) {
+        player.rot_y = (mouse.x - w / 2) / 2 /w;
+    }else if (state == CAR) {
+        player.rot_y = -(mouse.x - w / 2)*player.forward / 1000 / w;
+    }else if (state == FALL){
+        player.rot_y = Math.PI;  
+    } 
 	//speed
-	if (state == FLY) player.forward = flight_speed;
-	if (state == FALL) my_vel_z = gravity * MAG;
+	if (state == FLY){
+        player.forward = FLIGHT_SPEED;
+    }else if (state == FALL){
+        player.vel_z = GRAVITY * MAG/4;
+    }
 	//pitch
     if (state == WALK) {
-        my_rot_x = -(h / 2 - mouse.y) / 200;
+        player.rot_x = (mouse.y - h / 2) / h;
     }else if (state == FLY) {
-		my_rot_x = (h / 2 - mouse.y) / 400;
-		counter3--;
-		if (counter3 < 0) counter3 = 0;
-		if (counter3 > 0 && my_rot_x > -.1) my_rot_x = -.1;
+		player.rot_x = (h / 2 - mouse.y) / h;
+		glider_cannot_crash--;
+		if (glider_cannot_crash < 0){
+            glider_cannot_crash = 0;
+        }
+		if (glider_cannot_crash > 0 && player.rot_x > -.1) player.rot_x = -.1;
 	}else if (state == CAR) {
-		my_rot_x = Math.abs(mouse.x - w / 2)  *player.forward / 100000;
+		player.rot_x = Math.abs(mouse.x - w / 2)  *player.forward / h / 1000;
 	}else if (state == FALL){
-        my_rot_x = (h / 2 - mouse.y) / 200;
+        player.rot_x = (h / 2 - mouse.y) / h;
     } 
 	//head
 	head += player.forward / 200;
-	if (state == WALK) my_pos_z = tall + Math.sin(head) * 40;
-	if (state == CAR) my_pos_z = tall + Math.sin(head) * 20;
-	my_vel_y = Math.cos(my_rot_z) * player.forward - Math.sin(my_rot_z) * player.side;
-	my_vel_x = Math.sin(my_rot_z) * player.forward  + Math.cos(my_rot_z) * player.side;
-	if (state == FLY) my_vel_z = -Math.sin(my_rot_x) * player.forward;
-	player.pos_x += my_vel_x;
-	my_pos_y += my_vel_y;
-	my_pos_z += my_vel_z;
-	my_way += Math.abs(player.forward) / MAG;
-	if (my_pos_z <= 0 && state == FLY) {
-		my_rot_y = 0;
-		my_vel_z = 0;
-		my_pos_z = tall;
-		world[vehicle + 1] = (player.pos_x - 4 * my_vel_x) / MAG;
-		world[vehicle + 2] = (my_pos_y - 4 * my_vel_y) / MAG;
+	if (state == WALK){
+        player.pos_z = TALL + Math.sin(head) * 40;
+    }else if (state == CAR){
+        player.pos_z = TALL + Math.sin(head) * 20;
+    }
+	player.vel_y = cz * player.forward - sz * player.side;
+	player.vel_x = sz * player.forward + cz * player.side;
+	
+    if (state == FLY){
+        player.vel_z = -sx * player.forward;
+    }
+	player.pos_x += player.vel_x;
+	player.pos_y += player.vel_y;
+	player.pos_z += player.vel_z;
+	if (player.pos_z <= 0 && state == FLY) {
+		world[vehicle + 1] = (player.pos_x - 4 * player.vel_x) / MAG;
+		world[vehicle + 2] = (player.pos_y - 4 * player.vel_y) / MAG;
 		world[vehicle + 3] = 0;
 		state = WALK;
-		if (my_rot_x > 0.25) {
-			world[vehicle + 0] = 6;//roncs repcsi
-			sendMessage('T�l meredek volt a lesz�ll�s!', 50, 'Szerezz m�sik sikl�t!', 50);
+        snd_flying.pause();
+		if (player.rot_x > GLIDER_ROTX_CRASHED) {
+			world[vehicle + 0] = OBJ_WRECKED_GLIDER;
+            snd_explosion.play();
+			addMessage(MSG_CRASHED);
+            addMessage(MSG_FINDANOTHER);
 		} else {
-			world[vehicle + 0] = 2;//rep�l�
-			sendMessage('Lesz�llt�l!', 50, '', 0);
+			world[vehicle + 0] = OBJ_GLIDER;
+			addMessage(MSG_LANDED);
 		}
-		my_rot_x = 0;
+		player.rot_x = 0;
+		player.rot_y = 0;
+        player.rot_z = 0;
+		player.vel_z = 0;
+		player.pos_z = TALL;
+        player.forward = 0;
 	}
 }
 
@@ -666,128 +733,147 @@ function playerCollition() {
 		if (world[i] < INVISIBLE) {
 			bw = bbox[world[i] * 2 + 0];
 			bh = bbox[world[i] * 2 + 1];
-			if (bh * MAG < tall) bh += tall / MAG;
+			if (bh * MAG < TALL){
+                bh += TALL / MAG;
+            }
 			if (player.pos_x > (world[i + 1] - bw) * MAG && player.pos_x < (    world[i + 1] + bw) * MAG &&
-				my_pos_y > (world[i + 2] - bw) * MAG && my_pos_y < (world[i + 2] + bw) * MAG &&
-				my_pos_z > (world[i + 3]) * MAG && my_pos_z < (world[i + 3] + bh) * MAG) {
+				player.pos_y > (world[i + 2] - bw) * MAG && player.pos_y < (world[i + 2] + bw) * MAG &&
+				player.pos_z > (world[i + 3]) * MAG && player.pos_z < (world[i + 3] + bh) * MAG) {
 				found = true;
 			}
 		}
 		i += 4;
 	} while (!found && i < world.length);
 
-	if (found) {
+	if(found) {
 		i -= 4;
         player.forward = 0;
         player.side = 0;
-		if (world[i] == OBJ_GLIDER && state == WALK) {
+        var object = world[i]; 
+		if (object == OBJ_GLIDER && state == WALK) {
 			addMessage(MSG_GOTGLIDER);
             addMessage(MSG_CAREFUL);
 			world[i] = INVISIBLE;
-			counter3 = 30;
+			glider_cannot_crash = GLIDER_PROTECTED;
 			state = FLY;
 			vehicle = i;
-		}
-		//roncs sikl�
-		if (world[i] == OBJ_WRECKED_GLIDER && state == WALK) {
+		}else if(object == OBJ_WRECKED_GLIDER && state == WALK) {
+            snd_error.play();
 			addMessage(MSG_WONTFLIGHT);
             addMessage(MSG_FINDANOTHER);
-		}
-		//aut�
-		if (world[i] == OBJ_TRUCK && state == WALK) {
+		}else if(object == OBJ_TRUCK && state == WALK) {
 			if (hand_key == 1) {
 				addMessage(MSG_GOTCAR);
+                addMessage('Drive toward the city!');
+                addMessage('Find a parking place to leave the car!');
+                
 				world[i] = INVISIBLE;
 				state = CAR;
                 player.forward = 0;
                 player.side = 0;
 				vehicle = i;
 			} else {
+                snd_error.play();
 				addMessage(MSG_GETCARKEY);
 			}
-		}
-		//out of car at P-plate
-		if (world[i] == OBJ_PARKING && state == CAR) {
-			my_rot_x = 0;
-			my_rot_y = 0;
-			my_vel_z = 0;
-			my_pos_z = tall;
+		}else if(object == OBJ_PARKING && state == CAR) {
+			player.rot_x = 0;
+			player.rot_y = 0;
+            player.vel_x = 0;
+            player.vel_y = 0;
+			player.vel_z = 0;
+            player.pos_y = (world[i + 2] + 5) * MAG;
+			player.pos_z = TALL;
 			world[vehicle + 0] = OBJ_TRUCK;
 			world[vehicle + 1] = world[i + 1];
 			world[vehicle + 2] = world[i + 2] + 2;//put it close to P
 			world[vehicle + 3] = world[i + 3];
 			state = WALK;
+            snd_engine.pause();
 			addMessage(MSG_GOTOUT);
-		}
-		if (world[i] == OBJ_HOUSE && hand_key == 0) {
+            addMessage('Find a glider to catch some balloons!');
+		}else if(object == OBJ_HOUSE && hand_key == 0) {
 			addMessage(MSG_GOTKEY);
+            snd_pickup.play();
 			hand_key = 1;
-		}
-		if (world[i] == OBJ_CITY_HALL && state == WALK) {
+		}else if(object == OBJ_CITY_HALL && state == WALK) {
 			if (hand_saved >= must_saved) {
-				sendMessage('Most m�r beenged�nk az �v�helyre!', 50, 'Megmenek�lt�l!', 50);
+                snd_pickup.play();
+				addMessage('We are now letting you into the shelter.');
+                addMessage('You are saved!');
 				state = LIFT;
 				player.forward = 0;
                 player.side = 0;
-				my_vel_x = 0;
-				my_vel_y = 0;
+				player.vel_x = 0;
+				player.vel_y = 0;
 			} else {
-				sendMessage('Mentsd meg az �sszes h�zat!', 50, 'Eddig ' + hand_saved + ' toronyh�zat r�gz�tett�l!', 50);
-			}
-		}
-		//felvessz�k a k�telet
-		if (world[i] == OBJ_BALLOON) {
-			if (hand_band < 2) {
+                snd_error.play();
+				addMessage('We are not allowed getting into the shelter.');
+                addMessage('Still ' + (must_saved - hand_saved) + ' buildings must be tied down!');
+			}   
+		}else if(object == OBJ_BALLOON) {
+			if(hand_band < 2) {
+                snd_pickup.play();
 				hand_band++;
-				if (hand_band == 1) sendMessage('Felvetted az els� k�telet!', 50, '', 0);
-				if (hand_band == 2) sendMessage('Felvetted a m�sodik k�telet!', 50, '', 0);
+				if (hand_band == 1){
+                    addMessage('You have taken the first rope');
+                }else if (hand_band == 2){
+                    addMessage('You have taken the second rope');
+                }
 				world[i] = INVISIBLE;
 			} else {
-				sendMessage('Nincs t�bb hely a sikl�n!', 50, '', 0);
+                snd_error.play();
+				addMessage('There is no more place for rope!');
 			}
-		}
-		//hoztunk k�telet gyalog a h�zhoz
-		if (world[i] == OBJ_BUILDING && state == WALK) {
-			if (hand_band == 0) { sendMessage('Nincs k�teled a r�gz�t�shez!', 50, '', 0); }
-			if (hand_band == 1) {
-				sendMessage('Egy egys�g k�t�l nem el�g!', 50, 'K�t egys�g k�t�l kell a r�gz�t�shez!', 50);
-			}
-			if (hand_band == 2) {
-				world[i] = 9;//k�teles h�z
+		}else if (object == OBJ_BUILDING && state == WALK) {
+			if(hand_band == 0) {
+                snd_error.play();
+                addMessage('You do not have rope to tie down!');
+            }else if (hand_band == 1) {
+                snd_error.play();
+				addMessage('One rope is not enough!');
+                addMessage('Get one more!');
+			}else{
+                snd_pickup.play();
+				world[i] = OBJ_BUILDING_WITH_WIRE;
 				hand_band = 0;
 				hand_saved++;
-				if (must_saved - hand_saved != 0) {
-					sendMessage('A h�zat r�gz�tetted!', 50, 'M�g ' + (must_saved - hand_saved) + ' h�zat kell megmentened!', 50);
-				} else {
-					sendMessage('Ezzel, az �sszes h�zat r�gz�tetted!', 50, 'Most menj az �v�helyre!', 50);
-				}
+				if (hand_saved >= must_saved) {
+                    addMessage('You tied down all buildings!');
+                    addMessage('Now go to the townhouse shelter!');
+                }else{
+                    addMessage('You tied the building down');
+                    addMessage(hand_saved + ' of ' + must_saved + ' buildings are saved');
+                }
 			}
+		}else if (object == OBJ_JFHU_LOGO) {
+			addMessage('Just a statue in the city');
 		}
-		//jfhu logo
-		if (world[i] == OBJ_JFHU_LOGO) {
-			sendMessage('A v�ros v�delemz�je!', 50, 'L�togass el a www.jatekfejlesztes.hu oldalra!', 50);
-		}
-		//�tk�z�s a rep�l�vel a t�rgyaknak
-		if ((world[i] == OBJ_BUILDING || 
-            world[i] == OBJ_BUILDING_WITH_WIRE || 
-            world[i] == OBJ_CITY_HALL || 
-            world[i] == OBJ_HOUSE || 
-            world[i] == OBJ_TREE || 
-            world[i] == OBJ_JFHU_LOGO) && state == FLY) {
+        
+        if ((object == OBJ_BUILDING || 
+            object == OBJ_BUILDING_WITH_WIRE || 
+            object == OBJ_CITY_HALL || 
+            object == OBJ_HOUSE || 
+            object == OBJ_TREE || 
+            object == OBJ_JFHU_LOGO) && state == FLY) {
                 state = WALK;
-                my_pos_z = tall;
-                player.pos_x -= my_vel_x * 5;
-                my_pos_y -= my_vel_y * 5;
-                my_rot_x = 0;
-                my_rot_y = 0;
-                my_vel_z = 0;
-                world[vehicle + 0] = OBJ_WRECKED_GLIDER;//roncs repcsi
-                world[vehicle + 1] = (player.pos_x - 4 * my_vel_x) / MAG;
-                world[vehicle + 2] = (my_pos_y - 4 * my_vel_y) / MAG;
+                player.pos_z = TALL;
+                player.pos_x -= player.vel_x * 5;
+                player.pos_y -= player.vel_y * 5;
+                player.rot_x = 0;
+                player.rot_y = 0;
+                player.rot_z = 0;
+                player.vel_z = 0;
+                world[vehicle + 0] = OBJ_WRECKED_GLIDER;
+                world[vehicle + 1] = (player.pos_x - 4 * player.vel_x) / MAG;
+                world[vehicle + 2] = (player.pos_y - 4 * player.vel_y) / MAG;
                 world[vehicle + 3] = 0;
-                sendMessage('Lezuhant�l!', 50, 'Szerezz m�sik sikl�t!', 0);//lezuhant�l
+                snd_flying.pause();
+                snd_explosion.play();
+                addMessage(MSG_CRASHED);
+                addMessage(MSG_FINDANOTHER);
 		}
-		//�tk�z�s sokmindennel
+		//collition with all
 		if (world[i] == OBJ_HOUSE || 
             world[i] == OBJ_TREE || 
             world[i] == OBJ_WRECKED_GLIDER || 
@@ -797,8 +883,8 @@ function playerCollition() {
             world[i] == OBJ_BUILDING_WITH_WIRE || 
             world[i] == OBJ_CITY_HALL || 
             world[i] == OBJ_JFHU_LOGO) {
-                player.pos_x -= my_vel_x;
-                my_pos_y -= my_vel_y;
+                player.pos_x -= player.vel_x;
+                player.pos_y -= player.vel_y;
 		}
 	}
 }
@@ -826,30 +912,39 @@ function createWorld() {
 }
 
 function gameLoop() {
+    update();
 	armageddon();
 	playerControl();
 	playerCollition();
-	update();
     requestAnimationFrame(gameLoop);
 }
 
 function inic() {
-	tall = 1.2 * MAG;
+    textArray = [];
 	head = 0;
 	day = 0;
-	message1 = '', message2 = '';
-	counter = 0, counter1 = 0, counter2 = 0, counter3 = 0;
-	
+	counter = 0;
+    glider_cannot_crash = 0;
 	vehicle = 0;
-	hand_band = 0, hand_key = 1, hand_saved = 0;
-	mouse.x = 0, mouse.y = 0;
-	player.pos_x = -4 * MAG, my_pos_y = -2 * MAG, my_pos_z = tall;
+	hand_band = 0, hand_key = 0, hand_saved = 0;
+	mouse.x = 0;
+    mouse.y = 0;
+    mouse.dx = 0;
+    mouse.dy = 0;
+    snd_flying.pause();
+    snd_engine.pause();
+    snd_walking.pause();
+	player.pos_x = -4 * MAG;
+    player.pos_y = -2 * MAG;
+    player.pos_z = TALL;
 	player.forward = 0;
     player.side = 0;
-    my_vel_x = 0, my_vel_y = 0, my_vel_z = 0;
-	my_way = 0;
-	my_rot_x = 0, my_rot_y = 0, my_rot_z = 0;
+    player.vel_x = 0;
+    player.vel_y = 0;
+    player.vel_z = 0;
+	player.rot_x = 0;
+    player.rot_y = 0;
+    player.rot_z = 0;
 	createWorld();
-    
 }
 

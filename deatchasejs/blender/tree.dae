@@ -1,0 +1,141 @@
+<?xml version="1.0" encoding="utf-8"?>
+<COLLADA xmlns="http://www.collada.org/2005/11/COLLADASchema" version="1.4.1" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+  <asset>
+    <contributor>
+      <author>Blender User</author>
+      <authoring_tool>Blender 2.79.0 commit date:2018-03-22, commit time:14:10, hash:f4dc9f9d68b</authoring_tool>
+    </contributor>
+    <created>2022-05-11T08:46:43</created>
+    <modified>2022-05-11T08:46:43</modified>
+    <unit name="meter" meter="1"/>
+    <up_axis>Z_UP</up_axis>
+  </asset>
+  <library_images>
+    <image id="tree_32x16_png" name="tree_32x16_png">
+      <init_from>tree_32x16.png</init_from>
+    </image>
+  </library_images>
+  <library_effects>
+    <effect id="tree_32x16_png-effect">
+      <profile_COMMON>
+        <newparam sid="tree_32x16_png-surface">
+          <surface type="2D">
+            <init_from>tree_32x16_png</init_from>
+          </surface>
+        </newparam>
+        <newparam sid="tree_32x16_png-sampler">
+          <sampler2D>
+            <source>tree_32x16_png-surface</source>
+          </sampler2D>
+        </newparam>
+        <technique sid="common">
+          <phong>
+            <diffuse>
+              <texture texture="tree_32x16_png-sampler" texcoord="tree_32x16_png"/>
+            </diffuse>
+            <specular>
+              <color sid="specular">0 0 0 1</color>
+            </specular>
+          </phong>
+        </technique>
+      </profile_COMMON>
+    </effect>
+    <effect id="sweet24_png-effect">
+      <profile_COMMON>
+        <newparam sid="sweet24_png-surface">
+          <surface type="2D">
+            <init_from>sweet24_png</init_from>
+          </surface>
+        </newparam>
+        <newparam sid="sweet24_png-sampler">
+          <sampler2D>
+            <source>sweet24_png-surface</source>
+          </sampler2D>
+        </newparam>
+        <technique sid="common">
+          <phong>
+            <diffuse>
+              <texture texture="sweet24_png-sampler" texcoord="sweet24_png"/>
+            </diffuse>
+            <specular>
+              <color sid="specular">0 0 0 1</color>
+            </specular>
+          </phong>
+        </technique>
+      </profile_COMMON>
+    </effect>
+  </library_effects>
+  <library_materials>
+    <material id="tree_32x16_png-material" name="tree_32x16_png">
+      <instance_effect url="#tree_32x16_png-effect"/>
+    </material>
+    <material id="sweet24_png-material" name="sweet24_png">
+      <instance_effect url="#sweet24_png-effect"/>
+    </material>
+  </library_materials>
+  <library_geometries>
+    <geometry id="Tree2-mesh" name="Tree2">
+      <mesh>
+        <source id="Tree2-mesh-positions">
+          <float_array id="Tree2-mesh-positions-array" count="108">1.45726e-7 -0.4846087 -0.2387077 -0.206727 -0.4846087 -0.1193541 -0.5595328 0.1686234 -0.3230457 2.38419e-7 0.1686234 -0.6460927 -0.5595328 0.1686234 0.3230463 -0.4458498 2.487596 0.2574113 -0.4458498 2.487596 -0.2574117 -0.206727 -0.4846087 0.1193537 1.45726e-7 -0.4846087 0.2387074 2.38419e-7 0.1686234 0.6460923 0.2067265 -0.4846087 0.1193537 0.2067265 -0.4846087 -0.1193541 0.5595322 0.1686234 -0.3230467 0.5595322 0.1686234 0.3230463 2.38419e-7 2.487596 -0.5148227 -0.2094117 3.794062 -0.1209037 2.38419e-7 3.794062 -0.2418076 0.4458503 2.487596 0.2574113 2.38419e-7 2.487596 0.5148233 0.4458503 2.487596 -0.2574117 0.2094112 3.794062 -0.1209037 -0.2094117 3.794062 0.1209043 2.38419e-7 3.794062 0.2418083 0.2094112 3.794062 0.1209043 2.38419e-7 -5.965672 -0.3289947 0.2849172 -5.965672 -0.1644976 0.2849172 -5.965672 0.1644973 2.38419e-7 -5.965672 0.3289943 -0.2849178 -5.965672 0.1644973 -0.2849178 -5.965672 -0.1644976 -0.2200338 -3.225141 -0.1270369 1.61501e-7 -3.225141 0.2540728 1.61501e-7 -3.225141 -0.2540732 -0.2200338 -3.225141 0.1270365 0.2200334 -3.225141 -0.1270369 0.2200334 -3.225141 0.1270365</float_array>
+          <technique_common>
+            <accessor source="#Tree2-mesh-positions-array" count="36" stride="3">
+              <param name="X" type="float"/>
+              <param name="Y" type="float"/>
+              <param name="Z" type="float"/>
+            </accessor>
+          </technique_common>
+        </source>
+        <source id="Tree2-mesh-normals">
+          <float_array id="Tree2-mesh-normals-array" count="117">-0.4399359 -0.4752114 -0.7619912 -0.9988006 0.04896414 0 -0.4399351 -0.4752119 0.7619915 0.8798714 -0.475212 0 -0.8798714 -0.4752119 0 0.4399358 -0.4752119 -0.7619909 0.4399358 -0.4752119 0.7619909 -0.4920073 0.1780827 -0.8521829 0.4994005 0.0489639 0.8649865 0.4993999 0.04896408 -0.864987 -0.4994002 0.04896402 -0.8649867 -0.4994001 0.04896402 0.8649868 0.9988006 0.04896372 0 0 1 0 -0.4920081 0.1780824 0.8521824 0.9840155 0.1780833 0 -0.9840156 0.1780825 0 0.4920086 0.1780825 0.852182 0.4920077 0.1780829 -0.8521825 0.499949 0.01431202 -0.8659366 0.4999944 0.004855513 -0.8660151 0.9998977 0.01431202 0 0.9999883 0.004855513 0 0.499949 0.01431202 0.8659366 0.4999943 0.004855513 0.8660151 -0.4999476 0.01431202 0.8659374 -0.4999929 0.004855513 0.866016 -0.4999477 0.01431202 0.8659375 -0.9998977 0.01431202 0 -0.9999883 0.004855513 0 -0.4999477 0.01431202 -0.8659374 -0.499993 0.004855513 -0.8660159 -0.4999477 0.01431202 -0.8659375 -0.4998589 0.023669 -0.8657835 -0.9997199 0.023669 0 -0.4998588 0.023669 0.8657835 0.4998602 0.023669 0.8657827 0.9997199 0.023669 0 0.4998602 0.023669 -0.8657827</float_array>
+          <technique_common>
+            <accessor source="#Tree2-mesh-normals-array" count="39" stride="3">
+              <param name="X" type="float"/>
+              <param name="Y" type="float"/>
+              <param name="Z" type="float"/>
+            </accessor>
+          </technique_common>
+        </source>
+        <source id="Tree2-mesh-map">
+          <float_array id="Tree2-mesh-map-array" count="252">0.0625 0.1875 0.4375 0.1875 0.46875 0.9375 0.03125 0.9375 0 0 0.5 0 0.5 1 0 1 0.0625 0.8125 0.0625 0.5625 0.4375 0.4375 0.4375 0.875 0.0625 0.5 0.4375 0.5 0.5 1 0 1 0.09375 0.5 0.40625 0.5 0.4375 1 0.03125 1 0.0625 0.1875 0.4375 0.1875 0.46875 0.9375 0.03125 0.9375 0.0625 0.9375 0.125 0.4375 0.375 0.4375 0.4375 0.9375 0.03125 0.3125 0.46875 0.3125 0.40625 0.9375 0.0625 0.9375 0 1 0 0 0.5 0 0.5 1 0 0 0.5 0 0.5 1 0 1 0 0 0.5 0 0.5 1 0 1 0 1 0 0 0.5 0 0.5 1 0 0 0.5 0 0.5 1 0 1 0.40625 0.6875 0.21875 0.9375 0.03125 0.6875 0.03125 0.375 0.21875 0.125 0.40625 0.375 0 0.3125 0.5 0.3125 0.375 0.8125 0.125 0.8125 0.03125 0.125 0.46875 0.125 0.375 0.9375 0.125 0.9375 0.03125 0.1875 0.4375 0.1875 0.34375 0.9375 0.15625 0.9375 0.03125 0.125 0.4375 0.125 0.34375 0.9375 0.15625 0.9375 0.03125 0.25 0.5 0.25 0.375 0.875 0.125 0.875 1 0 1 1 0.5 1 0.5 0 1 0 1 1 0.5 1 0.5 0 0.5 0 0.5 1 1 1 1 0 1 0 1 1 0.5 1 0.5 0 1 0 1 1 0.5 1 0.5 0 1 0 1 1 0.5 1 0.5 0 1 0 1 1 0.5 1 0.5 0 1 0 1 1 0.5 1 0.5 0 1 0 1 1 0.5 1 0.5 0 0.5 0 0.5 1 1 1 1 0 1 0 1 1 0.5 1 0.5 0 1 0 1 1 0.5 1 0.5 0</float_array>
+          <technique_common>
+            <accessor source="#Tree2-mesh-map-array" count="126" stride="2">
+              <param name="S" type="float"/>
+              <param name="T" type="float"/>
+            </accessor>
+          </technique_common>
+        </source>
+        <vertices id="Tree2-mesh-vertices">
+          <input semantic="POSITION" source="#Tree2-mesh-positions"/>
+        </vertices>
+        <polylist material="tree_32x16_png-material" count="31">
+          <input semantic="VERTEX" source="#Tree2-mesh-vertices" offset="0"/>
+          <input semantic="NORMAL" source="#Tree2-mesh-normals" offset="1"/>
+          <input semantic="TEXCOORD" source="#Tree2-mesh-map" offset="2" set="0"/>
+          <vcount>4 4 4 4 4 4 4 4 4 4 4 4 4 6 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 4 </vcount>
+          <p>0 0 0 1 0 1 2 0 2 3 0 3 2 1 4 4 1 5 5 1 6 6 1 7 7 2 8 8 2 9 9 2 10 4 2 11 10 3 12 11 3 13 12 3 14 13 3 15 1 4 16 7 4 17 4 4 18 2 4 19 11 5 20 0 5 21 3 5 22 12 5 23 8 6 24 10 6 25 13 6 26 9 6 27 14 7 28 6 7 29 15 7 30 16 7 31 9 8 32 13 8 33 17 8 34 18 8 35 12 9 36 3 9 37 14 9 38 19 9 39 3 10 40 2 10 41 6 10 42 14 10 43 4 11 44 9 11 45 18 11 46 5 11 47 13 12 48 12 12 49 19 12 50 17 12 51 20 13 52 16 13 53 15 13 54 21 13 55 22 13 56 23 13 57 5 14 58 18 14 59 22 14 60 21 14 61 17 15 62 19 15 63 20 15 64 23 15 65 6 16 66 5 16 67 21 16 68 15 16 69 18 17 70 17 17 71 23 17 72 22 17 73 19 18 74 14 18 75 16 18 76 20 18 77 32 19 78 0 20 79 11 20 80 34 19 81 34 21 82 11 22 83 10 22 84 35 21 85 35 23 86 10 24 87 8 24 88 31 23 89 31 25 90 8 26 91 7 26 92 33 27 93 33 28 94 7 29 95 1 29 96 30 28 97 30 30 98 1 31 99 0 31 100 32 32 101 29 33 102 30 30 103 32 32 104 24 33 105 28 34 106 33 28 107 30 28 108 29 34 109 27 35 110 31 25 111 33 27 112 28 35 113 26 36 114 35 23 115 31 23 116 27 36 117 25 37 118 34 21 119 35 21 120 26 37 121 24 38 122 32 19 123 34 19 124 25 38 125</p>
+        </polylist>
+      </mesh>
+    </geometry>
+  </library_geometries>
+  <library_controllers/>
+  <library_visual_scenes>
+    <visual_scene id="Scene" name="Scene">
+      <node id="Tree2" name="Tree2" type="NODE">
+        <matrix sid="transform">1 0 0 5.824536 0 -4.37114e-8 -1 -0.2842485 0 1 -4.37114e-8 5.965672 0 0 0 1</matrix>
+        <instance_geometry url="#Tree2-mesh" name="Tree2">
+          <bind_material>
+            <technique_common>
+              <instance_material symbol="tree_32x16_png-material" target="#tree_32x16_png-material">
+                <bind_vertex_input semantic="UVMap" input_semantic="TEXCOORD" input_set="0"/>
+              </instance_material>
+            </technique_common>
+          </bind_material>
+        </instance_geometry>
+      </node>
+    </visual_scene>
+  </library_visual_scenes>
+  <scene>
+    <instance_visual_scene url="#Scene"/>
+  </scene>
+</COLLADA>

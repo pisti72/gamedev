@@ -1,5 +1,5 @@
 const MSG_ENDOFWORLD = "Armageddon is coming! Run to the city!";
-const MSG_GETCARKEY = "Get car key!";
+const MSG_GETCARKEY = "Get car key from the house!";
 const MSG_GOTKEY = "You got the car key.";
 const MSG_LOOKBEHIND = "Look behind! The trees are flying toward the sky!";
 const MSG_GOTCAR = "You got in the car!";
@@ -7,9 +7,17 @@ const MSG_GOTOUT = "You got out of the car!";
 const MSG_NEARPARKING = "Find a parking place in the near.";
 const MSG_PUTCAR = "You can put your car there.";
 const MSG_WONTFLIGHT = "You will not flight by this anymore.";
-const MSG_FINDANOTHER = "Find another one!";
+const MSG_FINDANOTHER = "Find another glider!";
 const MSG_GOTGLIDER = "You got in the glider";
+const MSG_LANDED = "You landed the glider";
+const MSG_CRASHED = "You crashed! The landing was too steep.";
 const MSG_CAREFUL = "Be careful! Do not crash!";
+const MSG_GAMEOVER = "GAME OVER";
+const MSG_PRESSFIRE = "Press Space or click with the mouse";
+const MSG_CREDITS = "Written by Istvan Szalontai \u00A92022";
+const MSG_SHORTDESCRIPTION = "Save the city from the falling!";
+const MSG_FALLENUP = "You fallen up!";
+const MSG_YOUWILLDIE = "You will die in the cold space!";
 
 var palette=[
 0,0,0		//00-black
@@ -69,21 +77,26 @@ const OBJ_JFHU_LOGO = 11;
 const END_OF_POINTS = 88888;
 const END_OF_FACES = 99999;
 
+const NUMBER_OF_BUILDINGS = 10;
+const NUMBER_OF_BALLOONS = 22;
+
+
 var prog=[
-10,1,	0,1900,0,		20,		20,0 //városháza
-,7,21,	-500,1000,50,	1000,	1300,200 //légipack 21 darab
-,8,10,	-300,1600,0,	600,	600,0 //toronyházak 10 darab
-,11,2,	-400,1500,0,	800,	800,0 //elrejtett jf logok 2 darab
-,2,6,	-300,1600,0,	600,	600,0 //repülõk 6 darab a városban
+OBJ_CITY_HALL,1,	0,1900,0,		20,		20,0 //városháza
+,OBJ_BALLOON,NUMBER_OF_BALLOONS,	-500,1000,50,	1000,	1300,200 //légipack 21 darab
+,OBJ_BUILDING,NUMBER_OF_BUILDINGS,	-300,1600,0,	600,	600,0 //toronyházak 10 darab
+,OBJ_JFHU_LOGO,2,	-400,1500,0,	800,	800,0 //elrejtett jf logok 2 darab
+,OBJ_GLIDER,6,	-300,1600,0,	600,	600,0 //repülõk 6 darab a városban
 
-,0,8,	-300,1100,0,	600,	400,0 //kertváros
-,4,2,   -200,1000,0,	400,	100,0 //parkolók a repülõ mellett
-,2,1,	-50,1200,0,		100,	50,0 //repülõ a határon
+,OBJ_HOUSE,8,	-300,1100,0,	600,	400,0 //kertváros
+,OBJ_PARKING,2,   -200,1000,0,	400,	100,0 //parkolók a repülõ mellett
+,OBJ_GLIDER,1,	-50,1200,0,		100,	50,0 //repülõ a határon
 
-,3,1,   -50,20,0,   	100,	20,0 //autó
-,0,1,	-50,70,0,		100,	20,0 //ház az autó mellett
-,1,50,  -100,-1000,0,	200,	3000,0 //fák
-,1,50,  -2000,-2000,0,  4000,	4000,0 //fák mindenfelé
+,OBJ_TRUCK,1,   -50,20,0,   	100,	20,0 //autó
+
+,OBJ_HOUSE,1,	-50,70,0,		100,	20,0 //ház az autó mellett
+,OBJ_TREE,50,  -100,-1000,0,	200,	3000,0 //fák
+,OBJ_TREE,50,  -2000,-2000,0,  4000,	4000,0 //fák mindenfelé
 ];//obj,n,  x,y,z,  l,w,h
 
 var obj=[

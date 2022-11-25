@@ -1,18 +1,26 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>Falling Trees</title>
+    <title>Falling Upward</title>
+    <meta charset="utf-8" />
     <style>
-body{
+html,body{
     margin:0px;
+    height:100%;
 }
 @font-face {
-  font-family: RetroGaming;
-  src: url(gfx/Retro_Gaming.ttf);
+  font-family: RobotoBold;
+  src: url(gfx/Roboto-Bold.ttf);
 }
     </style>
 </head>
 <body onLoad="start()">
+    <audio src="snd/walking.ogg" id="snd_walking"></audio>
+    <audio src="snd/engine.ogg" id="snd_engine"></audio>
+    <audio src="snd/pickup.ogg" id="snd_pickup"></audio>
+    <audio src="snd/explosion.ogg" id="snd_explosion"></audio>
+    <audio src="snd/flying.ogg" id="snd_flying"></audio>
+    <audio src="snd/error.ogg" id="snd_error"></audio>
     <canvas id="canvas"></canvas>
     <script type="text/javascript" src="data.js"></script>
     <script type="text/javascript" src="main.js"></script>
