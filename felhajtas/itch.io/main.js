@@ -1,7 +1,8 @@
 //const DEBUG = true;
 const DEBUG = false;
-const VERSION = '1.4';
+const VERSION = '1.5';
 const WIDTH = 900;
+//const WIDTH = 630;
 const HEIGHT = 500;
 
 const VISIBLE = 0;
@@ -17,6 +18,7 @@ const GAMEOVER = 6;
 const CONGRAT = 7;
 
 const KEY_SPACE = 32;
+const KEY_P = 80;
 const KEY_W = 87;
 const KEY_A = 65;
 const KEY_S = 83;
@@ -32,7 +34,7 @@ const DAY_BEGIN = .5;//-1 night --> 1 day
 const MAG = 400;
 const TALL = 480;
 const SMALLSIZE = 3;
-const MARGIN = 10;
+const MARGIN = 20;
 const WALK_SPEED = 50;
 const CAR_SPEED = 100;
 const FLIGHT_SPEED = 300;
@@ -52,6 +54,8 @@ var textArray=[];
 
 var canvasLeft;
 var canvasTop;
+
+var ispaused = false;
 
 var w, h;
 var head;
@@ -92,7 +96,7 @@ function start() {
     });
     window.addEventListener('mousemove', onMouseMove);
     document.addEventListener('keydown',function(e){
-        //debug=e.which;
+        debug=e.which;
         if(state == TITLE){
             if(e.which == KEY_SPACE){
                 state = WALK;
@@ -137,6 +141,8 @@ function start() {
             if(e.which == KEY_ESC){
                 inic();
                 state = TITLE;
+            }else if(e.which == KEY_P){
+                ispaused = !ispaused
             }
         }
     });
@@ -148,6 +154,7 @@ function start() {
             if(e.which == KEY_A || e.which == KEY_D){
                 player.side = 0;
             }
+            snd_walking.pause();
         }
     })
     document.addEventListener('click',function(e){
@@ -563,6 +570,9 @@ function elapseTime() {
 }
 
 function update() {
+    if(ispaused){
+        return;
+    }
 	elapseTime();
 	//rotate axis
 	cx = Math.cos(player.rot_x);
@@ -582,6 +592,7 @@ function update() {
         addMessage(MSG_SHORTDESCRIPTION);
         addMessage(MSG_PRESSFIRE);
         addMessage(MSG_CREDITS);
+        addMessage("Version: " + VERSION);
 	}else if(state == CAR){
         snd_engine.play();
         var truck_cockpit_height = Math.floor((w/truck_cockpit.width)*truck_cockpit.height);
@@ -634,9 +645,9 @@ function update() {
 function playerControl() {
 	//turning
     if(state == WALK){
-        if(mouse.x <= 0){
+        if(mouse.x <= MARGIN){
             player.rot_z -= 0.02;
-        }else if(mouse.x >= w){
+        }else if(mouse.x >= w - MARGIN){
             player.rot_z += 0.02;
         }else{
             player.rot_z += mouse.dx * 0.01;
@@ -647,9 +658,9 @@ function playerControl() {
     }else if(state == FLY){
         player.rot_z += (mouse.x - w / 2) / 10 / w;
     }else if(state == FALL){
-        if(mouse.x <= 0){
+        if(mouse.x <= MARGIN){
             player.rot_z += 0.02;
-        }else if(mouse.x >= w){
+        }else if(mouse.x >= w - MARGIN){
             player.rot_z -= 0.02;
         }else{
             player.rot_z -= mouse.dx * 0.01;
@@ -790,6 +801,7 @@ function playerCollition() {
 			world[vehicle + 3] = world[i + 3];
 			state = WALK;
             snd_engine.pause();
+            snd_pickup.play();
 			addMessage(MSG_GOTOUT);
             addMessage('Find a glider to catch some balloons!');
 		}else if(object == OBJ_HOUSE && hand_key == 0) {
@@ -934,6 +946,7 @@ function inic() {
     snd_flying.pause();
     snd_engine.pause();
     snd_walking.pause();
+    snd_pickup.play();
 	player.pos_x = -4 * MAG;
     player.pos_y = -2 * MAG;
     player.pos_z = TALL;
