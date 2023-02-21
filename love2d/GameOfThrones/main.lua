@@ -132,7 +132,7 @@ function love.load()
         love.graphics.newQuad(96, 48, TileW, TileW, tilesetW, tilesetH),    -- 23 = GFX_BRICKSIDE_RED
         love.graphics.newQuad(80,  0, TileW, TileW, tilesetW, tilesetH),    -- 24 = GFX_FLOOR_BLU
     }
-    wallsHeight = 30
+    wallsHeight = 16
     --stage = 6
     stage = 1
     gemsAll = 0
@@ -144,7 +144,7 @@ function love.load()
     debug1 = ""
     debug2 = ""
     
-    local flags = {fullscreen=false, resizable=true, vsync=false, minwidth=400, minheight=300}
+    local flags = {fullscreen=true, resizable=true, vsync=false, minwidth=400, minheight=300}
     w, h = love.window.getDesktopDimensions(flags.display)
     local success = love.window.setMode( w, h, flags )
     
