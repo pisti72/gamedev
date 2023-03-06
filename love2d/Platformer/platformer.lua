@@ -1,6 +1,6 @@
 function love.load()
-    TITLE_TEXT = "UNTITLED GAME"
-    ITEMS_VERTICAL = 15
+    TITLE_TEXT = "TASTE MY SWORD"
+    
     
     TITLE = 0
     CREDITS = 1
@@ -11,56 +11,71 @@ function love.load()
     
     
     state = TITLE
-    local flags = {fullscreen=true, resizable=true, vsync=false, minwidth=400, minheight=300}
-    w, h = love.window.getDesktopDimensions(flags.display)
-    local success = love.window.setMode(w, h, flags )
-    c=0
-    love.graphics.setDefaultFilter( 'nearest', 'nearest',1)
-    local font = love.graphics.newImageFont( 'assets/zxfont_8x8.png', ' ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789:.,!?@' )
-    love.graphics.setFont(font)
-    Tileset = love.graphics.newImage('assets/tiles_16x16.png')
-    local tilesetW, tilesetH = Tileset:getWidth(), Tileset:getHeight()
-    TileW = 16
-    Quads = {
-        love.graphics.newQuad(0, 0, TileW, TileW, tilesetW, tilesetH),
-        love.graphics.newQuad(16, 0, TileW, TileW, tilesetW, tilesetH),
-        love.graphics.newQuad(32, 0, TileW, TileW, tilesetW, tilesetH),
-    }
-    pixel = h/ITEMS_VERTICAL/TileW;
-    grid = TileW * pixel
+    
+    --c=0
+    
+    
     
     
     --https://www.bfxr.net/
+    --https://sfxr.me/
     snd_click = love.audio.newSource('snd/click.wav','static')
     snd_powerup = love.audio.newSource('snd/powerUp.wav','static')
+    snd_jump = love.audio.newSource('snd/jump.wav','static')
     
     
     
     map.loadFrom("assets/map.txt")
-    actor.add("PLAYER",1,10,3)
+
+    
+    
+    
+    
+    
+    actor.add("PLAYER", 3, 10, 3, actor.NOT_FIXED)
+    local player = actor.get("PLAYER")
+    player.debug = true;
+    player.left = 3;
+    player.right = 13;
+    --actor.snd_jump = snd_jump    
+    camera.actor = player
+    --actor.add("BLOCK",1,10,6,true)
+    --actor.get("BLOCK").debug = true;
+    --actor.GRAVITY = 0
 end
 
 function love.update(dt)
-    --w = w + 1
-    --h = h + 1
-    --pixel=pixel*1.001
+    camera.update(dt)
     actor.update(dt)
+    if state == EDITOR then
+        cursor.update()
+    end
 end
 
 function love.draw()
   love.graphics.setColor(.5, .5, .5)
   love.graphics.rectangle("fill", 0, 0, w, h)
   
-  
   map.draw()
   actor.draw()
   
   if state == TITLE then
     drawTitle()
-    menu.items={"PLAY","EDITOR","CREDITS","EXIT"}
+    menu.items={"PLAY","EDITOR","PIXEL: "..pixel,"CREDITS","EXIT"}
     menu.draw()
   elseif state == EDITOR then
     cursor.draw()
+  elseif state == CREDITS then
+    local credits={
+        "--- C R E D I T S ---",
+        "     PROGRAMMING",
+        "  ISTVAN SZALONTAI",
+        "",
+        " ARTWORK AND LEVELS",
+        " SZABOLCS SZALONTAI"}
+    for i=1,#credits do
+        love.graphics.print(credits[i], w/3, h/3+(i-1)*grid, 0 , pixel)
+    end
   end
 end
 
@@ -72,12 +87,27 @@ function love.keypressed(key,scancode,isrepeat)
     elseif key == "up" then
         menu.move(-1)
         snd_click:play()
+    elseif key == "left" then
+        if menu.getId() == 3 then
+            pixel = pixel - 1
+            if pixel < 1 then
+                pixel = 1
+            end
+            grid = TileW * pixel
+        end
+    elseif key == "right" then
+        if menu.getId() == 3 then
+            pixel = pixel + 1
+            if pixel > MAX_PIXEL then
+                pixel = MAX_PIXEL
+            end
+            grid = TileW * pixel
+        end
     elseif key == "return" then
         snd_powerup:play()
         if menu.getText() == "PLAY" then
             state = GAME
         elseif menu.getText() == "EDITOR" then
-            cursor.position(0,0)
             state = EDITOR
         elseif menu.getText() == "CREDITS" then
             state = CREDITS
@@ -86,55 +116,75 @@ function love.keypressed(key,scancode,isrepeat)
         end
     end
   elseif state == EDITOR then
-    if key == "down" then
-        cursor.move(0,1)
-    elseif key == "up" then
-        cursor.move(0,-1)
-    elseif key == "left" then
-        cursor.move(-1,0)
-    elseif key == "right" then
-        cursor.move(1,0)
+    if key == "a" then
+        cursor.previous_item()
+    elseif key == "d" then
+        cursor.next_item()
     elseif key == "return" then
-        map.set("B",cursor.x,cursor.y)
+        cursor.put()
     elseif key == "delete" then
-        map.set(" ",cursor.x,cursor.y)
+        cursor.delete()
     end
-  elseif state == GAME then
-    if key == "down" then
-        --player.move(0,1)
-    elseif key == "up" then
-        actor.jump("PLAYER")
-    end
-    
-    if key == "left" then
-        actor.left("PLAYER")
-    elseif key == "right" then
-        actor.right("PLAYER")
-    end
-    
+  elseif state == CREDITS then
     if key == "return" then
-        --map.set("B",cursor.x,cursor.y)
+        snd_powerup:play()
+        state = TITLE
     end
   end
   
+  if state == GAME or state == EDITOR then
+    if key == "down" then
+        actor.get("PLAYER").down_pressed = true
+    end
+    if key == "up" then
+        actor.get("PLAYER").up_pressed = true
+    end
+    
+    if key == "left" then
+        actor.get("PLAYER").left_pressed = true
+    end
+    if key == "right" then
+        actor.get("PLAYER").right_pressed = true
+    end
+    
+    if key == "return" then
+        actor.get("PLAYER").fire_pressed = true
+    end
+  end
+  
+  
+  
   if key == "escape" then
-    if state == CREDITS or state == EDITOR or state == GAME then
+    if state == CREDITS or state == GAME or state == EDITOR then
+        if state == EDITOR then
+            map.saveTo("map2.txt")
+        end
         state = TITLE
     else
+        --print ('Exiting')
         love.event.quit()
     end
   end
 end
 
 function love.keyreleased(key,scancode,isrepeat)
-    if state == GAME then
-        if key == "left" or key == "right" then
-            actor.stop("PLAYER")
+    if state == GAME or state == EDITOR then
+        if key == "left" then
+            actor.get("PLAYER").left_pressed = false
+        end
+        if key == "right" then
+            actor.get("PLAYER").right_pressed = false
+        end
+        if key == "up" then
+            actor.get("PLAYER").up_pressed = false
+        end
+        if key == "down" then
+            actor.get("PLAYER").down_pressed = false
         end
     end
 end
 
 function drawTitle(items)
-    love.graphics.setColor(1, 1, 0)
+   love.graphics.setColor(1, 1, 0)
    love.graphics.print(TITLE_TEXT, w/3, h/2+(-1)*TileW*pixel, 0 , pixel)
 end

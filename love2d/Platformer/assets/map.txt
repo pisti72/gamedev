@@ -1,9 +1,19 @@
-B
-BB
-BBB
-BBBB  B
-BBBBBBB
-BBBBBCBB
-BBBBBCBBB
-BBBBBBBBB                     B
-BBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBB
+ BBB                                
+B   B                               
+BBBBB                               
+B   B                               
+B   B                 B             
+                      B             
+BBBBBCBBB             B             
+BBBBBBBBB             B       B     
+BBBBBBBBBBBBBBBBBBB  BBBBB  BBBBBBBB
+             B    B  B  B   B       
+             B       B  BB  B       
+             B       B  B   B       
+             B       B  B  BB       
+             B    BBBB  B   B       
+             B          B   B       
+             B          BB  BB      
+             B               B      
+             B               B      
+             BBBBBBBBBBBBBBBBB      
