@@ -12,7 +12,8 @@ function love.load()
     
     state = TITLE
     
-    --c=0
+    c1=0
+    c2=0
     
     
     
@@ -23,7 +24,7 @@ function love.load()
     snd_powerup = love.audio.newSource('snd/powerUp.wav','static')
     snd_jump = love.audio.newSource('snd/jump.wav','static')
     
-    
+    --love.window.setVSync( 1 )
     
     map.loadFrom("assets/map.txt")
 
@@ -34,9 +35,11 @@ function love.load()
     
     actor.add("PLAYER", 3, 10, 3, actor.NOT_FIXED)
     local player = actor.get("PLAYER")
-    player.debug = true;
-    player.left = 3;
-    player.right = 13;
+    player.debug = true
+    player.left = 3
+    player.right = 13
+    player.idle = {5,6,7,8,9,10}
+    player.running = {11,12,13,14}
     --actor.snd_jump = snd_jump    
     camera.actor = player
     --actor.add("BLOCK",1,10,6,true)
@@ -45,6 +48,7 @@ function love.load()
 end
 
 function love.update(dt)
+    c1=c1+1
     camera.update(dt)
     actor.update(dt)
     if state == EDITOR then
@@ -53,11 +57,13 @@ function love.update(dt)
 end
 
 function love.draw()
+  c2 = c2 + 1
   love.graphics.setColor(.5, .5, .5)
   love.graphics.rectangle("fill", 0, 0, w, h)
   
   map.draw()
   actor.draw()
+  debug_display.draw({{"FPS",love.timer.getFPS( )},{"COUNTER",c1},{"YD",actor.get("PLAYER").yd}})
   
   if state == TITLE then
     drawTitle()
@@ -68,6 +74,7 @@ function love.draw()
   elseif state == CREDITS then
     local credits={
         "--- C R E D I T S ---",
+        "",
         "     PROGRAMMING",
         "  ISTVAN SZALONTAI",
         "",
@@ -89,7 +96,7 @@ function love.keypressed(key,scancode,isrepeat)
         snd_click:play()
     elseif key == "left" then
         if menu.getId() == 3 then
-            pixel = pixel - 1
+            pixel = pixel - .1
             if pixel < 1 then
                 pixel = 1
             end
@@ -97,7 +104,7 @@ function love.keypressed(key,scancode,isrepeat)
         end
     elseif key == "right" then
         if menu.getId() == 3 then
-            pixel = pixel + 1
+            pixel = pixel + .1
             if pixel > MAX_PIXEL then
                 pixel = MAX_PIXEL
             end
@@ -185,6 +192,9 @@ function love.keyreleased(key,scancode,isrepeat)
 end
 
 function drawTitle(items)
-   love.graphics.setColor(1, 1, 0)
-   love.graphics.print(TITLE_TEXT, w/3, h/2+(-1)*TileW*pixel, 0 , pixel)
+   --love.graphics.setColor(1, 1, 0)
+   --love.graphics.print(TITLE_TEXT, w/3, h/2+(-1)*TileW*pixel, 0 , pixel)
+   love.graphics.setColor(1, 1, 1)
+   --love.graphics.rectangle("fill", 40*pixel, 40*pixel, 240*pixel, 80*pixel)
+   love.graphics.draw(title_gfx, 40*pixel, 40*pixel, 0, pixel, pixel)
 end

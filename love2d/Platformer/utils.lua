@@ -1,37 +1,58 @@
 flr = math.floor
 abs = math.abs
 ITEMS_VERTICAL = 15
-DEBUG = true
+--DEBUG = false
 MAX_PIXEL = 8
 
-local flags = {fullscreen=true, resizable=true, vsync=false, minwidth=400, minheight=300}
+
+
+local flags = {fullscreen=true, resizable=true, vsync=true, minwidth=400, minheight=300}
 w, h = love.window.getDesktopDimensions(flags.display)
 local success = love.window.setMode(w, h, flags )
 love.graphics.setDefaultFilter( 'nearest', 'nearest',1)
 local font = love.graphics.newImageFont( 'assets/retro_font.png', ' ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789:.,!?@>-' )
 love.graphics.setFont(font)
 Tileset = love.graphics.newImage('assets/tiles_16x16.png')
+--[https://www.dafont.com/de/chomsky.font?text=Taste+My+Sword]
+title_gfx = love.graphics.newImage('assets/title_240x40.png')
 local tilesetW, tilesetH = Tileset:getWidth(), Tileset:getHeight()
 TileW = 16
 pixel = flr(h/ITEMS_VERTICAL/TileW);
 grid = TileW * pixel
 
+Blocks={
+}
+
 Quads = {
-        love.graphics.newQuad(0, 0, TileW, TileW, tilesetW, tilesetH),
-        love.graphics.newQuad(TileW, 0, TileW, TileW, tilesetW, tilesetH),
-        love.graphics.newQuad(TileW *2, 0, TileW, TileW, tilesetW, tilesetH),
+        love.graphics.newQuad(TileW * 0, TileW * 0, TileW, TileW, tilesetW, tilesetH),
+        love.graphics.newQuad(TileW * 1, TileW * 0, TileW, TileW, tilesetW, tilesetH),
+        love.graphics.newQuad(TileW * 2, TileW * 0, TileW, TileW, tilesetW, tilesetH),
+        love.graphics.newQuad(TileW * 3, TileW * 0, TileW, TileW, tilesetW, tilesetH),
+        
+        love.graphics.newQuad(TileW * 4, TileW * 1, TileW, TileW, tilesetW, tilesetH),
+        love.graphics.newQuad(TileW * 5, TileW * 1, TileW, TileW, tilesetW, tilesetH),
+        love.graphics.newQuad(TileW * 6, TileW * 1, TileW, TileW, tilesetW, tilesetH),
+        love.graphics.newQuad(TileW * 7, TileW * 1, TileW, TileW, tilesetW, tilesetH),
+        love.graphics.newQuad(TileW * 8, TileW * 1, TileW, TileW, tilesetW, tilesetH),
+        love.graphics.newQuad(TileW * 9, TileW * 1, TileW, TileW, tilesetW, tilesetH),
+        
+        love.graphics.newQuad(TileW * 4, TileW * 2, TileW, TileW, tilesetW, tilesetH),
+        love.graphics.newQuad(TileW * 5, TileW * 2, TileW, TileW, tilesetW, tilesetH),
+        love.graphics.newQuad(TileW * 6, TileW * 2, TileW, TileW, tilesetW, tilesetH),
+        love.graphics.newQuad(TileW * 7, TileW * 2, TileW, TileW, tilesetW, tilesetH),
     }
     
 
 actor={
     NOT_FIXED = false,
     FIXED = true,
-    GRAVITY = 1.2,
-    --GRAVITY = .005,
-    JUMPFORCE = 180,
-    --JUMPFORCE = .6,
-    SPEED = 100,
-    --SPEED = .400,
+    --GRAVITY = 1.2,
+    GRAVITY = .2,
+    --JUMPFORCE = 180,
+    JUMPFORCE = 4.1,
+    --SPEED = 100,
+    SPEED = 2.5,
+    FALL_LIMIT = 3,
     items={},
     add = function(name,id,x,y,fixed)
         local item = {
@@ -41,6 +62,7 @@ actor={
             y = y * TileW,
             xd = 0,
             yd = 0,
+            counter = 0, 
             flip = false,
             live = true,
             fixed = fixed,
@@ -52,6 +74,7 @@ actor={
             fire_pressed = false,
             isonground = false,
             snd_jump = {},
+            idle = {},
             left = 0,
             jumpforce = actor.JUMPFORCE,
             debug = false
@@ -61,18 +84,20 @@ actor={
     draw = function()
         love.graphics.setColor(1, 1, 1)
         for i,v  in pairs(actor.items) do
+            v.counter = v.counter + 1
             local x = pixel * flr(v.x - camera.x)
             local y = pixel * flr(v.y - camera.y)
+            local quad = v.idle[flr(v.counter/6)%#v.idle + 1]
+            if v.xd>0 or v.xd<0 then
+                quad = v.running[flr(v.counter/6)%#v.running + 1]
+            end
             if v.flip then
-                love.graphics.draw(Tileset, Quads[v.id], x + grid, y, 0, -pixel, pixel)
+                love.graphics.draw(Tileset, Quads[quad], x + grid, y, 0, -pixel, pixel)
             else
-                love.graphics.draw(Tileset, Quads[v.id], x, y, 0, pixel, pixel)
+                love.graphics.draw(Tileset, Quads[quad], x, y, 0, pixel, pixel)
             end
             
-            if v.debug then
-                love.graphics.print("FPS:"..tostring(love.timer.getFPS( )), 8 * pixel, 8 * pixel, 0, pixel)
-                love.graphics.print("MAP.H:"..tostring(map.h), 8 * pixel, 16 * pixel, 0, pixel)
-                love.graphics.print("CAMERA:"..tostring(camera.get().x), 8 * pixel, 24 * pixel, 0, pixel)
+            if debug_display.on and v.debug then
                 love.graphics.print(flr(v.x/TileW)..","..flr(v.y/TileW), x, y-TileW*pixel/2, 0 , pixel)
                 if v.overlapped then
                     love.graphics.setColor(1, .5, .5, .5)
@@ -101,6 +126,7 @@ actor={
         end
     end,
     update = function(dt)
+        dt = 1
         for i,v  in pairs(actor.items) do
             --v.onthefloor = false
             v.overlapped = false
@@ -121,33 +147,48 @@ actor={
             end
             
             v.yd = v.yd + actor.GRAVITY
+            
+            
             --moves
             if not v.fixed then
                 v.x = v.x + dt * v.xd
                 v.y = v.y + dt * v.yd
                 --v.x = v.x + v.xd
                 --v.y = v.y + v.yd
+                if v.yd > actor.FALL_LIMIT then
+                    v.yd = actor.FALL_LIMIT
+                end
+                
             end
             --collition with map
+            
+            if map.get(flr((v.x+v.left)/TileW),flr((v.y+TileW-4)/TileW)) == "B" and v.xd<0 then
+                v.x = v.x - dt * v.xd
+                --v.x = v.x - v.xd
+                v.xd = 0 --Bug
+            end
+            
+            if map.get(flr((v.x+v.right)/TileW),flr((v.y+TileW-4)/TileW)) == "B" and v.xd>0 then
+                v.x = v.x - dt * v.xd
+                --v.x = v.x - v.xd
+                v.xd = 0 --Bug
+            end
+            
+            
             v.isonground = false
-            if map.get(flr(v.x/TileW+0.5),flr((v.y+TileW-1)/TileW)) == "B" and v.yd>0 then
+            if (map.get(flr((v.x+v.left)/TileW),flr((v.y+TileW-1)/TileW)) == "B" or map.get(flr((v.x+v.right)/TileW),flr((v.y+TileW-1)/TileW))== "B") and v.yd>0 then
                 v.y = v.y - dt * v.yd
                 --v.y = v.y - v.yd
                 v.yd = 0 --Bug
                 v.isonground = true
             end
             
-            if map.get(flr((v.x+v.left)/TileW),flr((v.y+TileW-1)/TileW)) == "B" and v.xd<0 then
-                v.x = v.x - dt * v.xd
-                --v.x = v.x - v.xd
-                v.xd = 0 --Bug
+            if (map.get(flr((v.x+TileW/2)/TileW),flr((v.y+4)/TileW)) == "B") and v.yd<0 then
+                v.y = v.y - dt * v.yd
+                --v.y = v.y - v.yd
+                v.yd = 0 --Bug
             end
             
-            if map.get(flr((v.x+v.right)/TileW),flr((v.y+TileW-1)/TileW)) == "B" and v.xd>0 then
-                v.x = v.x - dt * v.xd
-                --v.x = v.x - v.xd
-                v.xd = 0 --Bug
-            end
             
             
             
@@ -226,7 +267,7 @@ menu={
 
 map={
     data = {},
-    quads = "BCD",
+    quads = "BCDE",
     w = 0,
     h = 0,
     loadFrom = function(filename)
@@ -284,11 +325,15 @@ map={
     set = function (id,x,y)
         local x = flr(x)
         local y = flr(y)
-        if x > map.w + 1 then
+        if x < 0 then
+            return
+        elseif x > map.w + 1 then
             map.w = x
             map.normalizing()
         end
-        if y > #map.data-1 then
+        if y < 0 then
+            return
+        elseif y > #map.data-1 then
             for i=1,y-#map.data+1 do
                 local row = {}
                 for j=1,map.w+1 do
@@ -313,9 +358,19 @@ map={
         love.graphics.setColor(1, 1, 1)
         for j=0,map.h-1 do
             for i=0,map.w-1 do
-                local quad_id = string.find(map.quads, map.get(i,j))
-                if not (quad_id == nil) then
-                    love.graphics.draw(Tileset, Quads[quad_id], grid * i - camera.get().x * pixel, grid * j - camera.get().y * pixel, 0, pixel, pixel)
+                local item = map.get(i,j)
+                local item_above = map.get(i,j-1)
+                local item_below = map.get(i,j+1)
+                local quad_id = string.find(map.quads, item)
+                --if not (quad_id == nil) then
+                if item == "B" then
+                    local quad = Quads[2]
+                    if not(item_above=="B") then
+                        quad = Quads[1]
+                    elseif not(item_below=="B") then
+                        quad = Quads[4]
+                    end
+                    love.graphics.draw(Tileset, quad, grid * i - camera.get().x * pixel, grid * j - camera.get().y * pixel, 0, pixel, pixel)
                 end
             end
         end
@@ -381,5 +436,18 @@ cursor={
         love.graphics.draw(Tileset, Quads[cursor.quad_id], x, y, 0, pixel, pixel)
         love.graphics.setColor(.5, .5, 1, .5)
         love.graphics.rectangle("fill", x, y, grid, grid)
+    end
+}
+
+debug_display = {
+    on = false,
+    draw = function(pairs_of_values)
+        if debug_display.on then
+            local pixel=2
+            local font_height=9
+            for i=1,#pairs_of_values do
+                love.graphics.print(pairs_of_values[i][1]..":"..tostring(pairs_of_values[i][2]), 8 * pixel, font_height * pixel * i, 0, pixel)
+            end
+        end
     end
 }
