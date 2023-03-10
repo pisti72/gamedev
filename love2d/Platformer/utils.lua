@@ -89,7 +89,7 @@ actor={
             local y = pixel * flr(v.y - camera.y)
             local quad = v.idle[flr(v.counter/6)%#v.idle + 1]
             if v.xd>0 or v.xd<0 then
-                quad = v.running[flr(v.counter/6)%#v.running + 1]
+                quad = v.running[flr(v.counter/4)%#v.running + 1]
             end
             if v.flip then
                 love.graphics.draw(Tileset, Quads[quad], x + grid, y, 0, -pixel, pixel)

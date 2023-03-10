@@ -25,13 +25,12 @@ function love.load()
     snd_jump = love.audio.newSource('snd/jump.wav','static')
     
     --love.window.setVSync( 1 )
-    
-    map.loadFrom("assets/map.txt")
-
-    
-    
-    
-    
+    local exists = love.filesystem.getInfo( "map2.txt" )
+    if exists then
+        map.loadFrom("map2.txt")
+    else
+        map.loadFrom("assets/map.txt")
+    end
     
     actor.add("PLAYER", 3, 10, 3, actor.NOT_FIXED)
     local player = actor.get("PLAYER")
