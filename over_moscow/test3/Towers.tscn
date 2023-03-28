@@ -1,3 +1,3 @@
 [gd_scene format=2]
 
-[node name="Towers" type="Spatial"]
+[node name="Towers" type="Node3D"]

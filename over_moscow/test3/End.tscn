@@ -1,3 +1,3 @@
 [gd_scene format=2]
 
-[node name="End" type="Spatial"]
+[node name="End" type="Node3D"]

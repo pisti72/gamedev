@@ -9,7 +9,7 @@ function love.load()
     
     
     
-    
+    PIXEL_STEPS = 1
     state = TITLE
     
     c1=0
@@ -34,7 +34,6 @@ function love.load()
     
     actor.add("PLAYER", 3, 10, 3, actor.NOT_FIXED)
     local player = actor.get("PLAYER")
-    player.debug = true
     player.left = 3
     player.right = 13
     player.idle = {5,6,7,8,9,10}
@@ -95,7 +94,7 @@ function love.keypressed(key,scancode,isrepeat)
         snd_click:play()
     elseif key == "left" then
         if menu.getId() == 3 then
-            pixel = pixel - .1
+            pixel = pixel - PIXEL_STEPS
             if pixel < 1 then
                 pixel = 1
             end
@@ -103,7 +102,7 @@ function love.keypressed(key,scancode,isrepeat)
         end
     elseif key == "right" then
         if menu.getId() == 3 then
-            pixel = pixel + .1
+            pixel = pixel + PIXEL_STEPS
             if pixel > MAX_PIXEL then
                 pixel = MAX_PIXEL
             end
@@ -139,21 +138,21 @@ function love.keypressed(key,scancode,isrepeat)
   end
   
   if state == GAME or state == EDITOR then
-    if key == "down" then
+    if key == "down" or key == "s" then
         actor.get("PLAYER").down_pressed = true
     end
-    if key == "up" then
+    if key == "up" or key == "w" then
         actor.get("PLAYER").up_pressed = true
     end
     
-    if key == "left" then
+    if key == "left" or or key == "a" then
         actor.get("PLAYER").left_pressed = true
     end
-    if key == "right" then
+    if key == "right" or key == "d" then
         actor.get("PLAYER").right_pressed = true
     end
     
-    if key == "return" then
+    if key == "return" or key == " " then
         actor.get("PLAYER").fire_pressed = true
     end
   end

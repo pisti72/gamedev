@@ -1,6 +1,6 @@
 flr = math.floor
 abs = math.abs
-ITEMS_VERTICAL = 15
+ITEMS_VERTICAL = 20
 --DEBUG = false
 MAX_PIXEL = 8
 
@@ -50,6 +50,7 @@ actor={
     GRAVITY = .2,
     --JUMPFORCE = 180,
     JUMPFORCE = 4.1,
+    RUNFORCE = .1,
     --SPEED = 100,
     SPEED = 2.5,
     FALL_LIMIT = 3,
@@ -62,7 +63,9 @@ actor={
             y = y * TileW,
             xd = 0,
             yd = 0,
-            counter = 0, 
+            counter = 0,
+            friction = .95,
+            xforce = 0,
             flip = false,
             live = true,
             fixed = fixed,
@@ -76,8 +79,8 @@ actor={
             snd_jump = {},
             idle = {},
             left = 0,
-            jumpforce = actor.JUMPFORCE,
-            debug = false
+            runforce = actor.RUNFORCE,
+            jumpforce = actor.JUMPFORCE
         }
         table.insert(actor.items, item)
     end,
@@ -88,7 +91,7 @@ actor={
             local x = pixel * flr(v.x - camera.x)
             local y = pixel * flr(v.y - camera.y)
             local quad = v.idle[flr(v.counter/6)%#v.idle + 1]
-            if v.xd>0 or v.xd<0 then
+            if abs(v.xd)>0.1 then
                 quad = v.running[flr(v.counter/4)%#v.running + 1]
             end
             if v.flip then
@@ -97,7 +100,7 @@ actor={
                 love.graphics.draw(Tileset, Quads[quad], x, y, 0, pixel, pixel)
             end
             
-            if debug_display.on and v.debug then
+            if debug_display.on then
                 love.graphics.print(flr(v.x/TileW)..","..flr(v.y/TileW), x, y-TileW*pixel/2, 0 , pixel)
                 if v.overlapped then
                     love.graphics.setColor(1, .5, .5, .5)
@@ -131,12 +134,14 @@ actor={
             --v.onthefloor = false
             v.overlapped = false
             --forces
-            v.xd = 0
+            v.xforce = 0
             if v.left_pressed then
-                v.xd = -actor.SPEED
+                --v.xd = -actor.SPEED
+                v.xforce = -v.runforce
                 v.flip = true
             elseif v.right_pressed then
-                v.xd = actor.SPEED
+                v.xforce = v.runforce
+                --v.xd = actor.SPEED
                 v.flip = false
             end
             
@@ -147,17 +152,34 @@ actor={
             end
             
             v.yd = v.yd + actor.GRAVITY
+            v.xd = v.xd + v.xforce
+            v.xd = v.xd * v.friction
+            if v.xd > actor.SPEED then
+                v.xd = actor.SPEED
+            end
             
+            if v.xd < -actor.SPEED then
+                v.xd = -actor.SPEED
+            end
             
+            if v.yd > actor.FALL_LIMIT then
+                v.yd = actor.FALL_LIMIT
+            end
+            
+            if v.xd>0 then
+                v.flip = false
+            end
+            
+            if v.xd<0 then
+                v.flip = true
+            end
             --moves
             if not v.fixed then
                 v.x = v.x + dt * v.xd
                 v.y = v.y + dt * v.yd
                 --v.x = v.x + v.xd
                 --v.y = v.y + v.yd
-                if v.yd > actor.FALL_LIMIT then
-                    v.yd = actor.FALL_LIMIT
-                end
+                
                 
             end
             --collition with map
