@@ -17,6 +17,7 @@ Tileset = love.graphics.newImage('assets/tiles_16x16.png')
 title_gfx = love.graphics.newImage('assets/title_240x40.png')
 local tilesetW, tilesetH = Tileset:getWidth(), Tileset:getHeight()
 TileW = 16
+Tile24 = 24
 pixel = flr(h/ITEMS_VERTICAL/TileW);
 grid = TileW * pixel
 
@@ -28,18 +29,18 @@ Quads = {
         love.graphics.newQuad(TileW * 1, TileW * 0, TileW, TileW, tilesetW, tilesetH),
         love.graphics.newQuad(TileW * 2, TileW * 0, TileW, TileW, tilesetW, tilesetH),
         love.graphics.newQuad(TileW * 3, TileW * 0, TileW, TileW, tilesetW, tilesetH),
-        
-        love.graphics.newQuad(TileW * 4, TileW * 1, TileW, TileW, tilesetW, tilesetH),
-        love.graphics.newQuad(TileW * 5, TileW * 1, TileW, TileW, tilesetW, tilesetH),
-        love.graphics.newQuad(TileW * 6, TileW * 1, TileW, TileW, tilesetW, tilesetH),
-        love.graphics.newQuad(TileW * 7, TileW * 1, TileW, TileW, tilesetW, tilesetH),
-        love.graphics.newQuad(TileW * 8, TileW * 1, TileW, TileW, tilesetW, tilesetH),
-        love.graphics.newQuad(TileW * 9, TileW * 1, TileW, TileW, tilesetW, tilesetH),
-        
-        love.graphics.newQuad(TileW * 4, TileW * 2, TileW, TileW, tilesetW, tilesetH),
-        love.graphics.newQuad(TileW * 5, TileW * 2, TileW, TileW, tilesetW, tilesetH),
-        love.graphics.newQuad(TileW * 6, TileW * 2, TileW, TileW, tilesetW, tilesetH),
-        love.graphics.newQuad(TileW * 7, TileW * 2, TileW, TileW, tilesetW, tilesetH),
+        --knight idle
+        love.graphics.newQuad(TileW * 4 + Tile24*0, TileW, Tile24, Tile24, tilesetW, tilesetH),
+        love.graphics.newQuad(TileW * 4 + Tile24*1, TileW, Tile24, Tile24, tilesetW, tilesetH),
+        love.graphics.newQuad(TileW * 4 + Tile24*2, TileW, Tile24, Tile24, tilesetW, tilesetH),
+        love.graphics.newQuad(TileW * 4 + Tile24*3, TileW, Tile24, Tile24, tilesetW, tilesetH),
+        love.graphics.newQuad(TileW * 4 + Tile24*4, TileW, Tile24, Tile24, tilesetW, tilesetH),
+        love.graphics.newQuad(TileW * 4 + Tile24*5, TileW, Tile24, Tile24, tilesetW, tilesetH),
+        --knight running
+        love.graphics.newQuad(TileW * 4 + Tile24*0, TileW + Tile24, Tile24, Tile24, tilesetW, tilesetH),
+        love.graphics.newQuad(TileW * 4 + Tile24*1, TileW + Tile24, Tile24, Tile24, tilesetW, tilesetH),
+        love.graphics.newQuad(TileW * 4 + Tile24*2, TileW + Tile24, Tile24, Tile24, tilesetW, tilesetH),
+        love.graphics.newQuad(TileW * 4 + Tile24*3, TileW + Tile24, Tile24, Tile24, tilesetW, tilesetH),
     }
     
 
@@ -92,7 +93,7 @@ actor={
             local y = pixel * flr(v.y - camera.y)
             local quad = v.idle[flr(v.counter/6)%#v.idle + 1]
             if abs(v.xd)>0.1 then
-                quad = v.running[flr(v.counter/4)%#v.running + 1]
+                quad = v.running[flr(v.counter/5)%#v.running + 1]
             end
             if v.flip then
                 love.graphics.draw(Tileset, Quads[quad], x + grid, y, 0, -pixel, pixel)
@@ -184,13 +185,13 @@ actor={
             end
             --collition with map
             
-            if map.get(flr((v.x+v.left)/TileW),flr((v.y+TileW-4)/TileW)) == "B" and v.xd<0 then
+            if map.get(flr((v.x+v.left)/TileW),flr((v.y+v.bottom-4)/TileW)) == "B" and v.xd<0 then
                 v.x = v.x - dt * v.xd
                 --v.x = v.x - v.xd
                 v.xd = 0 --Bug
             end
             
-            if map.get(flr((v.x+v.right)/TileW),flr((v.y+TileW-4)/TileW)) == "B" and v.xd>0 then
+            if map.get(flr((v.x+v.right)/TileW),flr((v.y+v.bottom-4)/TileW)) == "B" and v.xd>0 then
                 v.x = v.x - dt * v.xd
                 --v.x = v.x - v.xd
                 v.xd = 0 --Bug
@@ -198,14 +199,15 @@ actor={
             
             
             v.isonground = false
-            if (map.get(flr((v.x+v.left)/TileW),flr((v.y+TileW-1)/TileW)) == "B" or map.get(flr((v.x+v.right)/TileW),flr((v.y+TileW-1)/TileW))== "B") and v.yd>0 then
+            if (map.get(flr((v.x+v.left)/TileW),flr((v.y+v.bottom)/TileW)) == "B" or 
+              map.get(flr((v.x+v.right)/TileW),flr((v.y+v.bottom)/TileW))== "B") and v.yd>0 then
                 v.y = v.y - dt * v.yd
                 --v.y = v.y - v.yd
                 v.yd = 0 --Bug
                 v.isonground = true
             end
             
-            if (map.get(flr((v.x+TileW/2)/TileW),flr((v.y+4)/TileW)) == "B") and v.yd<0 then
+            if (map.get(flr((v.x+Tile24/2)/TileW),flr((v.y+v.top)/TileW)) == "B") and v.yd<0 then
                 v.y = v.y - dt * v.yd
                 --v.y = v.y - v.yd
                 v.yd = 0 --Bug

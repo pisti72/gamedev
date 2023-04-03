@@ -36,6 +36,8 @@ function love.load()
     local player = actor.get("PLAYER")
     player.left = 3
     player.right = 13
+    player.bottom = 23
+    player.top = 12
     player.idle = {5,6,7,8,9,10}
     player.running = {11,12,13,14}
     --actor.snd_jump = snd_jump    
@@ -145,7 +147,7 @@ function love.keypressed(key,scancode,isrepeat)
         actor.get("PLAYER").up_pressed = true
     end
     
-    if key == "left" or or key == "a" then
+    if key == "left" or key == "a" then
         actor.get("PLAYER").left_pressed = true
     end
     if key == "right" or key == "d" then
