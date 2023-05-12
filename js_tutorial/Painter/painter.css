@@ -1,0 +1,14 @@
+html,body{
+    height:99%;
+    margin:0;
+    background-color:#DDD;}
+#canvas{
+    position:fixed;
+    left:124px;
+    top:124px;
+    border-radius:25px;
+}
+#etch{
+    position:fixed;
+    left:0px;
+}

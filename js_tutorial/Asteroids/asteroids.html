@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+	<meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+	<title>Asteroids</title>
+	<link rel="stylesheet" href="asteroids.css">
+</head>
+
+<body onkeydown="keyPressed(event)" onkeyup="keyReleased(event)" onload="init()">
+
+	<div id="ship"></div>
+	<div id="asteroid0"></div>
+	<div id="asteroid1"></div>
+	<div id="asteroid2"></div>
+	<div id="asteroid3"></div>
+	<div id="asteroid4"></div>
+
+	<div id="shield"></div>
+	<div id="score">000000</div>
+	<div id="title">
+		<h2>asteroids</h2>
+		<p>(2019) small game ltd.</p>
+		<p>press space to play</p>
+	</div>
+	<div id="gameover">game over</div>
+    <div id="lefttouch"></div>
+    <div id="righttouch"></div>
+	<script type="text/javascript" src="asteroids.js"></script>
+</body>
+
+</html>

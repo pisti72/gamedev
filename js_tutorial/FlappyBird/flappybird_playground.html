@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Flappy Bird (debug)</title>
+    <link rel="stylesheet" href="flappybird.css">
+</head>
+<body onload="onload()">
+    <img src="assets/bird.svg" width="80px" id="bird"/>
+    <img src="assets/cloud.svg" width="250px" id="cloud"/>
+    <img src="assets/pipe_top.svg" width="128px" id="pipe_top"/>
+    <img src="assets/pipe_bottom.svg" width="128px" id="pipe_bottom"/>
+    <div id="score"></div>
+    <div id="hiscore"></div>
+    <div>
+        <input type="range" id="gap" name="gap" min="0" value="220" max="300">
+        <label for="gap">Gap</label>
+    </div>
+    <div>
+        <input type="range" id="distance" name="distance" min="200" value="450" max="600">
+        <label for="distance">Distance</label>
+    </div>
+    <div>
+        <input type="range" id="speed" name="speed" min="1" value="4" max="20">
+        <label for="speed">Speed</label>
+    </div>
+    <div>
+        <input type="range" id="gravity" name="gravity" min="1" value="2" max="10">
+        <label for="gravity">Gravity</label>
+    </div>
+    <div>
+        <input type="range" id="jump" name="jump" min="7" value="7" max="20">
+        <label for="jump">Jump force</label>
+    </div>
+    <script type="text/javascript" src="flappybird_playground.js"></script>
+</body>
+</html>

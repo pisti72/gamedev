@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Dice Roll</title>
+    <link rel="stylesheet" href="diceroll.css">
+</head>
+<body>
+    <img src="assets/dice1.svg" width="200px" id="dice1"/>
+    <img src="assets/dice2.svg" width="200px" id="dice2"/>
+    <img src="assets/dice3.svg" width="200px" id="dice3"/>
+    <img src="assets/dice4.svg" width="200px" id="dice4"/>
+    <img src="assets/dice5.svg" width="200px" id="dice5"/>
+    <img src="assets/dice6.svg" width="200px" id="dice6"/>
+    <button class="button" onclick="roll()">Roll</button>
+    <table border="">
+        <tr>
+            <td>1</td>
+            <td>2</td>
+            <td>3</td>
+            <td>4</td>
+            <td>5</td>
+            <td>6</td>
+        </tr>
+        <tr>
+            <td id="d1">0</td>
+            <td id="d2">0</td>
+            <td id="d3">0</td>
+            <td id="d4">0</td>
+            <td id="d5">0</td>
+            <td id="d6">0</td>
+        </tr>
+    </table>
+    <script type="text/javascript" src="diceroll.js"></script>
+</body>
+</html>

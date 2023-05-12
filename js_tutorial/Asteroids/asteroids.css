@@ -1,0 +1,89 @@
+html,
+body {
+    height: 100%;
+    width: 100%;
+    margin: 0px;
+}
+
+@font-face {
+    font-family: pressstart;
+    src: url("assets/PressStart2P.ttf");
+}
+
+body {
+    background-image: url("assets/beautiful-blue-stars-fill.jpg");
+    color: white;
+    font-size: 20px;
+    font-weight: bold;
+    font-family: pressstart;
+    text-transform: uppercase;
+    overflow: hidden;
+}
+
+#shield {
+    position: absolute;
+    top: 20px;
+    left: 20px;
+}
+
+#ship {
+    position: absolute;
+    width: 60px;
+    height: 60px;
+    top: 0px;
+    left: 0px;
+    background: url('assets/actors.png') 0 0;
+}
+
+#asteroid0,
+#asteroid1,
+#asteroid2,
+#asteroid3,
+#asteroid4 {
+    position: absolute;
+    width: 60px;
+    height: 60px;
+    top: 0px;
+    left: 0px;
+    background: url('assets/actors.png') -60px 0;
+}
+
+#title,
+#gameover {
+    position: absolute;
+    width: 100%;
+    padding: 200px 0;
+    text-align: center;
+    display: none;
+}
+
+#score {
+    position: absolute;
+    top: 20px;
+    right: 20px;
+    text-align: center;
+}
+
+h2 {
+    letter-spacing: 20px;
+}
+
+#lefttouch{
+    position: absolute;
+    top:0px;
+    left:0px;
+    width:50%;
+    height:100%;
+    background-color:white;
+    opacity:0;
+}
+
+#righttouch{
+    position: absolute;
+    top:0px;
+    right:0px;
+    width:50%;
+    height:100%;
+    background-color:white;
+    opacity:0;
+}

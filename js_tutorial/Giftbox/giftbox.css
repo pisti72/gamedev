@@ -1,0 +1,21 @@
+html,body{
+    height:99%;
+    margin:0px;
+    background-color:floralwhite;
+}
+.box{
+    position:absolute;
+    cursor:pointer;
+    display:none;
+}
+#ps5{
+    position:absolute;
+}
+#winner{
+    position:absolute;
+    left:700px;
+    top:100px;
+    z-index:500;
+    cursor:pointer;
+    display:none;
+}

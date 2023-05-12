@@ -1,0 +1,14 @@
+#nap {
+    text-align: center;
+    padding: 10%;
+}
+
+body {
+    background-color: lavender;
+    color: navy;
+    font-family: Arial, Helvetica, sans-serif;
+}
+
+h1 {
+    font-size: 6vw;
+}

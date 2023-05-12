@@ -1,0 +1,19 @@
+html,body{height:99%;margin:0;}
+#bird,#cloud,#pipe_top,#pipe_bottom{
+    position:fixed;
+}
+body{
+    background-color:#9DD;
+    font-family:sans-serif;
+}
+#score,#hiscore{
+    font-size:60px;
+    position:absolute;
+    left:30%;
+    color:white;
+    z-index:9999;
+    text-shadow: -2px -2px 0 #222, 2px -2px 0 #222, -2px 2px 0 #222, 2px 2px 0 #222;
+}
+#hiscore{
+    left:60%;
+}
