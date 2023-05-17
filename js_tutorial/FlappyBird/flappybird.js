@@ -1,10 +1,3 @@
-let cloud_img = document.getElementById("cloud");
-let bird_img = document.getElementById("bird");
-let pipe_bottom_img = document.getElementById("pipe_bottom");
-let pipe_top_img = document.getElementById("pipe_top");
-let pipes = [];
-let clouds = [];
-
 const GRAVITY = 0.2;
 const JUMP = 7;
 const GAP = 250;/*200 - HARD, 250-EASY*/
@@ -15,6 +8,16 @@ const SPEED = 4;
 const NUMBER_OF_PIPES = 10;
 const NUMBER_OF_CLOUDS = 10;
 const PIPE_HEIGHT = 900;
+const NOWHERE = -9000;
+
+let paused = false;
+
+let cloud_img = document.getElementById("cloud");
+let bird_img = document.getElementById("bird");
+let pipe_bottom_img = document.getElementById("pipe_bottom");
+let pipe_top_img = document.getElementById("pipe_top");
+let pipes = [];
+let clouds = [];
 
 function onload() {
     w = document.body.clientWidth;
@@ -29,41 +32,111 @@ function onload() {
         hiscore:0,
         width:60,
         height:40,
+        img:bird_img,
         lives:true,
         jump:function(){
             if(this.lives){
                 this.yd = -JUMP;
                 this.pressed = true;
             }
+        },
+        update:function(){
+            this.yd += GRAVITY;
+            this.y += this.yd;
+            if(this.y > h){
+                this.y = h/4;
+                this.yd = 0;
+                this.score = 0;
+                this.lives = true;
+                this.img.style.transform = "scaleY(1)";
+                inicPipes();
+                inicClouds();
+            }
+            this.img.style.left = bird.x+"px";
+            this.img.style.top = bird.y+"px";
         }
     }
     
-    for(let i=0; i<NUMBER_OF_CLOUDS; i++){
-        let cloud = {};
-        cloud.img = cloud_img.cloneNode(); 
-        document.body.appendChild(cloud.img);
-        cloud.width = 250;
+    createClouds(NUMBER_OF_CLOUDS);
+    inicClouds();
+ 
+    createPipes(NUMBER_OF_PIPES);
+    inicPipes()
+    
+    
+    bird_img.style.zIndex = 1000;
+    update();
+}
+
+function createClouds(n){
+    for(let i=0; i<n; i++){
+        let tmp = cloud_img.cloneNode(); 
+        document.body.appendChild(tmp);
+        let cloud = {
+            x:0,
+            y:0,
+            width:tmp.width,
+            img:tmp,
+            update:function(){
+                this.x -= SPEED/2;
+                if(this.x < -this.width){
+                    let x = NOWHERE;
+                    for(let j=0;j<clouds.length;j++){
+                        if(clouds[j].x > x){
+                            x = clouds[j].x;
+                        }
+                    }
+                    this.x = x + DISTANCE_BETWEEN_CLOUDS;
+                }
+                this.img.style.left = this.x + "px";
+                this.img.style.top = this.y+ "px";
+            }
+        };   
         clouds.push(cloud); 
     }
-    inicClouds();
-    cloud_img.style.display = "none";
-    bird.img = bird_img.cloneNode();
-    document.body.appendChild(bird.img);
-    bird_img.style.display = "none";
-    
-    for(let i=0; i<NUMBER_OF_PIPES; i++){
-        let pipe = {};
-        pipe.img_bottom = pipe_bottom_img.cloneNode();
-        pipe.img_top = pipe_top_img.cloneNode();
-        document.body.appendChild(pipe.img_top);
-        document.body.appendChild(pipe.img_bottom);
-        pipe.width = 128;
+    cloud_img.remove();
+}
+
+function createPipes(n){
+    for(let i=0; i<n; i++){
+        let img_top = pipe_top_img.cloneNode();
+        let img_bottom = pipe_bottom_img.cloneNode();
+        
+        document.body.appendChild(img_top);
+        document.body.appendChild(img_bottom);
+        
+        let pipe = {
+            img_top: img_top,
+            img_bottom: img_bottom,
+            width: img_top.width,
+            update: function(){
+                this.x -= SPEED;
+                if(this.x < -this.width){
+                    let x = NOWHERE;
+                    for(let j=0;j<pipes.length;j++){
+                        if(pipes[j].x > x){
+                            x = pipes[j].x;
+                        }
+                    }
+                    this.x = x + DISTANCE_BETWEEN_PIPES;
+                    this.y = Math.random()*h/2 + h/3;
+                    if(bird.lives){
+                        bird.score++;
+                    }
+                    if(bird.score > bird.hiscore){
+                        bird.hiscore = bird.score;
+                    }
+                }
+                this.img_top.style.left = this.x + "px";
+                this.img_top.style.top = this.y-PIPE_HEIGHT-GAP + "px";
+                this.img_bottom.style.left = this.x + "px";
+                this.img_bottom.style.top = this.y + "px";
+            }
+        };
         pipes.push(pipe); 
     }
-    inicPipes()
-    pipe_top_img.style.display = "none";
-    pipe_bottom_img.style.display = "none";
-    update();
+    pipe_top_img.remove();
+    pipe_bottom_img.remove();
 }
 
 function inicPipes(){
@@ -90,6 +163,9 @@ document.addEventListener('keydown', function(event) {
     if(event.code=="Space" && !bird.pressed){
         bird.jump();
     }
+    if(event.code=="KeyP"){
+        paused = !paused;
+    }
 });
 
 document.addEventListener('mousedown', function(event) {
@@ -103,69 +179,29 @@ document.addEventListener('keyup', function(event) {
 });
 
 function update() {
-    for(let i=0;i<clouds.length;i++){
-        let cloud = clouds[i];
-        cloud.x -= SPEED/2;
-        if(cloud.x < -cloud.width){
-            let x = -9999;
-            for(let j=0;j<clouds.length;j++){
-                if(clouds[j].x > x){
-                    x = clouds[j].x;
+    if(!paused){
+        bird.update();
+        for(let i=0;i<clouds.length;i++){
+            let cloud = clouds[i];
+            cloud.update();
+        }
+        for(let i=0;i<pipes.length;i++){
+            let pipe = pipes[i];
+            pipe.update();
+            
+            //collition
+            if(bird.x+bird.width>pipe.x && bird.x < pipe.x+pipe.width && bird.lives){
+                if(bird.y+bird.height > pipe.y || bird.y < pipe.y-GAP){
+                    bird.collied = true;
+                    bird.yd = -JUMP * 1.5;
+                    bird.lives = false;
+                    bird.img.style.transform = "scaleY(-1)";
                 }
             }
-            cloud.x = x + DISTANCE_BETWEEN_CLOUDS;
-        }
-        cloud.img.style.left = cloud.x + "px";
-        cloud.img.style.top = cloud.y+ "px";
-    }
-    for(let i=0;i<pipes.length;i++){
-        let pipe = pipes[i];
-        pipe.x -= SPEED;
-        if(pipe.x < -pipe.width){
-            let x = -9999;
-            for(let j=0;j<pipes.length;j++){
-                if(pipes[j].x > x){
-                    x = pipes[j].x;
-                }
-            }
-            pipe.x = x + DISTANCE_BETWEEN_PIPES;
-            pipe.y = Math.random()*h/2 + h/3;
-            if(bird.lives){
-                bird.score++;
-            }
-            if(bird.score > bird.hiscore){
-                bird.hiscore = bird.score;
-            }
-        }
-        pipe.img_top.style.left = pipe.x + "px";
-        pipe.img_top.style.top = pipe.y-PIPE_HEIGHT-GAP + "px";
-        pipe.img_bottom.style.left = pipe.x + "px";
-        pipe.img_bottom.style.top = pipe.y + "px";
-        
-        //collition
-        if(bird.x+bird.width>pipe.x && bird.x < pipe.x+pipe.width && bird.lives){
-            if(bird.y+bird.height > pipe.y || bird.y < pipe.y-GAP){
-                bird.collied = true;
-                bird.yd = -JUMP * 1.5;
-                bird.lives = false;
-                bird.img.style.transform = "scaleY(-1)";
-            }
         }
     }
-    bird.yd = bird.yd + GRAVITY;
-    bird.y = bird.y + bird.yd;
-    if(bird.y > h){
-        bird.y = h/4;
-        bird.yd = 0;
-        bird.score = 0;
-        bird.lives = true;
-        bird.img.style.transform = "scaleY(1)";
-        inicPipes();
-        inicClouds();
-    }
-    bird.img.style.left = bird.x+"px";
-    bird.img.style.top = bird.y+"px";
-    document.getElementById("score").innerHTML = "SC:" + bird.score;
-    document.getElementById("hiscore").innerHTML = "HI:" + bird.hiscore;
+    
+    document.getElementById("score").innerHTML = bird.score;
+    document.getElementById("hiscore").innerHTML = "HI: " + bird.hiscore;
     window.requestAnimationFrame(update);
 }

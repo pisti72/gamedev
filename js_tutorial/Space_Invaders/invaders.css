@@ -7,18 +7,21 @@ html,body{
   src: url(assets/GROBOLD.ttf);
 }
 body{
-    background-color:#EEE;
+    background-color:#44D;
     font-family:grobold;
     overflow:hidden;
+    /*cursor:none;*/
 }
-#dino1,#dino2,#cactus,#floor,#cloud{
+
+#player,#laser, #ufo, #bomb, #crab{
     position:absolute;
 }
+
 #score,#hiscore{
     font-size:60px;
     position:absolute;
     left:30%;
-    color:#333;
+    color:white;
     z-index:9999;
 }
 #hiscore{

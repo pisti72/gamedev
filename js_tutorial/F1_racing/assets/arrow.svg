@@ -1,0 +1,76 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!-- Created with Inkscape (http://www.inkscape.org/) -->
+
+<svg
+   width="37mm"
+   height="48.428776mm"
+   viewBox="0 0 37 48.428776"
+   version="1.1"
+   id="svg30245"
+   inkscape:version="1.2.2 (732a01da63, 2022-12-09)"
+   sodipodi:docname="arrow.svg"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:svg="http://www.w3.org/2000/svg">
+  <sodipodi:namedview
+     id="namedview30247"
+     pagecolor="#ffffff"
+     bordercolor="#000000"
+     borderopacity="0.25"
+     inkscape:showpageshadow="2"
+     inkscape:pageopacity="0.0"
+     inkscape:pagecheckerboard="0"
+     inkscape:deskcolor="#d1d1d1"
+     inkscape:document-units="mm"
+     showgrid="false"
+     inkscape:zoom="0.73049944"
+     inkscape:cx="120.46553"
+     inkscape:cy="162.90225"
+     inkscape:window-width="2880"
+     inkscape:window-height="1514"
+     inkscape:window-x="2869"
+     inkscape:window-y="-11"
+     inkscape:window-maximized="1"
+     inkscape:current-layer="layer1" />
+  <defs
+     id="defs30242" />
+  <g
+     inkscape:label="Layer 1"
+     inkscape:groupmode="layer"
+     id="layer1"
+     transform="translate(-73.135366,-105.45147)">
+    <g
+       id="g29501"
+       transform="translate(-49.873171,-99.413158)">
+      <rect
+         style="fill:#4d4d4d;fill-opacity:1;stroke:none;stroke-width:1;stroke-dasharray:none;stroke-opacity:1"
+         id="rect28354"
+         width="34.190765"
+         height="4.5459638"
+         x="125.11004"
+         y="248.74744" />
+      <rect
+         style="fill:#999999;fill-opacity:1;stroke:#000000;stroke-width:1;stroke-dasharray:none;stroke-opacity:1"
+         id="rect27989"
+         width="7.651372"
+         height="12.767378"
+         x="137.83224"
+         y="238.68658" />
+      <rect
+         style="fill:#f2f2f2;fill-opacity:1;stroke:#000000;stroke-width:1;stroke-dasharray:none;stroke-opacity:1"
+         id="rect26791"
+         width="36"
+         height="36"
+         x="123.50854"
+         y="205.36462"
+         rx="4.7692204"
+         ry="4.0408545" />
+      <path
+         id="rect27208"
+         style="fill:#ff0000;stroke:#000000;stroke-width:0.3"
+         d="m 129.33764,209.52988 h 16.80478 l 11.64167,13.44649 -11.64167,14.44253 h -16.80478 l 11.64167,-14.80472 z"
+         sodipodi:nodetypes="ccccccc" />
+    </g>
+  </g>
+</svg>

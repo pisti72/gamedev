@@ -1,12 +1,3 @@
-let dino1_img = document.getElementById("dino1");
-let dino2_img = document.getElementById("dino2");
-let cloud_img = document.getElementById("cloud");
-let floor_img = document.getElementById("floor");
-let cactus_img = document.getElementById("cactus");
-let floors = [];
-let clouds = [];
-let cactuses = [];
-
 const SPEED = 12;
 const NUMBER_OF_FLOORS = 6;
 const NUMBER_OF_CLOUDS = 6;
@@ -17,8 +8,22 @@ const CACTUS_WIDTH = 100;
 const CLOUD_WIDTH = 500;
 const CRITICAL_DISTANCE = 60;
 
+let paused = false;
+
+let dino1_img = document.getElementById("dino1");
+let dino2_img = document.getElementById("dino2");
+let cloud_img = document.getElementById("cloud");
+let floor_img = document.getElementById("floor");
+let cactus_img = document.getElementById("cactus");
+let floors = [];
+let clouds = [];
+let cactuses = [];
+
 document.addEventListener('keydown', function(event) {
-        dino.jump();
+    dino.jump();
+    if(event.code=="KeyP"){
+        paused = !paused;
+    }
 });
 
 document.addEventListener('mousedown', function(event) {
@@ -73,6 +78,13 @@ function onload() {
             if(this.t%20>10 && this.onfloor && this.lives){
                 this.img1.style.display = "none";
                 this.img2.style.display = "block";
+            }
+            
+            if(this.y > h*4){
+                this.inic();
+                inicFloors();
+                inicClouds();
+                inicCactuses();
             }
         },
         inic:function(){
@@ -150,54 +162,56 @@ function inicCactuses() {
 }
 
 function update() {
-    for(let i=0; i<floors.length; i++){
-        let floor = floors[i];
-        floor.x -= SPEED;
-        if(floor.x < -floor.width){
-            floor.x = + (floor.width * (floors.length-1));
-        }
-        floor.img.style.left = floor.x + "px";
-        floor.img.style.top = floor.y+ "px";
-    }
-    for(let i=0; i<clouds.length; i++){
-        let cloud = clouds[i];
-        cloud.x -= SPEED/2;
-        if(cloud.x < -cloud.width){
-            cloud.x = + (cloud.width * (clouds.length-1));
-        }
-        cloud.img.style.left = cloud.x + "px";
-        cloud.img.style.top = cloud.y+ "px";
-    }
-    for(let i=0; i<cactuses.length; i++){
-        let cactus = cactuses[i];
-        cactus.x -= SPEED;
-        if(cactus.x < -cactus.width){
-            let x = 0;
-            for(let j=0;j<cactuses.length;j++){
-                if(cactuses[j].x > x){
-                    x = cactuses[j].x;
-                }
+    if(!paused){
+        dino.update();
+        
+        for(let i=0; i<floors.length; i++){
+            let floor = floors[i];
+            floor.x -= SPEED;
+            if(floor.x < -floor.width){
+                floor.x = + (floor.width * (floors.length-1));
             }
-            cactus.x = x + (4 + Math.random()*6)*CACTUS_WIDTH;
-            dino.increaseScore(1);
+            floor.img.style.left = floor.x + "px";
+            floor.img.style.top = floor.y+ "px";
         }
-        if(Math.abs(cactus.x-dino.x)<CRITICAL_DISTANCE && Math.abs(cactus.y-dino.y)<CRITICAL_DISTANCE && dino.lives){
-            dino.lives = false;
-            dino.yd = -1.5*JUMP;
-            dino.img1.style.transform = "scaleY(-1)";
-            dino.img2.style.transform = "scaleY(-1)";
+        
+        for(let i=0; i<clouds.length; i++){
+            let cloud = clouds[i];
+            cloud.x -= SPEED/2;
+            if(cloud.x < -cloud.width){
+                cloud.x = + (cloud.width * (clouds.length-1));
+            }
+            cloud.img.style.left = cloud.x + "px";
+            cloud.img.style.top = cloud.y+ "px";
         }
-        cactus.img.style.left = cactus.x + "px";
-        cactus.img.style.top = cactus.y+ "px";
+        
+        for(let i=0; i<cactuses.length; i++){
+            let cactus = cactuses[i];
+            cactus.x -= SPEED;
+            if(cactus.x < -cactus.width){
+                let x = 0;
+                for(let j=0;j<cactuses.length;j++){
+                    if(cactuses[j].x > x){
+                        x = cactuses[j].x;
+                    }
+                }
+                cactus.x = x + (4 + Math.random()*6)*CACTUS_WIDTH;
+                dino.increaseScore(1);
+            }
+            if(Math.abs(cactus.x-dino.x)<CRITICAL_DISTANCE && Math.abs(cactus.y-dino.y)<CRITICAL_DISTANCE && dino.lives){
+                dino.lives = false;
+                dino.yd = -1.5*JUMP;
+                dino.img1.style.transform = "scaleY(-1)";
+                dino.img2.style.transform = "scaleY(-1)";
+            }
+            cactus.img.style.left = cactus.x + "px";
+            cactus.img.style.top = cactus.y+ "px";
+        }
     }
+    
     document.getElementById("score").innerHTML = dino.score;
-    document.getElementById("hiscore").innerHTML = "HI:" + dino.hiscore;
-    dino.update();
-    if(dino.y > h*4){
-        dino.inic();
-        inicFloors();
-        inicClouds();
-        inicCactuses();
-    }
+    document.getElementById("hiscore").innerHTML = "HI: " + dino.hiscore;
+    
+    
     window.requestAnimationFrame(update);
 }

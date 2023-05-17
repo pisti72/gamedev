@@ -1,10 +1,18 @@
-html,body{height:99%;margin:0;}
+html,body{
+    height:100%;
+    margin:0;
+}
+@font-face {
+  font-family: grobold;/* https://www.dafont.com/grobold.font */
+  src: url(assets/GROBOLD.ttf);
+}
 #bird,#cloud,#pipe_top,#pipe_bottom{
     position:fixed;
 }
 body{
     background-color:#9DD;
-    font-family:sans-serif;
+    font-family:grobold;
+    overflow:hidden;
 }
 #score,#hiscore{
     font-size:60px;

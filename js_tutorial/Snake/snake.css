@@ -11,14 +11,16 @@ body{
     font-family:grobold;
     overflow:hidden;
 }
-#dino1,#dino2,#cactus,#floor,#cloud{
+
+#head,#apple, #segment{
     position:absolute;
 }
+
 #score,#hiscore{
     font-size:60px;
     position:absolute;
     left:30%;
-    color:#333;
+    color:black;
     z-index:9999;
 }
 #hiscore{

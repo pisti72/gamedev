@@ -72,7 +72,7 @@ function update() {
     }
     
     ctx.drawImage(bucket_image, bucket.x, bucket.y);
-    ctx.font = "30px Arial";
+    ctx.font = "30px grobold";
     ctx.fillStyle = "blue";
     ctx.fillText(bucket.score,WIDTH/2-20,50)
     window.requestAnimationFrame(update);

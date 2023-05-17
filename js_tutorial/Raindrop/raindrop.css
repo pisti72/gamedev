@@ -1,3 +1,7 @@
+@font-face {
+  font-family: grobold;/* https://www.dafont.com/grobold.font */
+  src: url(assets/GROBOLD.ttf);
+}
 body{
     background-color:#EEE;
 }

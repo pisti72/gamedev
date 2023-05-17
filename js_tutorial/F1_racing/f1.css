@@ -1,0 +1,42 @@
+html,body{
+    height:100%;
+    margin:0;
+}
+@font-face {
+  font-family: upheaval;/* https://www.dafont.com/upheaval.font */
+  src: url(assets/upheavtt.ttf);
+}
+body{
+    background-color:green;
+    font-family:upheaval;
+    overflow:hidden;
+}
+
+#skybox{
+    top:0;
+    left:0;
+    width:100%;
+    height:50%;
+    position:absolute;
+    background-color:cyan;
+}
+
+#tree, #car, #arrow, #floor1, #floor2{
+    position:absolute;
+}
+
+#score,#hiscore,#speed{
+    font-size:60px;
+    position:absolute;
+    left:50%;
+    color:#444;
+    z-index:9999;
+}
+
+#speed{
+    left:10%;
+}
+
+#hiscore{
+    left:80%;
+}

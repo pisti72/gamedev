@@ -1,8 +1,16 @@
 html,body{
     height:100%;
     margin:0px;
-    background-color:floralwhite;
 }
 body{
     overflow:hidden;
+    background-color:floralwhite;
+}
+#ball{
+    width:100px;
+    height:100px;
+    position:absolute;
+    background-color: red;
+    border:5px solid navy;
+    border-radius:55px;
 }

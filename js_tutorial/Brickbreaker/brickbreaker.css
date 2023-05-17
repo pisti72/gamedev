@@ -1,0 +1,60 @@
+html,body{
+    height:100%;
+    margin:0;
+}
+@font-face {
+  font-family: upheaval;/* https://www.dafont.com/upheaval.font */
+  src: url(assets/upheavtt.ttf);
+}
+body{
+    background-color:#EDA;
+    font-family:upheaval;
+    overflow:hidden;
+}
+
+.brick{
+    width:77px;
+    height:35px;
+    border:2px solid black;
+    position:absolute;
+}
+
+#ball{
+    background-color:cyan;
+    border:3px solid black;
+    border-radius:30px;
+    position:absolute;
+}
+
+#pad{
+    background-color:white;
+    border:3px solid black;
+    position:absolute;
+}
+
+#red{
+    background-color:#F22;
+}
+
+#green{
+    background-color:#2F2;
+}
+
+#yellow{
+    background-color:#FF2;
+}
+
+#blue{
+    background-color:#22F;
+}
+
+#score,#hiscore{
+    font-size:60px;
+    position:absolute;
+    left:30%;
+    color:black;
+    z-index:9999;
+}
+#hiscore{
+    left:60%;
+}
