@@ -1,5 +1,11 @@
 const SPEED = 6;
 const NOWHERE = -1000;
+const MAX_SEGMENTS = 1000;
+const OVERLAP_FACTOR = 0.9;
+const APPLE_SLEEPING_MIN = 180;
+const APPLE_SLEEPING_RANDOM = 180;
+
+let paused = false;
 
 let dots = [];
 
@@ -53,6 +59,10 @@ function onload() {
             this.dots = 0;
             this.img.style.transform = "scaleX(1)";
             this.img.style.transform = "rotate(0deg)";
+        },
+        update: function(){
+            head_svg.style.left = this.x + "px";
+            head_svg.style.top = this.y + "px";
         }
     }
     
@@ -61,11 +71,28 @@ function onload() {
         y:0,
         width:apple_svg.width,
         height:apple_svg.height,
-        sleeping:180
+        sleeping:APPLE_SLEEPING_MIN,
+        reset: function(){
+            this.x = NOWHERE;
+            this.sleeping = APPLE_SLEEPING_MIN + rnd(APPLE_SLEEPING_RANDOM);
+        },
+        update: function(){
+            if(this.sleeping>0){
+                this.sleeping--;
+            }else{
+                this.putApple();
+            }
+            apple_svg.style.left = this.x + "px";
+            apple_svg.style.top = this.y + "px";
+        },
+        putApple: function(){
+            if(this.x == NOWHERE){
+                this.x = rnd(w - this.width);
+                this.y = rnd(h - this.height);
+            }
+        }
     }
-    
     createDots();
-    
     update();
 }
 
@@ -90,10 +117,13 @@ document.addEventListener('keydown',function(event) {
        player.yd = -SPEED;
        player.img.style.transform = "rotate(-90deg)";
     }
+    if(event.code=="KeyP"){
+        paused = !paused;
+    }
 });
 
 function createDots(){
-    for(let i=0;i<1000;i++){
+    for(let i=0;i<MAX_SEGMENTS;i++){
         let dot={
             x:NOWHERE,
             y:0,
@@ -103,7 +133,7 @@ function createDots(){
         let segment_tmp = segment_svg.cloneNode(); 
         document.body.appendChild(segment_tmp);
 
-        segment_tmp.style.zIndex="-9990";
+        segment_tmp.style.zIndex=MAX_SEGMENTS-i;
         
         dot.img = segment_tmp;
         dot.img.style.left = dot.x + "px";
@@ -111,6 +141,7 @@ function createDots(){
         dots.push(dot);
     }
     segment_svg.remove();
+    head_svg.style.zIndex=MAX_SEGMENTS+1;
 }
 
 function resetGame(){
@@ -119,15 +150,16 @@ function resetGame(){
         let dot = dots[i];
         dot.img.style.left = NOWHERE + "px";
     }
-    apple.sleeping = 180;
-    apple.x = NOWHERE;
+    apple.reset();
 }
 
 function update() {
-    player.move();
-    player.addCoord();
-    head_svg.style.left = player.x + "px";
-    head_svg.style.top = player.y + "px";
+    if(!paused){
+        player.move();
+        player.addCoord();
+        player.update();
+        apple.update();
+    }
     
     for(let i=0;i<player.dots;i++){
         let dot = dots[i];
@@ -145,37 +177,21 @@ function update() {
         resetGame();
     }
     
-    if(apple.sleeping>0){
-        apple.sleeping--;
-    }else{
-        putApple();
-    }
-    
     if(overlapped(apple)){
         player.addScore(1);
         player.dots++;
-        apple.x = NOWHERE;
-        apple.sleeping = 180 + rnd(180);
+        apple.reset();
     }
-    
-    apple_svg.style.left = apple.x + "px";
-    apple_svg.style.top = apple.y + "px";
-    
+
     document.getElementById("score").innerHTML = player.score;
     document.getElementById("hiscore").innerHTML = "HI: " + player.hiscore;
     
     window.requestAnimationFrame(update);
 }
 
-function putApple(){
-    if(apple.x == NOWHERE){
-        apple.x = rnd(w-apple.width);
-        apple.y = rnd(h-apple.height);
-    }
-}
-
 function overlapped(obj){
-    return (Math.abs(player.x - obj.x) < player.width * .8) && (Math.abs(player.y - obj.y) < player.height * .8);
+    return (Math.abs(player.x - obj.x) < player.width * OVERLAP_FACTOR) && 
+    (Math.abs(player.y - obj.y) < player.height * OVERLAP_FACTOR);
 }
 
 function rnd(n){

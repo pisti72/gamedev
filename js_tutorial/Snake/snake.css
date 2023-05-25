@@ -12,17 +12,26 @@ body{
     overflow:hidden;
 }
 
-#head,#apple, #segment{
+#head,#apple,#segment,#head_blue,#segment_blue{
     position:absolute;
 }
 
-#score,#hiscore{
+#p1,#p2,#message,#score,#hiscore{
     font-size:60px;
     position:absolute;
-    left:30%;
-    color:black;
+    left:20%;
+    color:#2A7FFF;
     z-index:9999;
 }
+#p1{
+    left:75%;
+    color:#28DA24;
+}
+#message{
+    left:40%;
+    top:400px;
+    color:#444;
+}
 #hiscore{
-    left:60%;
+    left:75%;
 }

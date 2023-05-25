@@ -4,6 +4,8 @@ const ROWS = 5;
 const COLUMNS = 8;
 const NOWHERE = -1000;
 
+let paused = false;
+
 let player_svg = document.getElementById("player");
 let laser_svg = document.getElementById("laser");
 let ufo_svg = document.getElementById("ufo");
@@ -11,6 +13,7 @@ let crab_svg = document.getElementById("crab");
 let bomb_svg = document.getElementById("bomb");
 
 let invaders = [];
+let invaders_xd = 1;
 
 function onload() {
     w = document.body.clientWidth;
@@ -28,6 +31,10 @@ function onload() {
             if(this.score > this.hiscore){
                 this.hiscore = this.score;
             }
+        },
+        update: function() {
+            player_svg.style.left = this.x + "px";
+            player_svg.style.top = this.y + "px";
         }
     }
     
@@ -36,7 +43,32 @@ function onload() {
         y:0,
         yd:0,
         height:laser_svg.height,
-        width:laser_svg.width
+        width:laser_svg.width,
+        update:function() {
+            if(this.x != NOWHERE){
+                this.y += this.yd;
+                if(this.y < -this.height){
+                    this.x = NOWHERE;
+                }
+                
+                if(overlapped(ufo,this)){
+                    ufo.reset();
+                    player.addScore(10);
+                    this.x = NOWHERE;
+                }
+                
+                for(let i=0;i<invaders.length;i++){
+                    let invader = invaders[i];
+                    if(overlapped(invader,this) && this.x != NOWHERE){
+                        this.x = NOWHERE;
+                        player.addScore(1);
+                        invader.x = NOWHERE;
+                    }
+                }
+            }
+            laser_svg.style.left = this.x + "px";
+            laser_svg.style.top = this.y + "px";
+        }
     }
     
     bomb = {
@@ -44,7 +76,25 @@ function onload() {
         y:0,
         yd:0,
         height:bomb_svg.height,
-        width:bomb_svg.width
+        width:bomb_svg.width,
+        update: function() {
+            if(this.x == NOWHERE){
+                let pick = rnd(invaders.length);
+                let invader = invaders[pick];
+                if(invader.x != NOWHERE){
+                    this.x = invader.x + (invader.width-this.width)/2;
+                    this.y = invader.y + invader.height;
+                }
+            }else{
+                if(this.y > 2*h){
+                    this.x = NOWHERE;
+                }else{
+                    this.y += LASER_SPEED;
+                }
+            }
+            bomb_svg.style.left = this.x + "px";
+            bomb_svg.style.top = this.y + "px";
+        }
     }
     
     ufo = {
@@ -56,13 +106,31 @@ function onload() {
         reset: function(){
             this.x = w+10;
             this.sleeping = rnd(180)+180;
+        },
+        update:function(){
+            if(this.sleeping>0){
+                this.sleeping--;
+            }else{
+                this.x -= UFO_SPEED;
+            }
+            
+            if(this.x < -this.width){
+                this.reset();
+            }
+            ufo_svg.style.left = this.x + "px";
+            ufo_svg.style.top = this.y + "px";
         }
     }
     
     createInvaders();
-    
     update();
 }
+
+document.addEventListener('keydown',function(event) {
+    if(event.code=="KeyP"){
+        paused = !paused;
+    }
+});
 
 document.addEventListener('mousemove',function(event) {
     player.x = event.pageX - player.width/2;
@@ -87,93 +155,70 @@ function createInvaders(){
     let top_margin = ufo.y+ufo.height+10;
     for(let j=0;j<ROWS;j++){
         for(let i=0;i<COLUMNS;i++){
+            let crab_tmp = crab_svg.cloneNode(); 
+            document.body.appendChild(crab_tmp);
+            crab_tmp.style.zIndex="-9990";
             let crab={
                 x:i*crab_svg.width*1.25 + left_margin,
                 y:j*crab_svg.height*1.25 + top_margin,
+                img:crab_tmp,
                 width:crab_svg.width,
-                height:crab_svg.height
+                height:crab_svg.height,
+                update:function(){
+                    if(this.x != NOWHERE){
+                        if(this.x+this.width>w){
+                            invaders_xd = -Math.abs(invaders_xd);
+                            moveInvaders(-20,20);
+                        }
+                        if(this.x<0){
+                            invaders_xd = Math.abs(invaders_xd);
+                            moveInvaders(20,20);
+                        }
+                        this.x += invaders_xd;
+                    }
+                    this.img.style.left = this.x + "px";
+                    this.img.style.top = this.y + "px";
+                }
             }
-            
-            let crab_tmp = crab_svg.cloneNode(); 
-            document.body.appendChild(crab_tmp);
-            
-            crab_tmp.style.zIndex="-9990";
-            crab.img = crab_tmp;
             invaders.push(crab);
         }
     }
     crab_svg.remove();
 }
 
-
-function update() {
-    player_svg.style.left = player.x + "px";
-    player_svg.style.top = player.y + "px";
-    
-    if(laser.x != NOWHERE){
-        laser.y += laser.yd;
-        if(laser.y < -laser.height){
-            laser.x = NOWHERE;
-        }
-        
-        if(overlapped(ufo,laser)){
-            ufo.reset();
-            player.addScore(10);
-            laser.x = NOWHERE;
-        }
-        
-        for(let i=0;i<invaders.length;i++){
-            let invader = invaders[i];
-            if(overlapped(invader,laser) && laser.x != NOWHERE){
-                laser.x = NOWHERE;
-                player.addScore(1);
-                invader.x = NOWHERE;
-            }
-        }
-    }
-    
-    if(bomb.x == NOWHERE){
-        let pick = rnd(invaders.length);
-        let invader = invaders[pick];
-        if(invader.x != NOWHERE){
-            bomb.x = invader.x + (invader.width-bomb.width)/2;
-            bomb.y = invader.y + invader.height;
-        }
-    }else{
-        if(bomb.y > 2*h){
-            bomb.x = NOWHERE;
-        }else{
-            bomb.y += LASER_SPEED;
-        }
-    }
-    
-    if(ufo.sleeping>0){
-        ufo.sleeping--;
-    }else{
-        ufo.x -= UFO_SPEED;
-    }
-    
-    if(ufo.x < -ufo.width){
-        ufo.reset();
-    }
-    
-    laser_svg.style.left = laser.x + "px";
-    laser_svg.style.top = laser.y + "px";
-    
-    bomb_svg.style.left = bomb.x + "px";
-    bomb_svg.style.top = bomb.y + "px";
-    
-    ufo_svg.style.left = ufo.x + "px";
-    ufo_svg.style.top = ufo.y + "px";
-    
+function moveInvaders(x,y){
     for(let i=0;i<invaders.length;i++){
         let invader = invaders[i];
-        invader.img.style.left = invader.x + "px";
-        invader.img.style.top = invader.y + "px";
+        if(invader.x != NOWHERE){
+            invader.x += x;
+            invader.y += y;
+        }
+    }
+}
+
+function updateInvaders(){
+    let active = 0;
+    for(let i=0;i<invaders.length;i++){
+        let invader = invaders[i];
+        invader.update();
+        if(invader.x != NOWHERE){
+            active++;
+        }
+    }
+    let f = invaders_xd/Math.abs(invaders_xd);
+    invaders_xd = f*invaders.length/active;
+}
+
+function update() {
+    if(!paused){
+        player.update();
+        ufo.update();
+        laser.update();
+        bomb.update();
+        updateInvaders();
     }
     
     document.getElementById("score").innerHTML = player.score;
-    //document.getElementById("score").innerHTML = bomb.y;
     document.getElementById("hiscore").innerHTML = "HI: " + player.hiscore;
     
     window.requestAnimationFrame(update);

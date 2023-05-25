@@ -1,0 +1,30 @@
+html,body{
+    height:100%;
+    margin:0;
+}
+@font-face {
+  font-family: upheaval;/* https://www.dafont.com/upheaval.font */
+  src: url(assets/upheavtt.ttf);
+}
+body{
+    background-color:#78F;
+    font-family:upheaval;
+    overflow:hidden;
+}
+
+#boy_idle,#boy_run1,#boy_run2,#floor,#brickwall,#cloud,#grey,#coin,#fox,#pipe,#exit{
+    position:absolute;
+/*    position:relative;*/
+}
+
+#score,#hiscore,#speed{
+    font-size:60px;
+    position:absolute;
+    left:50%;
+    color:white;
+    z-index:9999;
+}
+
+#hiscore{
+    left:80%;
+}
