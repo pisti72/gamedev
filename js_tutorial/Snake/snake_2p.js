@@ -181,7 +181,7 @@ function createPlayers(n){
                 for(let i=0;i<this.numberOfSegments;i++){
                     let segment = this.segments[i];
                     if(overlapped(obj,segment)){
-                        message = this.name + " player won!";
+                        message = obj.name + " player collied with!";
                         state = GAMEOVER;
                     }
                 }
@@ -202,14 +202,14 @@ function createPlayers(n){
                     segment.img.style.left = segment.x + "px";
                     segment.img.style.top = segment.y + "px";
                     if(i>=1 && overlapped(this,coord)){
-                        message = this.name + " player lost";
+                        message = this.name + " player eaten himself!";
                         state = GAMEOVER;
                         break;
                     }
                 }
                 
                 if(this.x + this.width > w || this.x < 0 || this.y + this.height > h || this.y<0){
-                    message = this.name + " player lost";
+                    message = this.name + " player left the arena!";
                     state = GAMEOVER;
                 }
                 

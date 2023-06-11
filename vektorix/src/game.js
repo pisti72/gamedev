@@ -150,11 +150,10 @@ function homePressed(evt)
 }
 
 // start animating
-requestAnimationFrame(animate);
+animate();
+
 function animate()
 {
-	requestAnimationFrame(animate);
-	
 	counter++;
 	
 	if(state == STATE_TITLE) t.rotateObj('title',-0.00 ,0 ,0.02);
@@ -174,6 +173,7 @@ function animate()
 		}
 	}
 	t.render();
+    requestAnimationFrame(animate);
 }
 
 

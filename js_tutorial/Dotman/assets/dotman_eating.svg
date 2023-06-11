@@ -1,0 +1,72 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!-- Created with Inkscape (http://www.inkscape.org/) -->
+
+<svg
+   width="36.731689mm"
+   height="40mm"
+   viewBox="0 0 36.731689 40"
+   version="1.1"
+   id="svg9249"
+   inkscape:version="1.2.2 (732a01da63, 2022-12-09)"
+   sodipodi:docname="dotman_eating.svg"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:svg="http://www.w3.org/2000/svg">
+  <sodipodi:namedview
+     id="namedview9251"
+     pagecolor="#ffffff"
+     bordercolor="#000000"
+     borderopacity="0.25"
+     inkscape:showpageshadow="2"
+     inkscape:pageopacity="0.0"
+     inkscape:pagecheckerboard="0"
+     inkscape:deskcolor="#d1d1d1"
+     inkscape:document-units="mm"
+     showgrid="false"
+     inkscape:zoom="0.73049944"
+     inkscape:cx="164.27117"
+     inkscape:cy="245.03783"
+     inkscape:window-width="1920"
+     inkscape:window-height="974"
+     inkscape:window-x="-11"
+     inkscape:window-y="-11"
+     inkscape:window-maximized="1"
+     inkscape:current-layer="layer1" />
+  <defs
+     id="defs9246" />
+  <g
+     inkscape:label="Layer 1"
+     inkscape:groupmode="layer"
+     id="layer1"
+     transform="translate(-61.679276,-83.587805)">
+    <g
+       id="g5068"
+       transform="translate(-48.320724,43.587805)">
+      <path
+         style="fill:#ffcc00;stroke-width:0.994934"
+         id="circle2094"
+         sodipodi:type="arc"
+         sodipodi:cx="130"
+         sodipodi:cy="60"
+         sodipodi:rx="20"
+         sodipodi:ry="20"
+         sodipodi:start="0.57977753"
+         sodipodi:end="5.6601491"
+         sodipodi:arc-type="slice"
+         d="m 146.73169,70.956757 a 20,20 0 0 1 -22.241,8.269461 20,20 0 0 1 -14.48601,-18.793665 20,20 0 0 1 13.65972,-19.402533 20,20 0 0 1 22.57781,7.299908 L 130,60 Z" />
+      <circle
+         style="fill:#1a1a1a;stroke-width:0.202141"
+         id="circle2096"
+         r="4.0634146"
+         cy="53.842686"
+         cx="126.19693" />
+      <circle
+         style="fill:#ffffff;stroke-width:0.0604015"
+         id="circle2098"
+         r="1.2141838"
+         cy="52.017895"
+         cx="124.88437" />
+    </g>
+  </g>
+</svg>

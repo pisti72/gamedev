@@ -7,20 +7,34 @@ html,body{
   src: url(assets/upheavtt.ttf);
 }
 body{
-    background-color:#78F;
+    /*background-color: black;*/
+    background-color: darkblue;
     font-family:upheaval;
     overflow:hidden;
 }
 
-#boy_idle,#boy_run1,#boy_run2,#floor,#brickwall,#cloud,#grey,#coin,#fox,#pipe,#exit{
+#field{
+    position:relative;
+    top:20px;
+    left: 40%;
+    width:400px;
+    height:400px;
+    border:2px solid white;
+    /*background-color: darkblue;*/
+    background-color: #CCC;
+}
+.block{
     position:absolute;
-/*    position:relative;*/
+    width:30px;
+    height:30px;
+    border:1px solid rgba(0,0,0,.3);
 }
 
 #score,#hiscore{
+    top:0px;
     font-size:60px;
     position:absolute;
-    left:50%;
+    left:20%;
     color:white;
     z-index:9999;
 }

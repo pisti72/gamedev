@@ -66,10 +66,6 @@ const db = [
     src:"assets/dinorun.png",
     description:"Running with your dino",
  },
- 
- 
- 
- 
  {
     title:"Whack a mole",
     href:"Whack_a_mole/whack_a_mole.html",
@@ -112,6 +108,25 @@ const db = [
     src:"assets/brickbreaker.png",
     description:"Breake the wall with your ball.",
  },
+ {
+    title:"Bomber",
+    href:"Bomber/bomber.html",
+    src:"assets/bomber.png",
+    description:"Drop the bomb just in the right time.",
+ },
+ {
+    title:"Pacman",
+    href:"Dotman/dotman.html",
+    src:"assets/bomber.png",
+    description:"Untitled",
+ },
+ {
+    title:"Tetris",
+    href:"Tetris/tetris.html",
+    src:"assets/tetris.png",
+    description:"Complete lines by moving differently shaped pieces.",
+ },
+ 
 ];
 
 let list = document.getElementById("list");

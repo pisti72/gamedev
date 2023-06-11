@@ -1,0 +1,28 @@
+html,body{
+    height:100%;
+    margin:0;
+}
+
+@font-face {
+  font-family: grobold;/* https://www.dafont.com/grobold.font */
+  src: url(assets/GROBOLD.ttf);
+}
+
+body{
+    background-color:#ADF;
+    font-family:grobold;
+    overflow:hidden;
+}
+#bomber,#bomb,#block{
+    position:absolute;
+}
+#score,#hiscore{
+    font-size:60px;
+    position:absolute;
+    left:30%;
+    color:#333;
+    z-index:9999;
+}
+#hiscore{
+    left:60%;
+}

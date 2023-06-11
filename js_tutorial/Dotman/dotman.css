@@ -1,0 +1,45 @@
+html,body{
+    height:100%;
+    margin:0;
+}
+@font-face {
+  font-family: upheavtt;
+  src: url(assets/upheavtt.ttf);
+}
+body{
+    background-color:#222;
+    font-family:upheavtt;
+    overflow:hidden;
+}
+.wall{
+    position:absolute;
+    width:100px;
+    height:100px;
+    border:4px solid blue;
+    border-radius: 60px;
+    background-color:rgb(0,0,180)
+}
+
+.dot{
+    position:absolute;
+    width:20px;
+    height:20px;
+    background-color:yellow;
+    border-radius: 20px;
+}
+
+#dotman_idle,#dotman_eating,.enemy{
+    position:absolute;
+}
+
+#score,#hiscore{
+    font-size:60px;
+    position:absolute;
+    left:20%;
+    color:#EEE;
+    z-index:9999;
+}
+
+#hiscore{
+    left:75%;
+}
