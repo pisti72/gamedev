@@ -2,7 +2,7 @@ let ball_svg = document.getElementById("ball");
 
 const GRAVITY = .7;
 
-onload = () => {
+function onload() {
     w = document.body.clientWidth;
     h = document.body.clientHeight;
     
@@ -17,7 +17,7 @@ onload = () => {
     update();
 }
 
-update = () => {
+function update() {
     ball.yd += GRAVITY;
     ball.y += ball.yd;
     ball.x += ball.xd;

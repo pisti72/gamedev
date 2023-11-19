@@ -1,0 +1,29 @@
+<h1>😃</h1>
+<!--
+https://www.w3schools.com/html/html_emojis.asp
+-->
+<script>
+x = 0;
+y = 0;
+x_sebesseg = 6;
+y_sebesseg = 6;
+
+face = document.querySelector("h1");
+face.style.position = "absolute"
+face.style.fontSize = "100px"
+update();
+
+function update(){
+    x = x + x_sebesseg;
+    y = y + y_sebesseg;
+    if(x>552 || x<0){
+        x_sebesseg = -x_sebesseg;
+    }
+    if(y>400 || y<0){
+        y_sebesseg = -y_sebesseg;
+    }
+    face.style.left = x+"px";
+    face.style.top = y+"px";
+    requestAnimationFrame(update);
+}
+</script>

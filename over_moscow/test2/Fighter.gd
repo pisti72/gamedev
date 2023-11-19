@@ -1,11 +1,11 @@
-extends KinematicBody
+extends CharacterBody3D
 
 
 # Declare member variables here. Examples:
 # var a = 2
 # var b = "text"
-export var speed=.01
-export var rot_speed = .02
+@export var speed=.01
+@export var rot_speed = .02
 var velocity = Vector3.LEFT * speed * 20
 var heading = Vector3.LEFT
 
@@ -26,5 +26,7 @@ func _physics_process(delta):
 		var h = heading.rotated(Vector3.UP,rotation.y - PI/2)
 		velocity = velocity.move_toward(h,speed)
 	
-	move_and_slide(velocity,Vector3.UP)
+	set_velocity(velocity)
+	set_up_direction(Vector3.UP)
+	move_and_slide()
 	rotate_y(radius)

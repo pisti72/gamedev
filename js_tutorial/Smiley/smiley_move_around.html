@@ -1,0 +1,18 @@
+<h1>🌍</h1>
+<script>
+	t = 0
+	face = document.querySelector("h1")
+	face.style.position = "absolute"
+    document.body.style.backgroundColor = "navy"
+	update()
+	function update(){
+		t+= 0.05
+		x = Math.sin(t)*300 + 400
+		y = Math.cos(t)*100 + 150
+        size = y/3 + 50
+		face.style.left = x + "px"
+		face.style.top = y + "px"
+        face.style.fontSize = size + "px"
+		requestAnimationFrame(update)
+	}
+</script>

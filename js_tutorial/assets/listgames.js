@@ -117,14 +117,20 @@ const db = [
  {
     title:"Pacman",
     href:"Dotman/dotman.html",
-    src:"assets/bomber.png",
-    description:"Untitled",
+    src:"assets/dotman.png",
+    description:"Collecting dots in the maze.",
  },
  {
     title:"Tetris",
     href:"Tetris/tetris.html",
     src:"assets/tetris.png",
     description:"Complete lines by moving differently shaped pieces.",
+ },
+ {
+    title:"Amoba",
+    href:"Amoba/amoba.html",
+    src:"assets/amoba.png",
+    description:"5 in a row game.",
  },
  
 ];

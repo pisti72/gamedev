@@ -1,3 +1,7 @@
+/*
+ * https://en.wikipedia.org/wiki/Snake_(video_game_genre)
+ *
+ */
 const SPEED = 6;
 const NOWHERE = -1000;
 const MAX_SEGMENTS = 1000;

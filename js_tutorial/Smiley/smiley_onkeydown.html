@@ -1,0 +1,44 @@
+<h1 style="position:absolute;">🍰</h1>
+<h2 style="position:absolute;">😃</h2>
+<script>
+x = 200
+y = 200
+x_cake = 300
+y_cake = 300
+size = 50
+x_sebesseg = 0
+y_sebesseg = 0
+
+face = document.querySelector("h2")
+cake = document.querySelector("h1")
+document.onkeydown = function(e){
+    if(e.key == "ArrowLeft")x_sebesseg = -4
+    if(e.key == "ArrowRight")x_sebesseg = 4
+    if(e.key == "ArrowUp")y_sebesseg = -4
+    if(e.key == "ArrowDown")y_sebesseg = 4
+}
+document.onkeyup = function(e){
+    x_sebesseg = 0
+    y_sebesseg = 0
+}
+
+update()
+
+function update(){
+    x = x + x_sebesseg
+    y = y + y_sebesseg
+    if(Math.abs((x_cake+25)-(x+size/2))<(50+size)/2 && 
+        Math.abs((y_cake+25)-(y+size/2))<(50+size)/2){
+        x_cake = Math.random()*900
+        y_cake = Math.random()*500
+        size = size + 10
+    }
+    face.style.left = x + "px"
+    face.style.top = y + "px"
+    cake.style.left = x_cake + "px"
+    cake.style.top = y_cake + "px"
+    face.style.fontSize = size + "px"
+    cake.style.fontSize = "50px"
+    requestAnimationFrame(update)
+}
+</script>

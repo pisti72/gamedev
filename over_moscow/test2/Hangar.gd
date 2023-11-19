@@ -1,4 +1,4 @@
-extends Spatial
+extends Node3D
 
 # Declare member variables here. Examples:
 # var a = 2
@@ -12,4 +12,4 @@ func _ready():
 
 # Called every frame. 'delta' is the elapsed time since the previous frame.
 func _process(delta):
-	$Camera.rotate_y()
+	$Camera3D.rotate_y()

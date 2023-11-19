@@ -1,0 +1,37 @@
+html,body{
+    height:100%;
+    margin:0;
+}
+@font-face {
+  font-family: grobold;/* https://www.dafont.com/grobold.font */
+  src: url(assets/GROBOLD.ttf);
+}
+body{
+    background-color:#EEE;
+    font-family:grobold;
+    overflow:hidden;
+}
+
+#head,#apple,#segment,#head_blue,#segment_blue{
+    position:absolute;
+}
+
+#p1,#p2,#message,#score,#hiscore{
+    font-size:60px;
+    position:absolute;
+    left:20%;
+    color:#2A7FFF;
+    z-index:9999;
+}
+#p1{
+    left:75%;
+    color:#28DA24;
+}
+#message{
+    left:40%;
+    top:400px;
+    color:#444;
+}
+#hiscore{
+    left:75%;
+}

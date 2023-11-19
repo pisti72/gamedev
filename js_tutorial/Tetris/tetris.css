@@ -27,12 +27,12 @@ body{
     position:absolute;
     width:30px;
     height:30px;
-    border:1px solid rgba(0,0,0,.3);
+    border:1px solid rgba(0,0,0,.5);
 }
 
 #score,#hiscore{
     top:0px;
-    font-size:60px;
+    font-size:3vw;
     position:absolute;
     left:20%;
     color:white;
@@ -41,4 +41,36 @@ body{
 
 #hiscore{
     left:80%;
+}
+
+#field1{
+    position:relative;
+    margin:auto;
+    width:200px;
+    height:400px;
+    border:2px solid white;
+    background-color: #CCC;
+}
+#field2{
+    position:relative;
+    margin:auto;
+    width:200px;
+    height:400px;
+    border:2px solid white;
+    background-color: #CCC;
+}
+
+table{
+    width:100%;
+}
+
+.cell{
+    text-align: center;
+    width:25%;
+}
+
+.text{
+    margin:auto;
+    font-size:3vw;
+    color:white;
 }

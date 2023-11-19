@@ -3,14 +3,14 @@
 [ext_resource path="res://Fighter.gd" type="Script" id=1]
 [ext_resource path="res://assets/fighter.dae" type="PackedScene" id=2]
 
-[sub_resource type="BoxShape" id=1]
+[sub_resource type="BoxShape3D" id=1]
 
-[node name="Fighter" type="KinematicBody"]
-transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, -0.00356531, 0.0780073, -0.701889 )
+[node name="Fighter" type="CharacterBody3D"]
+transform = Transform3D( 1, 0, 0, 0, 1, 0, 0, 0, 1, -0.00356531, 0.0780073, -0.701889 )
 script = ExtResource( 1 )
 
 [node name="fighter" parent="." instance=ExtResource( 2 )]
 
-[node name="CollisionShape" type="CollisionShape" parent="."]
-transform = Transform( 0.39701, 0, 0, 0, 0.139596, 1.09916e-10, 0, 1.09916e-10, 0.375639, -0.0341109, 0.31306, 0.0419093 )
+[node name="CollisionShape3D" type="CollisionShape3D" parent="."]
+transform = Transform3D( 0.39701, 0, 0, 0, 0.139596, 1.09916e-10, 0, 1.09916e-10, 0.375639, -0.0341109, 0.31306, 0.0419093 )
 shape = SubResource( 1 )
