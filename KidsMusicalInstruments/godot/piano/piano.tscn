@@ -1,0 +1,17 @@
+[gd_scene load_steps=4 format=3 uid="uid://b15f2dord5uoi"]
+
+[ext_resource type="Script" path="res://Piano.gd" id="1_s5b4d"]
+[ext_resource type="AudioStream" uid="uid://olkwmx8nyj2g" path="res://samples/grandpiano_c4.ogg" id="2_4ts2o"]
+[ext_resource type="AudioStream" uid="uid://dmn4dahd06fhp" path="res://samples/grandpiano_d4.ogg" id="3_x0use"]
+
+[node name="Piano" type="Node2D"]
+script = ExtResource("1_s5b4d")
+
+[node name="c4" type="AudioStreamPlayer" parent="."]
+stream = ExtResource("2_4ts2o")
+
+[node name="d4" type="AudioStreamPlayer" parent="."]
+stream = ExtResource("3_x0use")
+max_polyphony = 4
+
+[node name="Sprite2D" type="Sprite2D" parent="."]

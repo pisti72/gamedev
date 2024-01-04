@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <title>Piano</title>
+  <link href="piano.css" rel="stylesheet" />
+</head>
+
+<body>
+  <audio id="c4grand" src="notes/kids_piano.ogg" type="audio/ogg"></audio>
+  <audio id="d4grand" src="notes/kids_piano.ogg" type="audio/ogg"></audio>
+  <audio id="e4grand" src="notes/kids_piano.ogg" type="audio/ogg"></audio>
+  <audio id="f4grand" src="notes/kids_piano.ogg" type="audio/ogg"></audio>
+  <audio id="g4grand" src="notes/kids_piano.ogg" type="audio/ogg"></audio>
+  <audio id="a4grand" src="notes/kids_piano.ogg" type="audio/ogg"></audio>
+  <audio id="b4grand" src="notes/kids_piano.ogg" type="audio/ogg"></audio>
+  <audio id="c5grand" src="notes/kids_piano.ogg" type="audio/ogg"></audio>
+  <audio id="cis4grand" src="notes/kids_piano.ogg" type="audio/ogg"></audio>
+  <audio id="dis4grand" src="notes/kids_piano.ogg" type="audio/ogg"></audio>
+  <audio id="fis4grand" src="notes/kids_piano.ogg" type="audio/ogg"></audio>
+  <audio id="gis4grand" src="notes/kids_piano.ogg" type="audio/ogg"></audio>
+  <audio id="ais4grand" src="notes/kids_piano.ogg" type="audio/ogg"></audio>
+
+  <div id="debug"></div>
+
+  <div id="dashboard">
+    <div id="playing_container">
+      <div id="playing" class="ledoff"></div>
+      <div id="playing_on" class="ledon"></div>
+      <div id="playing_button" class="button"></div>
+      <div id="playing_text" class="white_text">[P] PLAY</div>
+    </div>
+    <div id="recording_container">
+      <div id="recording" class="ledoff"></div>
+      <div id="recording_on" class="ledon"></div>
+      <div id="recording_button" class="button"></div>
+      <div id="recording_text" class="white_text">[R] RECORD</div>
+    </div>
+    <div id="songs_container">
+      <div id="song1" class="button"></div>
+      <div id="song1_text" class="white_text">[1] Boci boci tarka</div>
+      <div id="song2" class="button"></div>
+      <div id="song2_text" class="white_text">[2] Twinkle Twinkle</div>
+      <div id="song3" class="button"></div>
+      <div id="song3_text" class="white_text">[3] Wheels On The Bus</div>
+      <div id="song4" class="button"></div>
+      <div id="song4_text" class="white_text">[4] Megalovania</div>
+    </div>
+    <div id="version"></div>
+  </div>
+  <div class="notes-container">
+    <div id="c4" class="note">C4</div>
+    <div id="d4" class="note">D4</div>
+    <div id="e4" class="note">E4</div>
+    <div id="f4" class="note">F4</div>
+    <div id="g4" class="note">G4</div>
+    <div id="a4" class="note">A4</div>
+    <div id="b4" class="note">B4</div>
+    <div id="c5" class="note">C5</div>
+  </div>
+  <div class="notes-container">
+    <div id="c4pressed" class="note-pressed"></div>
+    <div id="d4pressed" class="note-pressed"></div>
+    <div id="e4pressed" class="note-pressed"></div>
+    <div id="f4pressed" class="note-pressed"></div>
+    <div id="g4pressed" class="note-pressed"></div>
+    <div id="a4pressed" class="note-pressed"></div>
+    <div id="b4pressed" class="note-pressed"></div>
+    <div id="c5pressed" class="note-pressed"></div>
+  </div>
+  <div class="halfnotes-container">
+    <div id="cis4" class="halfnote"></div>
+    <div id="dis4" class="halfnote"></div>
+    <div id="fis4" class="halfnote"></div>
+    <div id="gis4" class="halfnote"></div>
+    <div id="ais4" class="halfnote"></div>
+  </div>
+  <div class="halfnotes-container">
+    <div id="cis4pressed" class="halfnote-pressed"></div>
+    <div id="dis4pressed" class="halfnote-pressed"></div>
+    <div id="fis4pressed" class="halfnote-pressed"></div>
+    <div id="gis4pressed" class="halfnote-pressed"></div>
+    <div id="ais4pressed" class="halfnote-pressed"></div>
+  </div>
+  <script src="songs.js"></script>
+  <script src="piano.js"></script>
+</body>
+
+</html>

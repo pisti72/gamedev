@@ -1,0 +1,215 @@
+body {
+    background-color: bisque;
+    margin: 0px;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+.ledon {
+    width: 29px;
+    height: 22px;
+    background-image: url(gfx/ledon.png);
+}
+
+.button {
+    cursor: pointer;
+    width: 41px;
+    height: 14px;
+    background-image: url(gfx/button.png);
+}
+
+.white_text {
+    color: white;
+    white-space: nowrap;
+}
+
+.ledoff {
+    width: 29px;
+    height: 22px;
+    background-image: url(gfx/ledoff.png);
+}
+
+#debug {
+    position: absolute;
+    left: 10px;
+    top: 10px;
+}
+
+#version {
+    position: absolute;
+    left: 714px;
+    top:165px;
+    color:#444;
+}
+
+#recording_container {
+    position: absolute;
+    left: 220px;
+    top: 48px;
+}
+
+#recording_on {
+    display: none;
+}
+
+#recording_button {
+    position: absolute;
+    top: 4px;
+    left: 50px;
+}
+
+#recording_text {
+    position: absolute;
+    top: 0px;
+    left: 110px;
+
+}
+
+#playing_container {
+    position: absolute;
+    left: 200px;
+    top: 20px;
+}
+
+#playing_on {
+    display: none;
+}
+
+#playing_button {
+    position: absolute;
+    top: 4px;
+    left: 50px;
+}
+
+#playing_text {
+    position: absolute;
+    top: 0px;
+    left: 110px;
+}
+
+#songs_container {
+    position: absolute;
+    left: 270px;
+    top: 80px;
+}
+
+#song1_text {
+    position: absolute;
+    top: -6px;
+    left: 56px;
+}
+
+#song2 {
+    position: absolute;
+    top: 28px;
+    left: 14px;
+}
+
+#song2_text {
+    position: absolute;
+    top: 22px;
+    left: 70px;
+}
+
+#song3 {
+    position: absolute;
+    top: 56px;
+    left: 28px;
+}
+
+#song3_text {
+    position: absolute;
+    top: 50px;
+    left: 84px;
+}
+
+#song4 {
+    position: absolute;
+    top: 84px;
+    left: 42px;
+}
+
+#song4_text {
+    position: absolute;
+    top: 78px;
+    left: 98px;
+}
+
+#dashboard {
+    width: 768px;
+    height: 192px;
+    background-image: url(gfx/dashboard.png);
+}
+
+.note {
+    background-color: white;
+    width: 96px;
+    height: 224px;
+    background-image: url(gfx/white_button.png);
+    background-color: black;
+    text-align: center;
+}
+
+.notes-container {
+    position: absolute;
+    left: 0 px;
+    top: 192px;
+    display: grid;
+    width: 224px;
+    grid-template-columns: auto auto auto auto auto auto auto auto;
+}
+
+.halfnotes-container {
+    position: absolute;
+    left: 0 px;
+    top: 192px;
+    display: grid;
+    grid-template-columns: auto auto auto auto auto auto;
+}
+
+.note-pressed {
+    width: 96px;
+    height: 224px;
+    cursor: pointer;
+    /*background-image: url(gfx/notes_96x224px.png);*/
+}
+
+.halfnote {
+    position: relative;
+    width: 64px;
+    height: 128px;
+    /*background-color: black;*/
+    background-image: url(gfx/black_button.png);
+}
+
+.halfnote-pressed {
+    position: relative;
+    width: 64px;
+    height: 128px;
+    cursor: pointer;
+    /*background-image: url(gfx/notes_96x224px.png);*/
+}
+
+#cis4,
+#cis4pressed {
+    left: 64px;
+}
+
+#dis4,
+#dis4pressed {
+    left: 96px;
+}
+
+#fis4,
+#fis4pressed {
+    left: 224px;
+}
+
+#gis4,
+#gis4pressed {
+    left: 256px;
+}
+
+#ais4,
+#ais4pressed {
+    left: 288px;
+}
