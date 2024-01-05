@@ -12,9 +12,23 @@ body {
 
 .button {
     cursor: pointer;
-    width: 41px;
-    height: 14px;
-    background-image: url(gfx/button.png);
+    width: 42px;
+    height: 16px;
+    background-image: url(gfx/button_42x16.png);
+}
+
+.button_mid {
+    cursor: pointer;
+    width: 42px;
+    height: 32px;
+    background-image: url(gfx/button_42x32.png);
+}
+
+.button_square {
+    cursor: pointer;
+    width: 42px;
+    height: 42px;
+    background-image: url(gfx/button_42x42.png);
 }
 
 .white_text {
@@ -36,15 +50,15 @@ body {
 
 #version {
     position: absolute;
-    left: 714px;
-    top:165px;
+    left: 790px;
+    top:190px;
     color:#444;
 }
 
 #recording_container {
     position: absolute;
-    left: 220px;
-    top: 48px;
+    left: 420px;
+    top: 20px;
 }
 
 #recording_on {
@@ -53,7 +67,7 @@ body {
 
 #recording_button {
     position: absolute;
-    top: 4px;
+    top: -4px;
     left: 50px;
 }
 
@@ -76,7 +90,7 @@ body {
 
 #playing_button {
     position: absolute;
-    top: 4px;
+    top: -4px;
     left: 50px;
 }
 
@@ -88,128 +102,208 @@ body {
 
 #songs_container {
     position: absolute;
-    left: 270px;
+    left: 410px;
     top: 80px;
 }
 
 #song1_text {
     position: absolute;
     top: -6px;
-    left: 56px;
+    left: 60px;
 }
 
 #song2 {
     position: absolute;
     top: 28px;
-    left: 14px;
+    left: 0px;
 }
 
 #song2_text {
     position: absolute;
     top: 22px;
-    left: 70px;
+    left: 60px;
 }
 
 #song3 {
     position: absolute;
     top: 56px;
-    left: 28px;
+    left: 0px;
 }
 
 #song3_text {
     position: absolute;
     top: 50px;
-    left: 84px;
+    left: 60px;
 }
 
 #song4 {
     position: absolute;
     top: 84px;
-    left: 42px;
+    left: 0px;
 }
 
 #song4_text {
     position: absolute;
     top: 78px;
+    left: 60px;
+}
+
+#drums_container {
+    position: absolute;
+    left: 220px;
+    top: 70px;
+}
+
+#drum1{
+    position: absolute;
+    left: 0px;
+    top: 0px;
+}
+
+#drum1_text{
+    position: absolute;
+    left: 48px;
+    top: 6px;
+}
+
+#drum2{
+    position: absolute;
+    left: 0px;
+    top: 64px;
+}
+
+#drum2_text{
+    position: absolute;
+    left: 48px;
+    top: 70px;
+}
+
+#drum3{
+    position: absolute;
+    left: 54px;
+    top: 30px;
+}
+
+#drum3_text{
+    position: absolute;
     left: 98px;
+    top: 38px;
+}
+
+#drum4{
+    position: absolute;
+    left: 54px;
+    top: 94px;
+}
+
+#drum4_text{
+    position: absolute;
+    left: 98px;
+    top: 104px;
 }
 
 #dashboard {
-    width: 768px;
-    height: 192px;
-    background-image: url(gfx/dashboard.png);
+    width: 840px;
+    height: 220px;
+    background-image: url(gfx/dashboard_840x220.png);
 }
 
 .note {
     background-color: white;
-    width: 96px;
-    height: 224px;
-    background-image: url(gfx/white_button.png);
+    width: 60px;
+    height: 180px;
+    background-image: url(gfx/white_60x180.png);
     background-color: black;
+    font-size: 14px;
+    line-height: 2.5;
     text-align: center;
 }
 
 .notes-container {
     position: absolute;
     left: 0 px;
-    top: 192px;
+    top: 220px;
     display: grid;
-    width: 224px;
-    grid-template-columns: auto auto auto auto auto auto auto auto;
+    grid-template-columns: auto auto auto auto auto auto auto auto auto auto auto auto auto auto;
 }
 
 .halfnotes-container {
     position: absolute;
     left: 0 px;
-    top: 192px;
+    top: 220px;
     display: grid;
-    grid-template-columns: auto auto auto auto auto auto;
+    grid-template-columns: auto auto auto auto auto auto auto auto auto auto auto auto;
 }
 
 .note-pressed {
-    width: 96px;
-    height: 224px;
+    width: 60px;
+    height: 180px;
     cursor: pointer;
     /*background-image: url(gfx/notes_96x224px.png);*/
 }
 
 .halfnote {
     position: relative;
-    width: 64px;
-    height: 128px;
+    width: 40px;
+    height: 120px;
     /*background-color: black;*/
-    background-image: url(gfx/black_button.png);
+    background-image: url(gfx/black_40x120.png);
 }
 
 .halfnote-pressed {
     position: relative;
-    width: 64px;
-    height: 128px;
+    width: 40px;
+    height: 120px;
     cursor: pointer;
     /*background-image: url(gfx/notes_96x224px.png);*/
 }
 
 #cis4,
 #cis4pressed {
-    left: 64px;
+    left: 40px;
 }
 
 #dis4,
 #dis4pressed {
-    left: 96px;
+    left: 60px;
 }
 
 #fis4,
 #fis4pressed {
-    left: 224px;
+    left: 140px;
 }
 
 #gis4,
 #gis4pressed {
-    left: 256px;
+    left: 160px;
 }
 
 #ais4,
 #ais4pressed {
-    left: 288px;
+    left: 180px;
+}
+
+#cis5,
+#cis5pressed {
+    left: 260px;
+}
+
+#dis5,
+#dis5pressed {
+    left: 280px;
+}
+
+#fis5,
+#fis5pressed {
+    left: 360px;
+}
+
+#gis5,
+#gis5pressed {
+    left: 380px;
+}
+
+#ais5,
+#ais5pressed {
+    left: 400px;
 }

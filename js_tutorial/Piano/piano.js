@@ -2,7 +2,7 @@
  *   https://www.irish-folk-songs.com/the-wheels-on-the-bus-go-round-and-round-tin-whistle-notes.html
  *   https://itch.io/jam/synth-jam
  */
-const VERSION = "v 0.1"
+const VERSION = "v 0.2"
 
 isRecording = false
 recordingArray = []
@@ -11,21 +11,40 @@ isPlaying = false
 counter = 0
 
 const notes = [
-  { idx: 0, id: "c4", idpressed: "c4pressed", key: "KeyZ", audio: f("c4grand"), pressed: false, start: 0, end: 1.60 },
-  { idx: 1, id: "d4", idpressed: "d4pressed", key: "KeyX", audio: f("d4grand"), pressed: false, start: 1.71, end: 3.3 },
-  { idx: 2, id: "e4", idpressed: "e4pressed", key: "KeyC", audio: f("e4grand"), pressed: false, start: 3.42, end: 5.0 },
-  { idx: 3, id: "f4", idpressed: "f4pressed", key: "KeyV", audio: f("f4grand"), pressed: false, start: 5.13, end: 6.7 },
-  { idx: 4, id: "g4", idpressed: "g4pressed", key: "KeyB", audio: f("g4grand"), pressed: false, start: 6.84, end: 8.3 },
-  { idx: 5, id: "a4", idpressed: "a4pressed", key: "KeyN", audio: f("a4grand"), pressed: false, start: 8.56, end: 10.0 },
-  { idx: 6, id: "b4", idpressed: "b4pressed", key: "KeyM", audio: f("b4grand"), pressed: false, start: 10.27, end: 11.9 },
-  { idx: 7, id: "c5", idpressed: "c5pressed", key: "Comma", audio: f("c5grand"), pressed: false, start: 11.98, end: 13.5 },
-  { idx: 8, id: "cis4", idpressed: "cis4pressed", key: "KeyS", audio: f("cis4grand"), pressed: false, start: 15.42, end: 17.0 },
-  { idx: 9, id: "dis4", idpressed: "dis4pressed", key: "KeyD", audio: f("dis4grand"), pressed: false, start: 17.13, end: 18.7 },
-  { idx: 10, id: "fis4", idpressed: "fis4pressed", key: "KeyG", audio: f("fis4grand"), pressed: false, start: 18.84, end: 20.4 },
-  { idx: 11, id: "gis4", idpressed: "gis4pressed", key: "KeyH", audio: f("gis4grand"), pressed: false, start: 20.56, end: 22.1 },
-  { idx: 12, id: "ais4", idpressed: "ais4pressed", key: "KeyJ", audio: f("ais4grand"), pressed: false, start: 22.27, end: 23.7 },
+  { idx: 0, id: "c4", idpressed: "c4pressed", key: "KeyZ", pressed: false, start: 0, end: 1.60 },
+  { idx: 1, id: "d4", idpressed: "d4pressed", key: "KeyX", pressed: false, start: 1.71, end: 3.3 },
+  { idx: 2, id: "e4", idpressed: "e4pressed", key: "KeyC", pressed: false, start: 3.42, end: 5.0 },
+  { idx: 3, id: "f4", idpressed: "f4pressed", key: "KeyV", pressed: false, start: 5.13, end: 6.7 },
+  { idx: 4, id: "g4", idpressed: "g4pressed", key: "KeyB", pressed: false, start: 6.84, end: 8.3 },
+  { idx: 5, id: "a4", idpressed: "a4pressed", key: "KeyN", pressed: false, start: 8.56, end: 10.0 },
+  { idx: 6, id: "b4", idpressed: "b4pressed", key: "KeyM", pressed: false, start: 10.27, end: 11.9 },
+  { idx: 7, id: "cis4", idpressed: "cis4pressed", key: "KeyS", pressed: false, start: 15.42, end: 17.0 },
+  { idx: 8, id: "dis4", idpressed: "dis4pressed", key: "KeyD", pressed: false, start: 17.13, end: 18.7 },
+  { idx: 9, id: "fis4", idpressed: "fis4pressed", key: "KeyG", pressed: false, start: 18.84, end: 20.4 },
+  { idx: 10, id: "gis4", idpressed: "gis4pressed", key: "KeyH", pressed: false, start: 20.56, end: 22.1 },
+  { idx: 11, id: "ais4", idpressed: "ais4pressed", key: "KeyJ", pressed: false, start: 22.27, end: 23.7 },
+  { idx: 12, id: "c5", idpressed: "c5pressed", key: "KeyQ", pressed: false, start: 23.96, end: 25.0 },
+  { idx: 13, id: "d5", idpressed: "d5pressed", key: "KeyW", pressed: false, start: 25.68, end: 27.3 },
+  { idx: 14, id: "e5", idpressed: "e5pressed", key: "KeyE", pressed: false, start: 27.42, end: 29.0 },
+  { idx: 15, id: "f5", idpressed: "f5pressed", key: "KeyR", pressed: false, start: 29.13, end: 30.7 },
+  { idx: 16, id: "g5", idpressed: "g5pressed", key: "KeyT", pressed: false, start: 30.84, end: 32.3 },
+  { idx: 17, id: "a5", idpressed: "a5pressed", key: "KeyY", pressed: false, start: 32.56, end: 34.0 },
+  { idx: 18, id: "b5", idpressed: "b5pressed", key: "KeyU", pressed: false, start: 34.27, end: 35.9 },
+  { idx: 19, id: "cis5", idpressed: "cis5pressed", key: "Digit2", pressed: false, start: 37.71, end: 39.0 },
+  { idx: 20, id: "dis5", idpressed: "dis5pressed", key: "Digit3", pressed: false, start: 39.42, end: 41.0 },
+  { idx: 21, id: "fis5", idpressed: "fis5pressed", key: "Digit5", pressed: false, start: 41.13, end: 42.7 },
+  { idx: 22, id: "gis5", idpressed: "gis5pressed", key: "Digit6", pressed: false, start: 42.85, end: 44.0 },
+  { idx: 23, id: "ais5", idpressed: "ais5pressed", key: "Digit7", pressed: false, start: 44.56, end: 46.3 },
+
+  { idx: 24, id: "snare", idpressed: "drum1", key: "KeyO", pressed: false, start: 47.99, end: 48.4 },
+  { idx: 25, id: "hihat", idpressed: "drum2", key: "KeyP", pressed: false, start: 51.41, end: 51.9 },
+  { idx: 26, id: "drum", idpressed: "drum3", key: "KeyL", pressed: false, start: 54.84, end: 55.6 },
+  { idx: 27, id: "kick", idpressed: "drum4", key: "KeyK", pressed: false, start: 58.27, end: 58.7 },
 
 ]
+
+createAudio()
+
 f("version").innerHTML = VERSION;
 
 document.addEventListener("keydown", function (e) {
@@ -38,9 +57,9 @@ document.addEventListener("keydown", function (e) {
       recordNote(note, "pressed")
     }
   }
-  if (e.code == "KeyR") {
+  if (e.code == "Space") {
     recordingPressed()
-  } else if (e.code == "KeyP") {
+  } else if (e.code == "Enter") {
     playingOn()
   }
 
@@ -101,6 +120,18 @@ f("playing_button").addEventListener("mousedown", function (e) {
 
 update()
 
+function createAudio(){
+  const audio = document.createElement("audio");
+  audio.src = "notes/all_audio.ogg"
+  //audio.play()
+  //console.log("played")
+  //document.body.appendChild(audio);
+  for (i = 0; i < notes.length; i++) {
+    let note = notes[i]
+    note.audio = audio.cloneNode(false)
+  }
+}
+
 function recordingPressed() {
   if (!isPlaying) {
     if (isRecording) {
@@ -143,6 +174,7 @@ function recordNote(note, e) {
 }
 
 function playNote(note) {
+  //f("debug").innerHTML = note.idx
   f(note.idpressed).style.backgroundColor = "rgba(20,20,20,.3)"
   note.audio.currentTime = note.start;
   note.audio.play()

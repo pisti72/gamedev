@@ -7,44 +7,40 @@
 </head>
 
 <body>
-  <audio id="c4grand" src="notes/kids_piano.ogg" type="audio/ogg"></audio>
-  <audio id="d4grand" src="notes/kids_piano.ogg" type="audio/ogg"></audio>
-  <audio id="e4grand" src="notes/kids_piano.ogg" type="audio/ogg"></audio>
-  <audio id="f4grand" src="notes/kids_piano.ogg" type="audio/ogg"></audio>
-  <audio id="g4grand" src="notes/kids_piano.ogg" type="audio/ogg"></audio>
-  <audio id="a4grand" src="notes/kids_piano.ogg" type="audio/ogg"></audio>
-  <audio id="b4grand" src="notes/kids_piano.ogg" type="audio/ogg"></audio>
-  <audio id="c5grand" src="notes/kids_piano.ogg" type="audio/ogg"></audio>
-  <audio id="cis4grand" src="notes/kids_piano.ogg" type="audio/ogg"></audio>
-  <audio id="dis4grand" src="notes/kids_piano.ogg" type="audio/ogg"></audio>
-  <audio id="fis4grand" src="notes/kids_piano.ogg" type="audio/ogg"></audio>
-  <audio id="gis4grand" src="notes/kids_piano.ogg" type="audio/ogg"></audio>
-  <audio id="ais4grand" src="notes/kids_piano.ogg" type="audio/ogg"></audio>
-
   <div id="debug"></div>
 
   <div id="dashboard">
     <div id="playing_container">
       <div id="playing" class="ledoff"></div>
       <div id="playing_on" class="ledon"></div>
-      <div id="playing_button" class="button"></div>
-      <div id="playing_text" class="white_text">[P] PLAY</div>
+      <div id="playing_button" class="button_mid"></div>
+      <div id="playing_text" class="white_text">[Enter] PLAY</div>
     </div>
     <div id="recording_container">
       <div id="recording" class="ledoff"></div>
       <div id="recording_on" class="ledon"></div>
-      <div id="recording_button" class="button"></div>
-      <div id="recording_text" class="white_text">[R] RECORD</div>
+      <div id="recording_button" class="button_mid"></div>
+      <div id="recording_text" class="white_text">[Space] RECORD</div>
     </div>
     <div id="songs_container">
       <div id="song1" class="button"></div>
-      <div id="song1_text" class="white_text">[1] Boci boci tarka</div>
+      <div id="song1_text" class="white_text">[8] Boci boci tarka</div>
       <div id="song2" class="button"></div>
-      <div id="song2_text" class="white_text">[2] Twinkle Twinkle</div>
+      <div id="song2_text" class="white_text">[9] Twinkle Twinkle</div>
       <div id="song3" class="button"></div>
-      <div id="song3_text" class="white_text">[3] Wheels On The Bus</div>
+      <div id="song3_text" class="white_text">[0] Wheels On The Bus</div>
       <div id="song4" class="button"></div>
-      <div id="song4_text" class="white_text">[4] Megalovania</div>
+      <div id="song4_text" class="white_text">[-] Megalovania</div>
+    </div>
+    <div id="drums_container">
+      <div id="drum1" class="button_square"></div>
+      <div id="drum1_text" class="white_text">[O] Snare</div>
+      <div id="drum2" class="button_square"></div>
+      <div id="drum2_text" class="white_text">[P] Hihat</div>
+      <div id="drum3" class="button_square"></div>
+      <div id="drum3_text" class="white_text">[L] Drum</div>
+      <div id="drum4" class="button_square"></div>
+      <div id="drum4_text" class="white_text">[K] Kick</div>
     </div>
     <div id="version"></div>
   </div>
@@ -57,6 +53,12 @@
     <div id="a4" class="note">A4</div>
     <div id="b4" class="note">B4</div>
     <div id="c5" class="note">C5</div>
+    <div id="d5" class="note">D5</div>
+    <div id="e5" class="note">E5</div>
+    <div id="f5" class="note">F5</div>
+    <div id="g5" class="note">G5</div>
+    <div id="a5" class="note">A5</div>
+    <div id="b5" class="note">B5</div>
   </div>
   <div class="notes-container">
     <div id="c4pressed" class="note-pressed"></div>
@@ -67,6 +69,12 @@
     <div id="a4pressed" class="note-pressed"></div>
     <div id="b4pressed" class="note-pressed"></div>
     <div id="c5pressed" class="note-pressed"></div>
+    <div id="d5pressed" class="note-pressed"></div>
+    <div id="e5pressed" class="note-pressed"></div>
+    <div id="f5pressed" class="note-pressed"></div>
+    <div id="g5pressed" class="note-pressed"></div>
+    <div id="a5pressed" class="note-pressed"></div>
+    <div id="b5pressed" class="note-pressed"></div>
   </div>
   <div class="halfnotes-container">
     <div id="cis4" class="halfnote"></div>
@@ -74,6 +82,11 @@
     <div id="fis4" class="halfnote"></div>
     <div id="gis4" class="halfnote"></div>
     <div id="ais4" class="halfnote"></div>
+    <div id="cis5" class="halfnote"></div>
+    <div id="dis5" class="halfnote"></div>
+    <div id="fis5" class="halfnote"></div>
+    <div id="gis5" class="halfnote"></div>
+    <div id="ais5" class="halfnote"></div>
   </div>
   <div class="halfnotes-container">
     <div id="cis4pressed" class="halfnote-pressed"></div>
@@ -81,6 +94,11 @@
     <div id="fis4pressed" class="halfnote-pressed"></div>
     <div id="gis4pressed" class="halfnote-pressed"></div>
     <div id="ais4pressed" class="halfnote-pressed"></div>
+    <div id="cis5pressed" class="halfnote-pressed"></div>
+    <div id="dis5pressed" class="halfnote-pressed"></div>
+    <div id="fis5pressed" class="halfnote-pressed"></div>
+    <div id="gis5pressed" class="halfnote-pressed"></div>
+    <div id="ais5pressed" class="halfnote-pressed"></div>
   </div>
   <script src="songs.js"></script>
   <script src="piano.js"></script>
