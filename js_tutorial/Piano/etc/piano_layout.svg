@@ -24,9 +24,9 @@
      inkscape:pagecheckerboard="0"
      inkscape:deskcolor="#d1d1d1"
      inkscape:document-units="mm"
-     inkscape:zoom="1"
-     inkscape:cx="311.5"
-     inkscape:cy="506"
+     inkscape:zoom="5.6568542"
+     inkscape:cx="241.2118"
+     inkscape:cy="493.56053"
      inkscape:window-width="1920"
      inkscape:window-height="1004"
      inkscape:window-x="0"
@@ -35,6 +35,22 @@
      inkscape:current-layer="layer1" />
   <defs
      id="defs1">
+    <linearGradient
+       id="linearGradient10"
+       inkscape:collect="always">
+      <stop
+         style="stop-color:#000000;stop-opacity:1;"
+         offset="0"
+         id="stop4" />
+      <stop
+         style="stop-color:#737373;stop-opacity:0;"
+         offset="0.53377056"
+         id="stop5" />
+      <stop
+         style="stop-color:#ffffff;stop-opacity:1;"
+         offset="1"
+         id="stop10" />
+    </linearGradient>
     <linearGradient
        id="linearGradient196"
        inkscape:collect="always">
@@ -222,16 +238,6 @@
          stdDeviation="0.17636864"
          id="feGaussianBlur299" />
     </filter>
-    <linearGradient
-       inkscape:collect="always"
-       xlink:href="#linearGradient296"
-       id="linearGradient1"
-       gradientUnits="userSpaceOnUse"
-       gradientTransform="matrix(0.18924149,0,0,0.13234055,27.203042,117.00427)"
-       x1="30.306351"
-       y1="149.28166"
-       x2="48.279724"
-       y2="181.84222" />
     <filter
        inkscape:collect="always"
        style="color-interpolation-filters:sRGB"
@@ -294,16 +300,6 @@
        gradientTransform="matrix(1.1491951,-0.00482187,0.00425473,1.0140337,-5.6548443,-1.7734041)"
        gradientUnits="userSpaceOnUse"
        spreadMethod="pad" />
-    <linearGradient
-       inkscape:collect="always"
-       xlink:href="#linearGradient296"
-       id="linearGradient116"
-       gradientUnits="userSpaceOnUse"
-       gradientTransform="matrix(0.18924149,0,0,0.13234055,36.985232,129.7533)"
-       x1="30.306351"
-       y1="149.28166"
-       x2="48.279724"
-       y2="181.84222" />
     <filter
        inkscape:collect="always"
        style="color-interpolation-filters:sRGB"
@@ -418,6 +414,26 @@
        x2="86.361855"
        y2="155.11703"
        spreadMethod="reflect" />
+    <linearGradient
+       inkscape:collect="always"
+       xlink:href="#linearGradient10"
+       id="linearGradient3"
+       gradientUnits="userSpaceOnUse"
+       gradientTransform="matrix(0.18924149,0,0,0.13234055,36.931797,129.74305)"
+       x1="23.702166"
+       y1="142.12688"
+       x2="52.101219"
+       y2="183.83485" />
+    <linearGradient
+       inkscape:collect="always"
+       xlink:href="#linearGradient10"
+       id="linearGradient11"
+       gradientUnits="userSpaceOnUse"
+       gradientTransform="matrix(0.18924149,0,0,0.13234055,27.177234,117.01158)"
+       x1="23.702166"
+       y1="142.12688"
+       x2="52.101219"
+       y2="183.83485" />
   </defs>
   <g
      inkscape:label="Layer 1"
@@ -490,12 +506,12 @@
          ry="0" />
     </g>
     <g
-       id="g96">
+       id="g11">
       <ellipse
-         style="fill:url(#linearGradient1);fill-opacity:1;stroke-width:0.0449976"
-         id="ellipse1"
-         cx="34.21286"
-         cy="138.88876"
+         style="fill:url(#linearGradient11);fill-opacity:1;stroke-width:0.0449976"
+         id="ellipse10"
+         cx="34.18705"
+         cy="138.89607"
          rx="4.0056105"
          ry="2.626133"
          transform="matrix(0.94850171,-0.31677202,0.21958438,0.97559351,0,0)"
@@ -663,55 +679,6 @@
        xlink:href="#use45"
        id="use47"
        transform="translate(16.837981,3.7324056e-4)" />
-    <g
-       id="g193"
-       inkscape:export-filename="ledoff.png"
-       inkscape:export-xdpi="96"
-       inkscape:export-ydpi="96">
-      <ellipse
-         style="fill:url(#linearGradient116);fill-opacity:1;stroke-width:0.0449976"
-         id="ellipse114"
-         cx="43.995049"
-         cy="151.6378"
-         rx="4.0056105"
-         ry="2.626133"
-         transform="matrix(0.94850171,-0.31677202,0.21958438,0.97559351,0,0)" />
-      <ellipse
-         style="opacity:1;mix-blend-mode:normal;fill:#4d4d4d;stroke:none;stroke-width:0.264583;stroke-opacity:1;filter:url(#filter116)"
-         id="path116"
-         cx="78.037674"
-         cy="137.0043"
-         rx="1.1163402"
-         ry="0.36890513"
-         transform="matrix(1.0811667,-0.67205509,0.70441612,1.0314976,-104.86869,46.218276)" />
-      <ellipse
-         style="fill:#1a1a1a;fill-opacity:1;stroke:none;stroke-width:0.294212;stroke-opacity:1"
-         id="ellipse115"
-         cx="75.069138"
-         cy="133.95125"
-         rx="1.6182206"
-         ry="1.6002593" />
-      <circle
-         style="fill:#550000;fill-opacity:1;stroke:none;stroke-width:0.264583;stroke-opacity:1"
-         id="circle115"
-         cx="75.071503"
-         cy="133.94579"
-         r="1.4471596" />
-      <circle
-         style="mix-blend-mode:normal;fill:#aa0000;fill-opacity:1;stroke-width:0.264583;filter:url(#filter298)"
-         id="circle116"
-         cx="76.294006"
-         cy="150.21559"
-         r="1.4471596"
-         transform="matrix(0.44980769,0,0,0.45222869,40.364709,65.526572)" />
-      <ellipse
-         style="mix-blend-mode:normal;fill:#ffaaaa;fill-opacity:1;stroke-width:0.264583;filter:url(#filter299)"
-         id="ellipse116"
-         cx="75.150902"
-         cy="134.65598"
-         rx="0.79917669"
-         ry="0.52548862" />
-    </g>
     <g
        id="g16"
        transform="translate(-5.8208336,15.874997)">
@@ -2134,6 +2101,55 @@
          y="152.10628"
          transform="matrix(1.1145595,0,0,4.3035265,-8.0734115,-505.32896)"
          rx="0.39074254" />
+    </g>
+    <g
+       id="g12">
+      <ellipse
+         style="fill:url(#linearGradient3);fill-opacity:1;stroke-width:0.0449976"
+         id="ellipse3"
+         cx="43.941612"
+         cy="151.62755"
+         rx="4.0056105"
+         ry="2.626133"
+         transform="matrix(0.94850171,-0.31677202,0.21958438,0.97559351,0,0)"
+         inkscape:export-filename="ledon.png"
+         inkscape:export-xdpi="96"
+         inkscape:export-ydpi="96" />
+      <ellipse
+         style="mix-blend-mode:normal;fill:#4d4d4d;stroke:none;stroke-width:0.264583;stroke-opacity:1;filter:url(#filter116)"
+         id="path116"
+         cx="78.037674"
+         cy="137.0043"
+         rx="1.1163402"
+         ry="0.36890513"
+         transform="matrix(1.0811667,-0.67205509,0.70441612,1.0314976,-104.86869,46.218276)" />
+      <ellipse
+         style="fill:#1a1a1a;fill-opacity:1;stroke:none;stroke-width:0.294212;stroke-opacity:1"
+         id="ellipse115"
+         cx="75.069138"
+         cy="133.95125"
+         rx="1.6182206"
+         ry="1.6002593" />
+      <circle
+         style="fill:#550000;fill-opacity:1;stroke:none;stroke-width:0.264583;stroke-opacity:1"
+         id="circle115"
+         cx="75.071503"
+         cy="133.94579"
+         r="1.4471596" />
+      <circle
+         style="mix-blend-mode:normal;fill:#aa0000;fill-opacity:1;stroke-width:0.264583;filter:url(#filter298)"
+         id="circle116"
+         cx="76.294006"
+         cy="150.21559"
+         r="1.4471596"
+         transform="matrix(0.44980769,0,0,0.45222869,40.364709,65.526572)" />
+      <ellipse
+         style="mix-blend-mode:normal;fill:#ffaaaa;fill-opacity:1;stroke-width:0.264583;filter:url(#filter299)"
+         id="ellipse116"
+         cx="75.150902"
+         cy="134.65598"
+         rx="0.79917669"
+         ry="0.52548862" />
     </g>
   </g>
 </svg>

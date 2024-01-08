@@ -1,7 +1,14 @@
 body {
-    background-color: bisque;
+    background-color: black;
     margin: 0px;
     font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+#dashboard {
+    width: 840px;
+    height: 220px;
+    /*background-image: url(gfx/dashboard_840x220.png);*/
+    background-image: url(gfx/dashboard_blue_840x220.png);
 }
 
 .ledon {
@@ -32,7 +39,7 @@ body {
 }
 
 .white_text {
-    color: white;
+    color: rgb(153, 182, 228);;
     white-space: nowrap;
 }
 
@@ -52,12 +59,12 @@ body {
     position: absolute;
     left: 790px;
     top:190px;
-    color:#444;
+    color:#37328f;
 }
 
 #recording_container {
     position: absolute;
-    left: 420px;
+    left: 410px;
     top: 20px;
 }
 
@@ -68,19 +75,19 @@ body {
 #recording_button {
     position: absolute;
     top: -4px;
-    left: 50px;
+    left: 40px;
 }
 
 #recording_text {
     position: absolute;
     top: 0px;
-    left: 110px;
+    left: 90px;
 
 }
 
 #playing_container {
     position: absolute;
-    left: 200px;
+    left: 210px;
     top: 20px;
 }
 
@@ -89,15 +96,15 @@ body {
 }
 
 #playing_button {
-    position: absolute;
-    top: -4px;
-    left: 50px;
+	position: absolute;
+	top: -4px;
+	left: 40px;
 }
 
 #playing_text {
-    position: absolute;
-    top: 0px;
-    left: 110px;
+	position: absolute;
+	top: 0px;
+	left: 90px;
 }
 
 #songs_container {
@@ -145,6 +152,18 @@ body {
 #song4_text {
     position: absolute;
     top: 78px;
+    left: 60px;
+}
+
+#song5 {
+    position: absolute;
+    top: 112px;
+    left: 0px;
+}
+
+#song5_text {
+    position: absolute;
+    top: 106px;
     left: 60px;
 }
 
@@ -202,11 +221,7 @@ body {
     top: 104px;
 }
 
-#dashboard {
-    width: 840px;
-    height: 220px;
-    background-image: url(gfx/dashboard_840x220.png);
-}
+
 
 .note {
     background-color: white;
@@ -215,6 +230,7 @@ body {
     background-image: url(gfx/white_60x180.png);
     background-color: black;
     font-size: 14px;
+    color:gray;
     line-height: 2.5;
     text-align: center;
 }
