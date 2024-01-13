@@ -11,54 +11,246 @@ const songs = [
         button: "song1",
         sequence:
             [
-                { event: "pressed", idx: 0, timestamp: 0 },
-                { event: "released", idx: 0, timestamp: 30 },
-                { event: "pressed", idx: 2, timestamp: 60 },
-                { event: "released", idx: 2, timestamp: 90 },
-                { event: "pressed", idx: 0, timestamp: 120 },
-                { event: "released", idx: 0, timestamp: 150 },
-                { event: "pressed", idx: 2, timestamp: 180 },
-                { event: "released", idx: 2, timestamp: 210 },
-                { event: "pressed", idx: 4, timestamp: 240 },
-                { event: "released", idx: 4, timestamp: 300 },
-                { event: "pressed", idx: 4, timestamp: 360 },
-                { event: "released", idx: 4, timestamp: 420 },
-                { event: "pressed", idx: 0, timestamp: 480 },
-                { event: "released", idx: 0, timestamp: 510 },
-                { event: "pressed", idx: 2, timestamp: 540 },
-                { event: "released", idx: 2, timestamp: 570 },
-                { event: "pressed", idx: 0, timestamp: 600 },
-                { event: "released", idx: 0, timestamp: 630 },
-                { event: "pressed", idx: 2, timestamp: 660 },
-                { event: "released", idx: 2, timestamp: 690 },
-                { event: "pressed", idx: 4, timestamp: 720 },
-                { event: "released", idx: 4, timestamp: 780 },
-                { event: "pressed", idx: 4, timestamp: 840 },
-                { event: "released", idx: 4, timestamp: 900 },
-                { event: "pressed", idx: 12, timestamp: 960 },
-                { event: "released", idx: 12, timestamp: 990 },
-                { event: "pressed", idx: 6, timestamp: 1020 },
-                { event: "released", idx: 6, timestamp: 1050 },
-                { event: "pressed", idx: 5, timestamp: 1080 },
-                { event: "released", idx: 5, timestamp: 1110 },
-                { event: "pressed", idx: 4, timestamp: 1140 },
-                { event: "released", idx: 4, timestamp: 1170 },
-                { event: "pressed", idx: 3, timestamp: 1200 },
-                { event: "released", idx: 3, timestamp: 1260 },
-                { event: "pressed", idx: 5, timestamp: 1320 },
-                { event: "released", idx: 5, timestamp: 1380 },
-                { event: "pressed", idx: 4, timestamp: 1440 },
-                { event: "released", idx: 4, timestamp: 1470 },
-                { event: "pressed", idx: 3, timestamp: 1500 },
-                { event: "released", idx: 3, timestamp: 1530 },
-                { event: "pressed", idx: 2, timestamp: 1560 },
-                { event: "released", idx: 2, timestamp: 1590 },
-                { event: "pressed", idx: 1, timestamp: 1620 },
-                { event: "released", idx: 1, timestamp: 1650 },
-                { event: "pressed", idx: 0, timestamp: 1680 },
-                { event: "released", idx: 0, timestamp: 1740 },
-                { event: "pressed", idx: 0, timestamp: 1800 },
-                { event: "released", idx: 0, timestamp: 1860 }
+                {
+                    "event": "pressed",
+                    "idx": 0,
+                    "timestamp": 0
+                },
+                {
+                    "event": "pressed",
+                    "idx": 2,
+                    "timestamp": 28
+                },
+                {
+                    "event": "pressed",
+                    "idx": 0,
+                    "timestamp": 55
+                },
+                {
+                    "event": "pressed",
+                    "idx": 2,
+                    "timestamp": 82
+                },
+                {
+                    "event": "pressed",
+                    "idx": 4,
+                    "timestamp": 114
+                },
+                {
+                    "event": "pressed",
+                    "idx": 4,
+                    "timestamp": 161
+                },
+                {
+                    "event": "pressed",
+                    "idx": 0,
+                    "timestamp": 213
+                },
+                {
+                    "event": "pressed",
+                    "idx": 2,
+                    "timestamp": 237
+                },
+                {
+                    "event": "pressed",
+                    "idx": 0,
+                    "timestamp": 264
+                },
+                {
+                    "event": "pressed",
+                    "idx": 2,
+                    "timestamp": 287
+                },
+                {
+                    "event": "pressed",
+                    "idx": 4,
+                    "timestamp": 317
+                },
+                {
+                    "event": "pressed",
+                    "idx": 4,
+                    "timestamp": 368
+                },
+                {
+                    "event": "pressed",
+                    "idx": 12,
+                    "timestamp": 421
+                },
+                {
+                    "event": "pressed",
+                    "idx": 6,
+                    "timestamp": 447
+                },
+                {
+                    "event": "pressed",
+                    "idx": 5,
+                    "timestamp": 473
+                },
+                {
+                    "event": "pressed",
+                    "idx": 4,
+                    "timestamp": 497
+                },
+                {
+                    "event": "pressed",
+                    "idx": 3,
+                    "timestamp": 525
+                },
+                {
+                    "event": "pressed",
+                    "idx": 5,
+                    "timestamp": 577
+                },
+                {
+                    "event": "pressed",
+                    "idx": 4,
+                    "timestamp": 627
+                },
+                {
+                    "event": "pressed",
+                    "idx": 3,
+                    "timestamp": 655
+                },
+                {
+                    "event": "pressed",
+                    "idx": 2,
+                    "timestamp": 678
+                },
+                {
+                    "event": "pressed",
+                    "idx": 1,
+                    "timestamp": 706
+                },
+                {
+                    "event": "pressed",
+                    "idx": 0,
+                    "timestamp": 733
+                },
+                {
+                    "event": "pressed",
+                    "idx": 0,
+                    "timestamp": 779
+                },
+                {
+                    "idx": 0,
+                    "event": "released",
+                    "timestamp": 6
+                },
+                {
+                    "idx": 2,
+                    "event": "released",
+                    "timestamp": 31
+                },
+                {
+                    "idx": 0,
+                    "event": "released",
+                    "timestamp": 59
+                },
+                {
+                    "idx": 2,
+                    "event": "released",
+                    "timestamp": 85
+                },
+                {
+                    "idx": 4,
+                    "event": "released",
+                    "timestamp": 119
+                },
+                {
+                    "idx": 4,
+                    "event": "released",
+                    "timestamp": 166
+                },
+                {
+                    "idx": 0,
+                    "event": "released",
+                    "timestamp": 217
+                },
+                {
+                    "idx": 2,
+                    "event": "released",
+                    "timestamp": 241
+                },
+                {
+                    "idx": 0,
+                    "event": "released",
+                    "timestamp": 269
+                },
+                {
+                    "idx": 2,
+                    "event": "released",
+                    "timestamp": 292
+                },
+                {
+                    "idx": 4,
+                    "event": "released",
+                    "timestamp": 321
+                },
+                {
+                    "idx": 4,
+                    "event": "released",
+                    "timestamp": 372
+                },
+                {
+                    "idx": 12,
+                    "event": "released",
+                    "timestamp": 424
+                },
+                {
+                    "idx": 6,
+                    "event": "released",
+                    "timestamp": 451
+                },
+                {
+                    "idx": 5,
+                    "event": "released",
+                    "timestamp": 476
+                },
+                {
+                    "idx": 4,
+                    "event": "released",
+                    "timestamp": 502
+                },
+                {
+                    "idx": 3,
+                    "event": "released",
+                    "timestamp": 528
+                },
+                {
+                    "idx": 5,
+                    "event": "released",
+                    "timestamp": 580
+                },
+                {
+                    "idx": 4,
+                    "event": "released",
+                    "timestamp": 631
+                },
+                {
+                    "idx": 3,
+                    "event": "released",
+                    "timestamp": 660
+                },
+                {
+                    "idx": 2,
+                    "event": "released",
+                    "timestamp": 682
+                },
+                {
+                    "idx": 1,
+                    "event": "released",
+                    "timestamp": 709
+                },
+                {
+                    "idx": 0,
+                    "event": "released",
+                    "timestamp": 737
+                },
+                {
+                    "idx": 0,
+                    "event": "released",
+                    "timestamp": 783
+                }
             ]
     }, {
         name: "Twinkle little star",
@@ -67,90 +259,441 @@ const songs = [
         button: "song2",
         sequence:
             [
-                { event: "pressed", idx: 0, timestamp: 0 },
-                { event: "released", idx: 0, timestamp: 21 },
-                { event: "pressed", idx: 0, timestamp: 46 },
-                { event: "released", idx: 0, timestamp: 67 },
-                { event: "pressed", idx: 4, timestamp: 93 },
-                { event: "released", idx: 4, timestamp: 113 },
-                { event: "pressed", idx: 4, timestamp: 136 },
-                { event: "released", idx: 4, timestamp: 159 },
-                { event: "pressed", idx: 5, timestamp: 184 },
-                { event: "released", idx: 5, timestamp: 202 },
-                { event: "pressed", idx: 5, timestamp: 229 },
-                { event: "released", idx: 5, timestamp: 250 },
-                { event: "pressed", idx: 4, timestamp: 275 },
-                { event: "released", idx: 4, timestamp: 328 },
-                { event: "pressed", idx: 3, timestamp: 424 },
-                { event: "released", idx: 3, timestamp: 449 },
-                { event: "pressed", idx: 3, timestamp: 466 },
-                { event: "released", idx: 3, timestamp: 487 },
-                { event: "pressed", idx: 2, timestamp: 513 },
-                { event: "released", idx: 2, timestamp: 534 },
-                { event: "pressed", idx: 2, timestamp: 559 },
-                { event: "released", idx: 2, timestamp: 579 },
-                { event: "pressed", idx: 1, timestamp: 608 },
-                { event: "released", idx: 1, timestamp: 621 },
-                { event: "pressed", idx: 1, timestamp: 652 },
-                { event: "released", idx: 1, timestamp: 672 },
-                { event: "pressed", idx: 0, timestamp: 700 },
-                { event: "released", idx: 0, timestamp: 764 },
-                { event: "pressed", idx: 4, timestamp: 804 },
-                { event: "released", idx: 4, timestamp: 826 },
-                { event: "pressed", idx: 4, timestamp: 848 },
-                { event: "released", idx: 4, timestamp: 868 },
-                { event: "pressed", idx: 3, timestamp: 897 },
-                { event: "released", idx: 3, timestamp: 915 },
-                { event: "pressed", idx: 3, timestamp: 943 },
-                { event: "released", idx: 3, timestamp: 962 },
-                { event: "pressed", idx: 2, timestamp: 993 },
-                { event: "released", idx: 2, timestamp: 1009 },
-                { event: "pressed", idx: 2, timestamp: 1039 },
-                { event: "released", idx: 2, timestamp: 1057 },
-                { event: "pressed", idx: 1, timestamp: 1090 },
-                { event: "released", idx: 1, timestamp: 1155 },
-                { event: "pressed", idx: 4, timestamp: 1187 },
-                { event: "released", idx: 4, timestamp: 1211 },
-                { event: "pressed", idx: 4, timestamp: 1230 },
-                { event: "released", idx: 4, timestamp: 1246 },
-                { event: "pressed", idx: 3, timestamp: 1277 },
-                { event: "released", idx: 3, timestamp: 1298 },
-                { event: "pressed", idx: 3, timestamp: 1320 },
-                { event: "released", idx: 3, timestamp: 1339 },
-                { event: "pressed", idx: 2, timestamp: 1369 },
-                { event: "released", idx: 2, timestamp: 1389 },
-                { event: "pressed", idx: 2, timestamp: 1414 },
-                { event: "released", idx: 2, timestamp: 1433 },
-                { event: "pressed", idx: 1, timestamp: 1464 },
-                { event: "released", idx: 1, timestamp: 1514 },
-                { event: "pressed", idx: 0, timestamp: 1563 },
-                { event: "released", idx: 0, timestamp: 1582 },
-                { event: "pressed", idx: 0, timestamp: 1609 },
-                { event: "released", idx: 0, timestamp: 1630 },
-                { event: "pressed", idx: 4, timestamp: 1656 },
-                { event: "released", idx: 4, timestamp: 1678 },
-                { event: "pressed", idx: 4, timestamp: 1701 },
-                { event: "released", idx: 4, timestamp: 1722 },
-                { event: "pressed", idx: 5, timestamp: 1752 },
-                { event: "released", idx: 5, timestamp: 1770 },
-                { event: "pressed", idx: 5, timestamp: 1800 },
-                { event: "released", idx: 5, timestamp: 1818 },
-                { event: "pressed", idx: 4, timestamp: 1848 },
-                { event: "released", idx: 4, timestamp: 1901 },
-                { event: "pressed", idx: 3, timestamp: 1947 },
-                { event: "released", idx: 3, timestamp: 1968 },
-                { event: "pressed", idx: 3, timestamp: 1990 },
-                { event: "released", idx: 3, timestamp: 2012 },
-                { event: "pressed", idx: 2, timestamp: 2035 },
-                { event: "released", idx: 2, timestamp: 2056 },
-                { event: "pressed", idx: 2, timestamp: 2081 },
-                { event: "released", idx: 2, timestamp: 2103 },
-                { event: "pressed", idx: 1, timestamp: 2128 },
-                { event: "released", idx: 1, timestamp: 2151 },
-                { event: "pressed", idx: 1, timestamp: 2175 },
-                { event: "released", idx: 1, timestamp: 2197 },
-                { event: "pressed", idx: 0, timestamp: 2229 },
-                { event: "released", idx: 0, timestamp: 2254 }
+                {
+                    "event": "pressed",
+                    "idx": 0,
+                    "timestamp": 0
+                },
+                {
+                    "event": "pressed",
+                    "idx": 0,
+                    "timestamp": 44
+                },
+                {
+                    "event": "pressed",
+                    "idx": 4,
+                    "timestamp": 94
+                },
+                {
+                    "event": "pressed",
+                    "idx": 4,
+                    "timestamp": 146
+                },
+                {
+                    "event": "pressed",
+                    "idx": 5,
+                    "timestamp": 203
+                },
+                {
+                    "event": "pressed",
+                    "idx": 5,
+                    "timestamp": 254
+                },
+                {
+                    "event": "pressed",
+                    "idx": 4,
+                    "timestamp": 303
+                },
+                {
+                    "event": "pressed",
+                    "idx": 3,
+                    "timestamp": 406
+                },
+                {
+                    "event": "pressed",
+                    "idx": 3,
+                    "timestamp": 452
+                },
+                {
+                    "event": "pressed",
+                    "idx": 2,
+                    "timestamp": 499
+                },
+                {
+                    "event": "pressed",
+                    "idx": 2,
+                    "timestamp": 544
+                },
+                {
+                    "event": "pressed",
+                    "idx": 1,
+                    "timestamp": 590
+                },
+                {
+                    "event": "pressed",
+                    "idx": 1,
+                    "timestamp": 633
+                },
+                {
+                    "event": "pressed",
+                    "idx": 0,
+                    "timestamp": 678
+                },
+                {
+                    "event": "pressed",
+                    "idx": 4,
+                    "timestamp": 773
+                },
+                {
+                    "event": "pressed",
+                    "idx": 4,
+                    "timestamp": 816
+                },
+                {
+                    "event": "pressed",
+                    "idx": 3,
+                    "timestamp": 864
+                },
+                {
+                    "event": "pressed",
+                    "idx": 3,
+                    "timestamp": 906
+                },
+                {
+                    "event": "pressed",
+                    "idx": 2,
+                    "timestamp": 950
+                },
+                {
+                    "event": "pressed",
+                    "idx": 2,
+                    "timestamp": 991
+                },
+                {
+                    "event": "pressed",
+                    "idx": 1,
+                    "timestamp": 1037
+                },
+                {
+                    "event": "pressed",
+                    "idx": 4,
+                    "timestamp": 1132
+                },
+                {
+                    "event": "pressed",
+                    "idx": 4,
+                    "timestamp": 1177
+                },
+                {
+                    "event": "pressed",
+                    "idx": 3,
+                    "timestamp": 1219
+                },
+                {
+                    "event": "pressed",
+                    "idx": 3,
+                    "timestamp": 1266
+                },
+                {
+                    "event": "pressed",
+                    "idx": 2,
+                    "timestamp": 1310
+                },
+                {
+                    "event": "pressed",
+                    "idx": 2,
+                    "timestamp": 1355
+                },
+                {
+                    "event": "pressed",
+                    "idx": 1,
+                    "timestamp": 1404
+                },
+                {
+                    "event": "pressed",
+                    "idx": 0,
+                    "timestamp": 1497
+                },
+                {
+                    "event": "pressed",
+                    "idx": 0,
+                    "timestamp": 1541
+                },
+                {
+                    "event": "pressed",
+                    "idx": 4,
+                    "timestamp": 1588
+                },
+                {
+                    "event": "pressed",
+                    "idx": 4,
+                    "timestamp": 1630
+                },
+                {
+                    "event": "pressed",
+                    "idx": 5,
+                    "timestamp": 1676
+                },
+                {
+                    "event": "pressed",
+                    "idx": 5,
+                    "timestamp": 1721
+                },
+                {
+                    "event": "pressed",
+                    "idx": 4,
+                    "timestamp": 1762
+                },
+                {
+                    "event": "pressed",
+                    "idx": 3,
+                    "timestamp": 1845
+                },
+                {
+                    "event": "pressed",
+                    "idx": 3,
+                    "timestamp": 1887
+                },
+                {
+                    "event": "pressed",
+                    "idx": 2,
+                    "timestamp": 1930
+                },
+                {
+                    "event": "pressed",
+                    "idx": 2,
+                    "timestamp": 1974
+                },
+                {
+                    "event": "pressed",
+                    "idx": 1,
+                    "timestamp": 2022
+                },
+                {
+                    "event": "pressed",
+                    "idx": 1,
+                    "timestamp": 2066
+                },
+                {
+                    "event": "pressed",
+                    "idx": 0,
+                    "timestamp": 2111
+                },
+                {
+                    "idx": 0,
+                    "event": "released",
+                    "timestamp": 10
+                },
+                {
+                    "idx": 0,
+                    "event": "released",
+                    "timestamp": 54
+                },
+                {
+                    "idx": 4,
+                    "event": "released",
+                    "timestamp": 106
+                },
+                {
+                    "idx": 4,
+                    "event": "released",
+                    "timestamp": 154
+                },
+                {
+                    "idx": 5,
+                    "event": "released",
+                    "timestamp": 211
+                },
+                {
+                    "idx": 5,
+                    "event": "released",
+                    "timestamp": 262
+                },
+                {
+                    "idx": 4,
+                    "event": "released",
+                    "timestamp": 312
+                },
+                {
+                    "idx": 3,
+                    "event": "released",
+                    "timestamp": 415
+                },
+                {
+                    "idx": 3,
+                    "event": "released",
+                    "timestamp": 461
+                },
+                {
+                    "idx": 2,
+                    "event": "released",
+                    "timestamp": 508
+                },
+                {
+                    "idx": 2,
+                    "event": "released",
+                    "timestamp": 553
+                },
+                {
+                    "idx": 1,
+                    "event": "released",
+                    "timestamp": 600
+                },
+                {
+                    "idx": 1,
+                    "event": "released",
+                    "timestamp": 642
+                },
+                {
+                    "idx": 0,
+                    "event": "released",
+                    "timestamp": 688
+                },
+                {
+                    "idx": 4,
+                    "event": "released",
+                    "timestamp": 784
+                },
+                {
+                    "idx": 4,
+                    "event": "released",
+                    "timestamp": 826
+                },
+                {
+                    "idx": 3,
+                    "event": "released",
+                    "timestamp": 871
+                },
+                {
+                    "idx": 3,
+                    "event": "released",
+                    "timestamp": 916
+                },
+                {
+                    "idx": 2,
+                    "event": "released",
+                    "timestamp": 960
+                },
+                {
+                    "idx": 2,
+                    "event": "released",
+                    "timestamp": 1002
+                },
+                {
+                    "idx": 1,
+                    "event": "released",
+                    "timestamp": 1046
+                },
+                {
+                    "idx": 4,
+                    "event": "released",
+                    "timestamp": 1140
+                },
+                {
+                    "idx": 4,
+                    "event": "released",
+                    "timestamp": 1185
+                },
+                {
+                    "idx": 3,
+                    "event": "released",
+                    "timestamp": 1228
+                },
+                {
+                    "idx": 3,
+                    "event": "released",
+                    "timestamp": 1273
+                },
+                {
+                    "idx": 2,
+                    "event": "released",
+                    "timestamp": 1319
+                },
+                {
+                    "idx": 2,
+                    "event": "released",
+                    "timestamp": 1364
+                },
+                {
+                    "idx": 1,
+                    "event": "released",
+                    "timestamp": 1412
+                },
+                {
+                    "idx": 0,
+                    "event": "released",
+                    "timestamp": 1505
+                },
+                {
+                    "idx": 0,
+                    "event": "released",
+                    "timestamp": 1550
+                },
+                {
+                    "idx": 4,
+                    "event": "released",
+                    "timestamp": 1596
+                },
+                {
+                    "idx": 4,
+                    "event": "released",
+                    "timestamp": 1639
+                },
+                {
+                    "idx": 5,
+                    "event": "released",
+                    "timestamp": 1685
+                },
+                {
+                    "idx": 5,
+                    "event": "released",
+                    "timestamp": 1729
+                },
+                {
+                    "idx": 4,
+                    "event": "released",
+                    "timestamp": 1770
+                },
+                {
+                    "idx": 3,
+                    "event": "released",
+                    "timestamp": 1856
+                },
+                {
+                    "idx": 3,
+                    "event": "released",
+                    "timestamp": 1897
+                },
+                {
+                    "idx": 2,
+                    "event": "released",
+                    "timestamp": 1940
+                },
+                {
+                    "idx": 2,
+                    "event": "released",
+                    "timestamp": 1984
+                },
+                {
+                    "idx": 1,
+                    "event": "released",
+                    "timestamp": 2030
+                },
+                {
+                    "idx": 1,
+                    "event": "released",
+                    "timestamp": 2074
+                },
+                {
+                    "idx": 0,
+                    "event": "released",
+                    "timestamp": 2120
+                },
+                {
+                    "idx": 0,
+                    "event": "released",
+                    "timestamp": 2216
+                },
+                {
+                    "idx": 0,
+                    "event": "released",
+                    "timestamp": 2244
+                },
+                {
+                    "idx": 0,
+                    "event": "released",
+                    "timestamp": 2261
+                }
             ]
     },
     {
@@ -160,62 +703,292 @@ const songs = [
         button: "song3",
         sequence:
             [
-                { event: "pressed", idx: 0, timestamp: 0 },
-                { event: "released", idx: 0, timestamp: 10 },
-                { event: "pressed", idx: 3, timestamp: 93 },
-                { event: "released", idx: 3, timestamp: 106 },
-                { event: "pressed", idx: 3, timestamp: 125 },
-                { event: "released", idx: 3, timestamp: 132 },
-                { event: "pressed", idx: 3, timestamp: 147 },
-                { event: "released", idx: 3, timestamp: 153 },
-                { event: "pressed", idx: 3, timestamp: 171 },
-                { event: "released", idx: 3, timestamp: 180 },
-                { event: "pressed", idx: 5, timestamp: 220 },
-                { event: "released", idx: 5, timestamp: 227 },
-                { event: "pressed", idx: 12, timestamp: 268 },
-                { event: "released", idx: 12, timestamp: 276 },
-                { event: "pressed", idx: 5, timestamp: 319 },
-                { event: "released", idx: 5, timestamp: 326 },
-                { event: "pressed", idx: 3, timestamp: 378 },
-                { event: "released", idx: 3, timestamp: 387 },
-                { event: "pressed", idx: 4, timestamp: 471 },
-                { event: "released", idx: 4, timestamp: 489 },
-                { event: "pressed", idx: 2, timestamp: 530 },
-                { event: "released", idx: 2, timestamp: 538 },
-                { event: "pressed", idx: 0, timestamp: 574 },
-                { event: "released", idx: 0, timestamp: 594 },
-                { event: "pressed", idx: 5, timestamp: 716 },
-                { event: "released", idx: 5, timestamp: 730 },
-                { event: "pressed", idx: 4, timestamp: 760 },
-                { event: "released", idx: 4, timestamp: 770 },
-                { event: "pressed", idx: 3, timestamp: 804 },
-                { event: "released", idx: 3, timestamp: 815 },
-                { event: "pressed", idx: 0, timestamp: 931 },
-                { event: "released", idx: 0, timestamp: 942 },
-                { event: "pressed", idx: 3, timestamp: 985 },
-                { event: "released", idx: 3, timestamp: 998 },
-                { event: "pressed", idx: 3, timestamp: 1023 },
-                { event: "released", idx: 3, timestamp: 1035 },
-                { event: "pressed", idx: 3, timestamp: 1048 },
-                { event: "released", idx: 3, timestamp: 1054 },
-                { event: "pressed", idx: 3, timestamp: 1077 },
-                { event: "released", idx: 3, timestamp: 1086 },
-                { event: "pressed", idx: 5, timestamp: 1137 },
-                { event: "released", idx: 5, timestamp: 1146 },
-                { event: "pressed", idx: 12, timestamp: 1195 },
-                { event: "released", idx: 12, timestamp: 1209 },
-                { event: "pressed", idx: 5, timestamp: 1287 },
-                { event: "released", idx: 5, timestamp: 1302 },
-                { event: "pressed", idx: 3, timestamp: 1346 },
-                { event: "released", idx: 3, timestamp: 1357 },
-                { event: "pressed", idx: 4, timestamp: 1464 },
-                { event: "released", idx: 4, timestamp: 1482 },
-                { event: "pressed", idx: 0, timestamp: 1555 },
-                { event: "released", idx: 0, timestamp: 1567 },
-                { event: "pressed", idx: 0, timestamp: 1586 },
-                { event: "released", idx: 0, timestamp: 1595 },
-                { event: "pressed", idx: 3, timestamp: 1631 },
-                { event: "released", idx: 3, timestamp: 1639 }]
+                {
+                    "event": "pressed",
+                    "idx": 0,
+                    "timestamp": 0
+                },
+                {
+                    "event": "pressed",
+                    "idx": 3,
+                    "timestamp": 49
+                },
+                {
+                    "event": "pressed",
+                    "idx": 3,
+                    "timestamp": 83
+                },
+                {
+                    "event": "pressed",
+                    "idx": 3,
+                    "timestamp": 107
+                },
+                {
+                    "event": "pressed",
+                    "idx": 3,
+                    "timestamp": 129
+                },
+                {
+                    "event": "pressed",
+                    "idx": 5,
+                    "timestamp": 166
+                },
+                {
+                    "event": "pressed",
+                    "idx": 12,
+                    "timestamp": 203
+                },
+                {
+                    "event": "pressed",
+                    "idx": 5,
+                    "timestamp": 240
+                },
+                {
+                    "event": "pressed",
+                    "idx": 3,
+                    "timestamp": 278
+                },
+                {
+                    "event": "pressed",
+                    "idx": 4,
+                    "timestamp": 352
+                },
+                {
+                    "event": "pressed",
+                    "idx": 2,
+                    "timestamp": 389
+                },
+                {
+                    "event": "pressed",
+                    "idx": 0,
+                    "timestamp": 426
+                },
+                {
+                    "event": "pressed",
+                    "idx": 5,
+                    "timestamp": 497
+                },
+                {
+                    "event": "pressed",
+                    "idx": 4,
+                    "timestamp": 532
+                },
+                {
+                    "event": "pressed",
+                    "idx": 3,
+                    "timestamp": 569
+                },
+                {
+                    "event": "pressed",
+                    "idx": 0,
+                    "timestamp": 656
+                },
+                {
+                    "event": "pressed",
+                    "idx": 3,
+                    "timestamp": 696
+                },
+                {
+                    "event": "pressed",
+                    "idx": 3,
+                    "timestamp": 729
+                },
+                {
+                    "event": "pressed",
+                    "idx": 3,
+                    "timestamp": 752
+                },
+                {
+                    "event": "pressed",
+                    "idx": 3,
+                    "timestamp": 772
+                },
+                {
+                    "event": "pressed",
+                    "idx": 5,
+                    "timestamp": 811
+                },
+                {
+                    "event": "pressed",
+                    "idx": 12,
+                    "timestamp": 850
+                },
+                {
+                    "event": "pressed",
+                    "idx": 5,
+                    "timestamp": 887
+                },
+                {
+                    "event": "pressed",
+                    "idx": 3,
+                    "timestamp": 923
+                },
+                {
+                    "event": "pressed",
+                    "idx": 4,
+                    "timestamp": 988
+                },
+                {
+                    "event": "pressed",
+                    "idx": 0,
+                    "timestamp": 1050
+                },
+                {
+                    "event": "pressed",
+                    "idx": 0,
+                    "timestamp": 1119
+                },
+                {
+                    "event": "pressed",
+                    "idx": 3,
+                    "timestamp": 1184
+                },
+                {
+                    "idx": 0,
+                    "event": "released",
+                    "timestamp": 11
+                },
+                {
+                    "idx": 3,
+                    "event": "released",
+                    "timestamp": 57
+                },
+                {
+                    "idx": 3,
+                    "event": "released",
+                    "timestamp": 89
+                },
+                {
+                    "idx": 3,
+                    "event": "released",
+                    "timestamp": 114
+                },
+                {
+                    "idx": 3,
+                    "event": "released",
+                    "timestamp": 135
+                },
+                {
+                    "idx": 5,
+                    "event": "released",
+                    "timestamp": 172
+                },
+                {
+                    "idx": 12,
+                    "event": "released",
+                    "timestamp": 209
+                },
+                {
+                    "idx": 5,
+                    "event": "released",
+                    "timestamp": 247
+                },
+                {
+                    "idx": 3,
+                    "event": "released",
+                    "timestamp": 284
+                },
+                {
+                    "idx": 4,
+                    "event": "released",
+                    "timestamp": 360
+                },
+                {
+                    "idx": 2,
+                    "event": "released",
+                    "timestamp": 396
+                },
+                {
+                    "idx": 0,
+                    "event": "released",
+                    "timestamp": 435
+                },
+                {
+                    "idx": 5,
+                    "event": "released",
+                    "timestamp": 506
+                },
+                {
+                    "idx": 4,
+                    "event": "released",
+                    "timestamp": 540
+                },
+                {
+                    "idx": 3,
+                    "event": "released",
+                    "timestamp": 578
+                },
+                {
+                    "idx": 0,
+                    "event": "released",
+                    "timestamp": 664
+                },
+                {
+                    "idx": 3,
+                    "event": "released",
+                    "timestamp": 702
+                },
+                {
+                    "idx": 3,
+                    "event": "released",
+                    "timestamp": 735
+                },
+                {
+                    "idx": 3,
+                    "event": "released",
+                    "timestamp": 756
+                },
+                {
+                    "idx": 3,
+                    "event": "released",
+                    "timestamp": 778
+                },
+                {
+                    "idx": 5,
+                    "event": "released",
+                    "timestamp": 816
+                },
+                {
+                    "idx": 12,
+                    "event": "released",
+                    "timestamp": 858
+                },
+                {
+                    "idx": 5,
+                    "event": "released",
+                    "timestamp": 895
+                },
+                {
+                    "idx": 3,
+                    "event": "released",
+                    "timestamp": 932
+                },
+                {
+                    "idx": 4,
+                    "event": "released",
+                    "timestamp": 1000
+                },
+                {
+                    "idx": 0,
+                    "event": "released",
+                    "timestamp": 1061
+                },
+                {
+                    "idx": 0,
+                    "event": "released",
+                    "timestamp": 1135
+                },
+                {
+                    "idx": 3,
+                    "event": "released",
+                    "timestamp": 1194
+                },
+                {
+                    "idx": 3,
+                    "event": "released",
+                    "timestamp": 1238
+                }
+            ]
     }
 
     /*
@@ -229,54 +1002,207 @@ const songs = [
         symbol: "-",
         button: "song4",
         sequence: [
-            { "event": "pressed", "idx": 1, "timestamp": 0 },
-            { "event": "released", "idx": 1, "timestamp": 6 },
-            { "event": "pressed", "idx": 1, "timestamp": 15 },
-            { "event": "released", "idx": 1, "timestamp": 20 },
-            { "event": "pressed", "idx": 13, "timestamp": 30 },
-            { "event": "released", "idx": 13, "timestamp": 40 },
-            { "event": "pressed", "idx": 5, "timestamp": 45 },
-            { "event": "released", "idx": 5, "timestamp": 55 },
-            { "event": "pressed", "idx": 10, "timestamp": 60 },
-            { "event": "released", "idx": 10, "timestamp": 70 },
-            { "event": "pressed", "idx": 4, "timestamp": 75 },
-            { "event": "released", "idx": 4, "timestamp": 85 },
-            { "event": "pressed", "idx": 3, "timestamp": 90 },
-            { "event": "released", "idx": 3, "timestamp": 100 },
-            { "event": "pressed", "idx": 1, "timestamp": 1068 },
-            { "event": "released", "idx": 1, "timestamp": 1076 },
-            { "event": "pressed", "idx": 3, "timestamp": 1181 },
-            { "event": "released", "idx": 3, "timestamp": 1187 },
-            { "event": "pressed", "idx": 4, "timestamp": 1332 },
-            { "event": "released", "idx": 4, "timestamp": 1337 },
-            { "event": "pressed", "idx": 0, "timestamp": 1667 },
-            { "event": "released", "idx": 0, "timestamp": 1674 },
-            { "event": "pressed", "idx": 0, "timestamp": 1684 },
-            { "event": "released", "idx": 0, "timestamp": 1692 },
-            { "event": "pressed", "idx": 13, "timestamp": 1948 },
-            { "event": "released", "idx": 13, "timestamp": 1960 },
-            { "event": "pressed", "idx": 5, "timestamp": 2127 },
-            { "event": "released", "idx": 5, "timestamp": 2135 },
-            { "event": "pressed", "idx": 10, "timestamp": 2261 },
-            { "event": "released", "idx": 10, "timestamp": 2266 },
-            { "event": "pressed", "idx": 4, "timestamp": 2391 },
-            { "event": "released", "idx": 4, "timestamp": 2399 },
-            { "event": "pressed", "idx": 3, "timestamp": 2574 },
-            { "event": "released", "idx": 3, "timestamp": 2583 },
-            { "event": "pressed", "idx": 1, "timestamp": 2859 },
-            { "event": "released", "idx": 1, "timestamp": 2869 },
-            { "event": "pressed", "idx": 3, "timestamp": 2939 },
-            { "event": "released", "idx": 3, "timestamp": 2948 },
-            { "event": "pressed", "idx": 4, "timestamp": 3092 },
-            { "event": "released", "idx": 4, "timestamp": 3103 },
-            { "event": "pressed", "idx": 0, "timestamp": 3236 },
-            { "event": "released", "idx": 0, "timestamp": 3244 },
-            { "event": "pressed", "idx": 0, "timestamp": 3255 },
-            { "event": "released", "idx": 0, "timestamp": 3264 },
-            { "event": "pressed", "idx": 5, "timestamp": 3512 },
-            { "event": "released", "idx": 5, "timestamp": 3522 }]
-
-
+            {
+                "event": "pressed",
+                "idx": 0,
+                "timestamp": 0
+            },
+            {
+                "event": "pressed",
+                "idx": 0,
+                "timestamp": 29
+            },
+            {
+                "event": "pressed",
+                "idx": 12,
+                "timestamp": 59
+            },
+            {
+                "event": "pressed",
+                "idx": 4,
+                "timestamp": 119
+            },
+            {
+                "event": "pressed",
+                "idx": 9,
+                "timestamp": 176
+            },
+            {
+                "event": "pressed",
+                "idx": 3,
+                "timestamp": 211
+            },
+            {
+                "event": "pressed",
+                "idx": 8,
+                "timestamp": 243
+            },
+            {
+                "event": "pressed",
+                "idx": 0,
+                "timestamp": 274
+            },
+            {
+                "event": "pressed",
+                "idx": 8,
+                "timestamp": 295
+            },
+            {
+                "event": "pressed",
+                "idx": 3,
+                "timestamp": 310
+            },
+            {
+                "event": "pressed",
+                "idx": 0,
+                "timestamp": 341
+            },
+            {
+                "event": "pressed",
+                "idx": 0,
+                "timestamp": 365
+            },
+            {
+                "event": "pressed",
+                "idx": 12,
+                "timestamp": 396
+            },
+            {
+                "event": "pressed",
+                "idx": 4,
+                "timestamp": 440
+            },
+            {
+                "event": "pressed",
+                "idx": 9,
+                "timestamp": 498
+            },
+            {
+                "event": "pressed",
+                "idx": 3,
+                "timestamp": 526
+            },
+            {
+                "event": "pressed",
+                "idx": 8,
+                "timestamp": 550
+            },
+            {
+                "event": "pressed",
+                "idx": 0,
+                "timestamp": 575
+            },
+            {
+                "event": "pressed",
+                "idx": 8,
+                "timestamp": 591
+            },
+            {
+                "event": "pressed",
+                "idx": 3,
+                "timestamp": 605
+            },
+            {
+                "idx": 0,
+                "event": "released",
+                "timestamp": 10
+            },
+            {
+                "idx": 0,
+                "event": "released",
+                "timestamp": 38
+            },
+            {
+                "idx": 12,
+                "event": "released",
+                "timestamp": 69
+            },
+            {
+                "idx": 4,
+                "event": "released",
+                "timestamp": 128
+            },
+            {
+                "idx": 9,
+                "event": "released",
+                "timestamp": 186
+            },
+            {
+                "idx": 3,
+                "event": "released",
+                "timestamp": 219
+            },
+            {
+                "idx": 8,
+                "event": "released",
+                "timestamp": 253
+            },
+            {
+                "idx": 0,
+                "event": "released",
+                "timestamp": 283
+            },
+            {
+                "idx": 8,
+                "event": "released",
+                "timestamp": 302
+            },
+            {
+                "idx": 3,
+                "event": "released",
+                "timestamp": 317
+            },
+            {
+                "idx": 0,
+                "event": "released",
+                "timestamp": 349
+            },
+            {
+                "idx": 0,
+                "event": "released",
+                "timestamp": 373
+            },
+            {
+                "idx": 12,
+                "event": "released",
+                "timestamp": 402
+            },
+            {
+                "idx": 4,
+                "event": "released",
+                "timestamp": 447
+            },
+            {
+                "idx": 9,
+                "event": "released",
+                "timestamp": 504
+            },
+            {
+                "idx": 3,
+                "event": "released",
+                "timestamp": 532
+            },
+            {
+                "idx": 8,
+                "event": "released",
+                "timestamp": 556
+            },
+            {
+                "idx": 0,
+                "event": "released",
+                "timestamp": 581
+            },
+            {
+                "idx": 8,
+                "event": "released",
+                "timestamp": 597
+            },
+            {
+                "idx": 3,
+                "event": "released",
+                "timestamp": 611
+            }
+        ]
     },
     /*
     *
@@ -289,17 +1215,138 @@ const songs = [
         symbol: "=",
         button: "song5",
         sequence: [
-            { "event": "pressed", "idx": 23, "timestamp": 0 },
-            { "event": "pressed", "idx": 11, "timestamp": 0 },
-            { "event": "released", "idx": 11, "timestamp": 15 },
-            { "event": "released", "idx": 23, "timestamp": 15 },
-            { "event": "pressed", "idx": 22, "timestamp": 60 },
-            { "event": "released", "idx": 22, "timestamp": 75 },
-            { "event": "pressed", "idx": 20, "timestamp": 90 },
-            { "event": "released", "idx": 20, "timestamp": 105 },
-            { "event": "pressed", "idx": 19, "timestamp": 150 },
-            { "event": "released", "idx": 19, "timestamp": 165 }
+            {
+                "event": "pressed",
+                "idx": 23,
+                "timestamp": 0
+            },
+            {
+                "event": "pressed",
+                "idx": 22,
+                "timestamp": 78
+            },
+            {
+                "event": "pressed",
+                "idx": 20,
+                "timestamp": 107
+            },
+            {
+                "event": "pressed",
+                "idx": 21,
+                "timestamp": 182
+            },
+            {
+                "event": "pressed",
+                "idx": 23,
+                "timestamp": 326
+            },
+            {
+                "event": "pressed",
+                "idx": 22,
+                "timestamp": 402
+            },
+            {
+                "event": "pressed",
+                "idx": 20,
+                "timestamp": 431
+            },
+            {
+                "event": "pressed",
+                "idx": 19,
+                "timestamp": 498
+            },
+            {
+                "event": "pressed",
+                "idx": 23,
+                "timestamp": 626
+            },
+            {
+                "event": "pressed",
+                "idx": 22,
+                "timestamp": 690
+            },
+            {
+                "event": "pressed",
+                "idx": 20,
+                "timestamp": 728
+            },
+            {
+                "event": "pressed",
+                "idx": 21,
+                "timestamp": 760
+            },
+            {
+                "event": "pressed",
+                "idx": 11,
+                "timestamp": 796
+            },
+            {
+                "idx": 23,
+                "event": "released",
+                "timestamp": 5
+            },
+            {
+                "idx": 22,
+                "event": "released",
+                "timestamp": 87
+            },
+            {
+                "idx": 20,
+                "event": "released",
+                "timestamp": 118
+            },
+            {
+                "idx": 21,
+                "event": "released",
+                "timestamp": 190
+            },
+            {
+                "idx": 23,
+                "event": "released",
+                "timestamp": 335
+            },
+            {
+                "idx": 22,
+                "event": "released",
+                "timestamp": 411
+            },
+            {
+                "idx": 20,
+                "event": "released",
+                "timestamp": 441
+            },
+            {
+                "idx": 19,
+                "event": "released",
+                "timestamp": 504
+            },
+            {
+                "idx": 23,
+                "event": "released",
+                "timestamp": 632
+            },
+            {
+                "idx": 22,
+                "event": "released",
+                "timestamp": 698
+            },
+            {
+                "idx": 20,
+                "event": "released",
+                "timestamp": 737
+            },
+            {
+                "idx": 21,
+                "event": "released",
+                "timestamp": 769
+            },
+            {
+                "idx": 11,
+                "event": "released",
+                "timestamp": 808
+            }
         ]
+
     }
 
 ]

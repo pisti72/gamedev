@@ -24,9 +24,9 @@
      inkscape:pagecheckerboard="0"
      inkscape:deskcolor="#d1d1d1"
      inkscape:document-units="mm"
-     inkscape:zoom="5.6568542"
-     inkscape:cx="241.2118"
-     inkscape:cy="493.56053"
+     inkscape:zoom="11.313708"
+     inkscape:cx="379.40699"
+     inkscape:cy="507.17234"
      inkscape:window-width="1920"
      inkscape:window-height="1004"
      inkscape:window-x="0"
@@ -434,11 +434,23 @@
        y1="142.12688"
        x2="52.101219"
        y2="183.83485" />
+    <linearGradient
+       inkscape:collect="always"
+       xlink:href="#linearGradient6"
+       id="linearGradient15"
+       gradientUnits="userSpaceOnUse"
+       gradientTransform="matrix(1.0435403,0,0,3.3601315,-2.016168,-362.42794)"
+       x1="86.353256"
+       y1="150.73071"
+       x2="86.361855"
+       y2="155.11703"
+       spreadMethod="reflect" />
   </defs>
   <g
      inkscape:label="Layer 1"
      inkscape:groupmode="layer"
-     id="layer1">
+     id="layer1"
+     style="display:inline">
     <g
        id="g1"
        transform="translate(178.85889,98.166667)">
@@ -550,7 +562,8 @@
        id="button_42x16"
        inkscape:export-filename="button_42x16.png"
        inkscape:export-xdpi="96"
-       inkscape:export-ydpi="96">
+       inkscape:export-ydpi="96"
+       transform="translate(0,-5.2916718)">
       <rect
          style="fill:#1a1a1a;stroke:none;stroke-width:0.294455;stroke-opacity:1"
          id="rect3"
@@ -2151,5 +2164,73 @@
          rx="0.79917669"
          ry="0.52548862" />
     </g>
+    <g
+       id="g15"
+       transform="matrix(1,0,0,0.76190475,14.287503,19.75564)"
+       inkscape:export-filename="button_42x32_pink.png"
+       inkscape:export-xdpi="96"
+       inkscape:export-ydpi="96"
+       inkscape:label="button_42x32_pink">
+      <rect
+         style="fill:#1a1a1a;stroke:none;stroke-width:0.477072;stroke-opacity:1"
+         id="rect2"
+         width="11.1125"
+         height="11.1125"
+         x="82.020836"
+         y="140.75822"
+         rx="2.1166666"
+         ry="2.1166666" />
+      <rect
+         style="fill:url(#linearGradient15);stroke:none;stroke-width:0.454353;stroke-opacity:1"
+         id="rect10"
+         width="10.583333"
+         height="10.583333"
+         x="82.285416"
+         y="141.0228"
+         rx="2.1166666"
+         ry="2.1166666" />
+      <path
+         id="path12"
+         style="fill:#b3b3b3;stroke-width:0.350763"
+         d="m 82.303698,142.85018 c 0.895188,2.34967 0.486984,5.20289 0,6.75224 0,0 0,-3.98258 0,-6.75224 z"
+         sodipodi:nodetypes="ccc" />
+      <path
+         id="path13"
+         style="fill:#666666;stroke-width:0.350664"
+         d="m 92.852343,142.94934 c -0.895189,2.34834 -0.486984,5.19995 0,6.74843 0,0 0,-3.98033 0,-6.74843 z"
+         sodipodi:nodetypes="ccc" />
+      <rect
+         style="fill:#f9f9f9;stroke:none;stroke-width:0.264583;stroke-opacity:1;filter:url(#filter7)"
+         id="rect14"
+         width="8.8101587"
+         height="0.27679622"
+         x="83.216797"
+         y="141.57704"
+         transform="matrix(1,0,0,2.2838039,0,-181.50448)" />
+      <rect
+         style="fill:#999999;stroke:none;stroke-width:0.264583;stroke-opacity:1;filter:url(#filter7)"
+         id="rect15"
+         width="8.8101587"
+         height="0.27679622"
+         x="81.33168"
+         y="152.10628"
+         transform="matrix(1.1145595,0,0,4.3035265,-8.0734115,-505.32896)"
+         rx="0.39074254" />
+    </g>
+  </g>
+  <g
+     inkscape:groupmode="layer"
+     id="layer2"
+     inkscape:label="colors"
+     style="mix-blend-mode:overlay">
+    <rect
+       style="mix-blend-mode:multiply;fill:#c35b5b;fill-opacity:1;stroke:none;stroke-width:0.396592;stroke-opacity:1"
+       id="rect10-0"
+       width="10.583333"
+       height="8.0634918"
+       x="96.572701"
+       y="127.20126"
+       rx="2.1166666"
+       ry="1.6126983" />
   </g>
 </svg>

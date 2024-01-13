@@ -1,7 +1,18 @@
+/**
+ * display: 840x400 px
+ */
+@font-face {
+    font-family: Bebas;
+    src: url(gfx/Bebas-Regular.otf);
+}
+
 body {
     background-color: black;
     margin: 0px;
-    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    /*font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;*/
+    font-family: Bebas;
+    font-size: 18px;
+    overflow: hidden;
 }
 
 #dashboard {
@@ -31,6 +42,13 @@ body {
     background-image: url(gfx/button_42x32.png);
 }
 
+.button_mid_red{
+    cursor: pointer;
+    width: 42px;
+    height: 32px;
+    background-image: url(gfx/button_42x32_red.png);
+}
+
 .button_square {
     cursor: pointer;
     width: 42px;
@@ -39,8 +57,8 @@ body {
 }
 
 .white_text {
-    color: rgb(153, 182, 228);;
-    white-space: nowrap;
+	color: rgb(208, 208, 208);
+	white-space: nowrap;
 }
 
 .ledoff {
@@ -58,9 +76,14 @@ body {
 #version {
     position: absolute;
     left: 790px;
-    top:190px;
-    color:#37328f;
+    top: 190px;
+    color: #8186d9;
 }
+
+/**
+ *  RECORDING
+ */
+
 
 #recording_container {
     position: absolute;
@@ -85,6 +108,10 @@ body {
 
 }
 
+/**
+ *  PLAYING
+ */
+
 #playing_container {
     position: absolute;
     left: 210px;
@@ -96,16 +123,46 @@ body {
 }
 
 #playing_button {
-	position: absolute;
-	top: -4px;
-	left: 40px;
+    position: absolute;
+    top: -4px;
+    left: 40px;
 }
 
 #playing_text {
-	position: absolute;
-	top: 0px;
-	left: 90px;
+    position: absolute;
+    top: 0px;
+    left: 90px;
 }
+
+/**
+ *  RE-RHYTHMING
+ */
+
+ #rerhythming_container {
+    position: absolute;
+    left: 315px;
+    top: 50px;
+}
+
+#rerhythming_on {
+    display: none;
+}
+
+#rerhythming_button {
+    position: absolute;
+    top: -4px;
+    left: 40px;
+}
+
+#rerhythming_text {
+    position: absolute;
+    top: 0px;
+    left: 90px;
+}
+
+/**
+ *  SONGS
+ */
 
 #songs_container {
     position: absolute;
@@ -115,8 +172,8 @@ body {
 
 #song1_text {
     position: absolute;
-    top: -6px;
-    left: 60px;
+    top: -4px;
+    left: 54px;
 }
 
 #song2 {
@@ -127,8 +184,8 @@ body {
 
 #song2_text {
     position: absolute;
-    top: 22px;
-    left: 60px;
+    top: 24px;
+    left: 54px;
 }
 
 #song3 {
@@ -139,8 +196,8 @@ body {
 
 #song3_text {
     position: absolute;
-    top: 50px;
-    left: 60px;
+    top: 52px;
+    left: 54px;
 }
 
 #song4 {
@@ -151,8 +208,8 @@ body {
 
 #song4_text {
     position: absolute;
-    top: 78px;
-    left: 60px;
+    top: 80px;
+    left: 54px;
 }
 
 #song5 {
@@ -163,9 +220,13 @@ body {
 
 #song5_text {
     position: absolute;
-    top: 106px;
-    left: 60px;
+    top: 108px;
+    left: 54px;
 }
+
+/**
+ *  DRUMS
+ */
 
 #drums_container {
     position: absolute;
@@ -173,55 +234,57 @@ body {
     top: 70px;
 }
 
-#drum1{
+#drum1 {
     position: absolute;
     left: 0px;
     top: 0px;
 }
 
-#drum1_text{
+#drum1_text {
     position: absolute;
     left: 48px;
     top: 6px;
 }
 
-#drum2{
+#drum2 {
     position: absolute;
     left: 0px;
     top: 64px;
 }
 
-#drum2_text{
+#drum2_text {
     position: absolute;
     left: 48px;
     top: 70px;
 }
 
-#drum3{
+#drum3 {
     position: absolute;
     left: 54px;
     top: 30px;
 }
 
-#drum3_text{
+#drum3_text {
     position: absolute;
-    left: 98px;
+    left: 104px;
     top: 38px;
 }
 
-#drum4{
+#drum4 {
     position: absolute;
     left: 54px;
     top: 94px;
 }
 
-#drum4_text{
+#drum4_text {
     position: absolute;
-    left: 98px;
+    left: 104px;
     top: 104px;
 }
 
-
+/**
+ *  NOTES
+ */
 
 .note {
     background-color: white;
@@ -229,8 +292,7 @@ body {
     height: 180px;
     background-image: url(gfx/white_60x180.png);
     background-color: black;
-    font-size: 14px;
-    color:gray;
+    color: gray;
     line-height: 2.5;
     text-align: center;
 }

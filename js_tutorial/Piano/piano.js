@@ -8,14 +8,20 @@ const VERSION = "v 0.1"
 
 isRecording = false
 recordingArray = []
+newRecordingArray = []
 recordingResult = ""
 recordingNormalized = ""
+recordingIndex = 0
 isPlaying = false
+isMousePressed = false
+isRerhythming = false
 counter = 0
 
 const NOTE = 0
 const HALFNOTE = 1
 const DRUM = 2
+const PRESSED = "pressed"
+const RELEASED = "released"
 
 const notes = [
   { idx: 0, id: "c4", idpressed: "c4pressed", key: "KeyZ", pressed: false, start: 0, end: 1.60, type: NOTE },
@@ -63,13 +69,15 @@ document.addEventListener("keydown", function (e) {
     let note = notes[i]
     if (e.code == note.key && !note.pressed) {
       playNote(note)
-      recordNote(note, "pressed")
+      recordNote(note, PRESSED)
     }
   }
   if (e.code == "Space") {
     recordingPressed()
   } else if (e.code == "Enter") {
     playingOn()
+  } else if (e.code == "Digit1") {
+    playNextNote()
   }
 
   for (i = 0; i < songs.length; i++) {
@@ -86,7 +94,7 @@ document.addEventListener("keyup", function (e) {
       stopNote(notes[i])
       if (isRecording) {
         let snapshot = {
-          event: "released",
+          event: RELEASED,
           idx: i,
           timestamp: counter
         }
@@ -94,20 +102,37 @@ document.addEventListener("keyup", function (e) {
       }
     }
   }
+  if (e.code == "Digit1") {
+    stopNextNote()
+  }
 })
 
 for (i = 0; i < notes.length; i++) {
   let note = notes[i]
   f(note.idpressed).addEventListener("mousedown", function (e) {
+    isMousePressed = true
     if (!note.pressed) {
       playNote(note)
-      recordNote(note, "pressed")
+      recordNote(note, PRESSED)
+    }
+  })
+
+  f(note.idpressed).addEventListener("mouseover", function (e) {
+    if (!note.pressed && isMousePressed) {
+      playNote(note)
+      recordNote(note, PRESSED)
     }
   })
 
   f(note.idpressed).addEventListener("mouseup", function (e) {
+    isMousePressed = false
     stopNote(note)
-    recordNote(note, "released")
+    recordNote(note, RELEASED)
+  })
+
+  f(note.idpressed).addEventListener("mouseout", function (e) {
+    stopNote(note)
+    recordNote(note, RELEASED)
   })
 }
 
@@ -125,6 +150,14 @@ f("recording_button").addEventListener("mousedown", function (e) {
 
 f("playing_button").addEventListener("mousedown", function (e) {
   playingOn()
+})
+
+f("rerhythming_button").addEventListener("mousedown", function (e) {
+  playNextNote()
+})
+
+f("rerhythming_button").addEventListener("mouseup", function (e) {
+  stopNextNote()
 })
 
 
@@ -159,7 +192,7 @@ function createSongDivs() {
 function createNoteDivs() {
   for (i = 0; i < notes.length; i++) {
     let note = notes[i]
-    if(note.type == NOTE){
+    if (note.type == NOTE) {
       div = document.createElement("div");
       div.id = note.id
       div.className = "note"
@@ -169,7 +202,7 @@ function createNoteDivs() {
       div.id = note.id + "pressed"
       div.className = "note-pressed"
       f("notes-pressed").appendChild(div)
-    }else if(note.type == HALFNOTE){
+    } else if (note.type == HALFNOTE) {
       div = document.createElement("div");
       div.id = note.id
       div.className = "halfnote"
@@ -186,14 +219,71 @@ function recordingPressed() {
   if (!isPlaying) {
     if (isRecording) {
       isRecording = false
-      recordingResult = JSON.stringify(recordingArray)
-      visible("recording")
-      hide("recording_on")
+      recordingResult = JSON.stringify(recordingArray, null, " ")
     } else {
       isRecording = true
       playingOff()
       recordingArray = []
     }
+  }
+}
+
+function playNextNote() {
+  //f("debug").innerHTML = recordingIndex
+  if (isPlaying || isRecording) {
+    return
+  } else if (recordingArray.length == 0) {
+    recordingIndex = 0
+    return
+  } else if (recordingIndex < recordingArray.length) {
+    if (recordingIndex == 0) {
+      isRerhythming = true
+      counter = 0
+      newRecordingArray = []
+      newRecordingArrayReleased = []
+      for (i = 0; i < recordingArray.length; i++) {
+        let snapshot = recordingArray[i]
+        if (snapshot.event == PRESSED) {
+          let item = {
+            event: PRESSED,
+            idx: snapshot.idx,
+            timestamp: 0
+          }
+          newRecordingArray.push(item)
+        }
+      }
+    }
+
+    if (recordingIndex < newRecordingArray.length) {
+      let snapshot = newRecordingArray[recordingIndex]
+      snapshot.timestamp = counter
+      playNote(notes[snapshot.idx])
+      recordingIndex++
+    }
+  }
+}
+
+function stopNextNote() {
+  if (isPlaying || isRecording) {
+    return
+  } else if (recordingArray.length == 0) {
+    recordingIndex = 0
+    return
+  } else if (newRecordingArrayReleased.length < newRecordingArray.length) {
+    let snapshotPRESSED = newRecordingArray[recordingIndex - 1]
+    let snapshot = {
+      idx: snapshotPRESSED.idx,
+      event: RELEASED,
+      timestamp: counter
+    }
+    stopNote(notes[snapshot.idx])
+    newRecordingArrayReleased.push(snapshot)
+  } else {
+    console.log("end of re-rhythming")
+    recordingArray = newRecordingArray.concat(newRecordingArrayReleased)
+    recordingResult = JSON.stringify(recordingArray, null, " ")
+    recordingIndex = 0
+    isRerhythming = false
   }
 }
 
@@ -212,8 +302,6 @@ function playingOn() {
 
 function playingOff() {
   isPlaying = false
-  visible("playing")
-  hide("playing_on")
   counter = 0
 }
 
@@ -255,31 +343,39 @@ function update() {
     }
   }
 
-  if (isRecording) {
-    if (counter % 60 > 30) {
-      visible("recording")
-      hide("recording_on")
-    } else {
-      hide("recording")
-      visible("recording_on")
-    }
+  if (isRerhythming && counter % 60 < 30) {
+    hide("rerhythming")
+    visible("rerhythming_on")
+  } else {
+    visible("rerhythming")
+    hide("rerhythming_on")
+  }
+
+
+  if (isRecording && counter % 60 < 30) {
+    hide("recording")
+    visible("recording_on")
+  } else {
+    visible("recording")
+    hide("recording_on")
+  }
+
+  if(isPlaying && counter % 60 < 30){
+    hide("playing")
+    visible("playing_on")
+  } else {
+    visible("playing")
+    hide("playing_on")
   }
 
   if (isPlaying) {
     if (recordingArray.length == 0) {
       playingOff()
     } else {
-      if (counter % 60 > 30) {
-        visible("playing")
-        hide("playing_on")
-      } else {
-        hide("playing")
-        visible("playing_on")
-      }
       for (i = 0; i < recordingArray.length; i++) {
         let snapshot = recordingArray[i]
         if (snapshot.timestamp == counter) {
-          if (snapshot.event == "pressed") {
+          if (snapshot.event == PRESSED) {
             playNote(notes[snapshot.idx])
           } else {
             stopNote(notes[snapshot.idx])
@@ -292,6 +388,7 @@ function update() {
     }
 
   }
+  
   counter++;
   requestAnimationFrame(update)
 }
