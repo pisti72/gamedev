@@ -1,0 +1,39 @@
+body {
+    background-color: 0;
+    overflow: hidden;
+    margin: 0px;
+}
+
+#debug {
+    position: absolute;
+    top: 0 px;
+    left: 0px;
+}
+
+#container {
+    position: absolute;
+    width: 900px;
+    height: 440px;
+    top: 0 px;
+    left: 0px;
+    overflow: hidden;
+    cursor: none;
+}
+
+#board {
+    position: absolute;
+    width: 900px;
+    height: 440px;
+    top: 0 px;
+    left: 0px;
+    background-image: url(assets/xylophone.png);
+}
+
+#hand {
+    position: absolute;
+    width: 420px;
+    height: 419px;
+    top: 120px;
+    left: 380px;
+    background-image: url(assets/hand.png);
+}

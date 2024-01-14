@@ -1,4 +1,9 @@
-/*
+/**
+ * Title: Blue Piano
+ * Author: Istvan Szalontai
+ * Created at: 2024-01-08
+ * 
+ *
  *   https://www.irish-folk-songs.com/the-wheels-on-the-bus-go-round-and-round-tin-whistle-notes.html
  *   https://itch.io/jam/synth-jam
  * 
@@ -164,14 +169,10 @@ f("rerhythming_button").addEventListener("mouseup", function (e) {
 update()
 
 function createAudio() {
-  const audio = document.createElement("audio");
-  audio.src = "notes/all_audio.ogg"
-  //audio.play()
-  //console.log("played")
-  //document.body.appendChild(audio);
   for (i = 0; i < notes.length; i++) {
-    let note = notes[i]
-    note.audio = audio.cloneNode(false)
+    let audio = document.createElement("audio");
+    audio.src = "notes/all_audio.ogg"
+    notes[i].audio = audio
   }
 }
 
@@ -320,7 +321,6 @@ function recordNote(note, e) {
 }
 
 function playNote(note) {
-  //f("debug").innerHTML = note.idx
   f(note.idpressed).style.backgroundColor = "rgba(20,20,20,.3)"
   note.audio.currentTime = note.start;
   note.audio.play()
