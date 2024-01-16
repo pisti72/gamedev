@@ -8,6 +8,8 @@
  *   https://itch.io/jam/synth-jam
  * 
  *   https://virtualpiano.net/
+ *   Soviet Pif synth: a cute analog synthesizer for children (+ FREE Sample Library)
+ *   https://www.youtube.com/watch?v=sStI42iwdIM
  */
 const VERSION = "v 0.1"
 

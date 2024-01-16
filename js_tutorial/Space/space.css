@@ -1,0 +1,17 @@
+body{
+    background-color: black;
+    overflow: hidden;
+    margin:0px;
+}
+
+#container{
+    background-color: navy;
+    margin:0px;
+    width:900px;
+    height:600px;
+    overflow: hidden;
+}
+
+#planet1{
+    transform: rotate(10deg);
+}
