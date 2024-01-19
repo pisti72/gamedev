@@ -46,6 +46,14 @@ for (let i = 0; i < notes.length; i++) {
 document.getElementById("container").addEventListener('mousemove', function (event) {
     hand.x = event.pageX;
     hand.y = event.pageY;
+    if (hand.isBeating) {
+        for (let i = 0; i < notes.length; i++) {
+            let note = notes[i]
+            if (hand.x > note.left && hand.x <= note.right) {
+                note.audio.play()
+            }
+        }
+    }
     hand.update()
 })
 

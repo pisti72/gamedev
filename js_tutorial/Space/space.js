@@ -113,8 +113,8 @@ spaceman = {
         if (E_pressed) {
             this.rot += .05
         }
-        if (isOnPlanet) {
-
+        if (this.isOnPlanet) {
+            //getting surface speed
         }
 
         this.velocity_x += xd
