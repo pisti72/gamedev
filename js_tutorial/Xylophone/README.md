@@ -6,23 +6,25 @@
 <h3>Learning time</h3>
 <p>It is amazing how many popular songs can be played on this little toy!</p>
 <p></p>
-<div class="video-container"><iframe width="500" height="281" src="//www.youtube.com/embed/kJURNZZulik" frameborder="0" allowfullscreen=""></iframe></div>
-<p></p>
-<div class="video-container"><iframe width="500" height="281" src="//www.youtube.com/embed/J1RmNPH9v3s" frameborder="0" allowfullscreen=""></iframe></div>
-<p></p>
-<div class="video-container"><iframe width="500" height="281" src="//www.youtube.com/embed/k9JC3m418_0" frameborder="0" allowfullscreen=""></iframe></div>
-<p></p>
-<div class="video-container"><iframe width="500" height="281" src="//www.youtube.com/embed/Ejr1MS_UsnQ" frameborder="0" allowfullscreen=""></iframe></div>
-<p></p>
-<div class="video-container"><iframe width="500" height="281" src="//www.youtube.com/embed/Gg_RzBVPTDE" frameborder="0" allowfullscreen=""></iframe></div>
-<p></p>
-<div class="video-container"><iframe width="500" height="281" src="//www.youtube.com/embed/r3vOjpxV0z4" frameborder="0" allowfullscreen=""></iframe></div>
-<p></p>
-<div class="video-container"><iframe width="500" height="281" src="//www.youtube.com/embed/N18j04Go22M" frameborder="0" allowfullscreen=""></iframe></div>
-<p></p>
-<div class="video-container"><iframe width="500" height="281" src="//www.youtube.com/embed/CnJDy5r_caM" frameborder="0" allowfullscreen=""></iframe></div>
-<p></p>
-<div class="video-container"><iframe width="500" height="281" src="//www.youtube.com/embed/4zx7IhO7jOM" frameborder="0" allowfullscreen=""></iframe></div>
-<p></p>
-<div class="video-container"><iframe width="500" height="281" src="//www.youtube.com/embed/qsYCyJ4KRY8" frameborder="0" allowfullscreen=""></iframe></div>
-<p></p>
+<ul>
+<li><a href="https://youtu.be/kJURNZZulik" target="_blank">RUSH E on a XYLOPHONE</a>
+</li>
+<li><a href="https://youtu.be/J1RmNPH9v3s" target="_blank">Hull a pelyhes fehér hó</a>
+</li>
+<li><a href="https://youtu.be/k9JC3m418_0" target="_blank">Boci boci tarka</a>
+</li>
+<li><a href="https://youtu.be/Ejr1MS_UsnQ" target="_blank">Despacito - Xylophone</a>
+</li>
+<li><a href="https://youtu.be/Gg_RzBVPTDE" target="_blank">Dance Monkey - Xylophone</a>
+</li>
+<li><a href="https://youtu.be/r3vOjpxV0z4" target="_blank">Blinding Lights - Xylophone</a>
+</li>
+<li><a href="https://youtu.be/N18j04Go22M" target="_blank">Houdini by Dua Lipa - Xylophone</a>
+</li>
+<li><a href="https://youtu.be/CnJDy5r_caM" target="_blank">Radioactive - Xylophone</a>
+</li>
+<li><a href="https://youtu.be/4zx7IhO7jOM" target="_blank">Star Wars Imperial March, Part 1 (Xylophone)</a>
+</li>
+<li><a href="https://youtu.be/qsYCyJ4KRY8" target="_blank">Alle meine Entchen / All my little ducklings (Xylophone)</a>
+</li>
+</ul>
