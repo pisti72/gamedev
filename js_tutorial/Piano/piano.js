@@ -11,7 +11,7 @@
  *   Soviet Pif synth: a cute analog synthesizer for children (+ FREE Sample Library)
  *   https://www.youtube.com/watch?v=sStI42iwdIM
  */
-const VERSION = "v 0.1"
+const VERSION = "v 0.2"
 
 isRecording = false
 recordingArray = []
@@ -196,20 +196,23 @@ function createNoteDivs() {
   for (i = 0; i < notes.length; i++) {
     let note = notes[i]
     if (note.type == NOTE) {
-      div = document.createElement("div");
-      div.id = note.id
-      div.className = "note"
-      div.innerHTML = note.id.toUpperCase()
-      f("notes-image").appendChild(div)
+      img = document.createElement("img");
+      img.id = note.id
+      img.src = "gfx/white_60x180.png"
+      img.className = "note"
+      img.innerHTML = note.id.toUpperCase()
+      f("notes-image").appendChild(img)
       div = document.createElement("div");
       div.id = note.id + "pressed"
       div.className = "note-pressed"
+      note.note_image_pressed = div
       f("notes-pressed").appendChild(div)
     } else if (note.type == HALFNOTE) {
-      div = document.createElement("div");
-      div.id = note.id
-      div.className = "halfnote"
-      f("halfnotes-image").appendChild(div)
+      img = document.createElement("img");
+      img.id = note.id
+      img.src = "gfx/black_40x120.png"
+      img.className = "halfnote"
+      f("halfnotes-image").appendChild(img)
       div = document.createElement("div");
       div.id = note.id + "pressed"
       div.className = "halfnote-pressed"

@@ -5,9 +5,9 @@
  * 
  */
 
+magnify = 1
 
-
-hand_div = document.getElementById("hand")
+hand_div = f("hand")
 
 hand = {
     x: 0,
@@ -43,13 +43,13 @@ for (let i = 0; i < notes.length; i++) {
     notes[i].audio = audio
 }
 
-document.getElementById("container").addEventListener('mousemove', function (event) {
+f("container").addEventListener('mousemove', function (event) {
     hand.x = event.pageX;
     hand.y = event.pageY;
     if (hand.isBeating) {
         for (let i = 0; i < notes.length; i++) {
             let note = notes[i]
-            if (hand.x > note.left && hand.x <= note.right) {
+            if (hand.x > note.left * magnify && hand.x <= note.right * magnify) {
                 note.audio.play()
             }
         }
@@ -57,11 +57,11 @@ document.getElementById("container").addEventListener('mousemove', function (eve
     hand.update()
 })
 
-document.getElementById("container").addEventListener('mousedown', function (event) {
+f("container").addEventListener('mousedown', function (event) {
     hand.isBeating = true
     for (let i = 0; i < notes.length; i++) {
         let note = notes[i]
-        if (hand.x > note.left && hand.x <= note.right) {
+        if (hand.x > note.left * magnify && hand.x <= note.right * magnify) {
             note.audio.currentTime = 0
             note.audio.play()
         }
@@ -69,7 +69,28 @@ document.getElementById("container").addEventListener('mousedown', function (eve
     hand.update()
 })
 
-document.getElementById("container").addEventListener('mouseup', function (event) {
+f("container").addEventListener('mouseup', function (event) {
     hand.isBeating = false
     hand.update()
 })
+
+window.addEventListener("resize", function () {
+    let w = document.body.clientWidth;
+    let h = document.body.clientHeight;
+    let board_div = f("board")
+    let container = f("container")
+    board_div.style.width = w + "px"
+    board_div.style.height = h + "px"
+    container.style.width = w + "px"
+    container.style.height = h + "px"
+    board_div.style.backgroundSize = w + "px " + h + "px"
+    magnify = w / 900
+    let hand_width = Math.floor(420 * magnify)
+    let hand_height = Math.floor(420 * magnify)
+    hand_div.style.width = hand_width + "px"
+    hand_div.style.height = hand_height + "px"
+})
+
+function f(n) {
+    return document.getElementById(n)
+}

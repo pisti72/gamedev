@@ -8,43 +8,45 @@
 
 <body>
   <div id="debug"></div>
-
-  <div id="dashboard">
-    <div id="playing_container">
-      <div id="playing" class="ledoff"></div>
-      <div id="playing_on" class="ledon"></div>
-      <div id="playing_button" class="button_mid"></div>
-      <div id="playing_text" class="white_text">[Enter] PLAY</div>
+  <div id="piano_container">
+    <div id="dashboard">
+      <img id="dashboard_bg" src="gfx/dashboard_blue_840x220.png">
+      <div id="playing_container">
+        <div id="playing" class="ledoff"></div>
+        <div id="playing_on" class="ledon"></div>
+        <div id="playing_button" class="button_mid"></div>
+        <div id="playing_text" class="white_text">[Enter] PLAY</div>
+      </div>
+      <div id="recording_container">
+        <div id="recording" class="ledoff"></div>
+        <div id="recording_on" class="ledon"></div>
+        <div id="recording_button" class="button_mid"></div>
+        <div id="recording_text" class="white_text">[Space] RECORD</div>
+      </div>
+      <div id="rerhythming_container">
+        <div id="rerhythming" class="ledoff"></div>
+        <div id="rerhythming_on" class="ledon"></div>
+        <div id="rerhythming_button" class="button_mid_red"></div>
+        <div id="rerhythming_text" class="white_text">[1] RE-RYTHMING</div>
+      </div>
+      <div id="songs_container"></div>
+      <div id="drums_container">
+        <div id="drum1" class="button_square"></div>
+        <div id="drum1_text" class="white_text">[O] Snare</div>
+        <div id="drum2" class="button_square"></div>
+        <div id="drum2_text" class="white_text">[P] Hihat</div>
+        <div id="drum3" class="button_square"></div>
+        <div id="drum3_text" class="white_text">[L] Drum</div>
+        <div id="drum4" class="button_square"></div>
+        <div id="drum4_text" class="white_text">[K] Kick</div>
+      </div>
+      <div id="version"></div>
     </div>
-    <div id="recording_container">
-      <div id="recording" class="ledoff"></div>
-      <div id="recording_on" class="ledon"></div>
-      <div id="recording_button" class="button_mid"></div>
-      <div id="recording_text" class="white_text">[Space] RECORD</div>
-    </div>
-    <div id="rerhythming_container">
-      <div id="rerhythming" class="ledoff"></div>
-      <div id="rerhythming_on" class="ledon"></div>
-      <div id="rerhythming_button" class="button_mid_red"></div>
-      <div id="rerhythming_text" class="white_text">[1] RE-RYTHMING</div>
-    </div>
-    <div id="songs_container"></div>
-    <div id="drums_container">
-      <div id="drum1" class="button_square"></div>
-      <div id="drum1_text" class="white_text">[O] Snare</div>
-      <div id="drum2" class="button_square"></div>
-      <div id="drum2_text" class="white_text">[P] Hihat</div>
-      <div id="drum3" class="button_square"></div>
-      <div id="drum3_text" class="white_text">[L] Drum</div>
-      <div id="drum4" class="button_square"></div>
-      <div id="drum4_text" class="white_text">[K] Kick</div>
-    </div>
-    <div id="version"></div>
+    <div id="notes-image" class="notes-container"></div>
+    <div id="notes-pressed" class="notes-container"></div>
+    <div id="halfnotes-image" class="halfnotes-container"></div>
+    <div id="halfnotes-pressed" class="halfnotes-container"></div>
   </div>
-  <div id="notes-image" class="notes-container"></div>
-  <div id="notes-pressed" class="notes-container"></div>
-  <div id="halfnotes-image" class="halfnotes-container"></div>
-  <div id="halfnotes-pressed" class="halfnotes-container"></div>
   <script src="songs.js"></script>
   <script src="piano.js"></script>
 </body>

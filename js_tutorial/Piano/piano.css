@@ -5,7 +5,9 @@
     font-family: Bebas;
     src: url(gfx/Bebas-Regular.otf);
 }
-
+body, html{
+    height:100%;
+}
 body {
     background-color: black;
     margin: 0px;
@@ -15,11 +17,21 @@ body {
     overflow: hidden;
 }
 
+#piano_container{
+    position: relative;
+    width:100%;
+    height:100%;
+}
+
 #dashboard {
-    width: 840px;
-    height: 220px;
-    /*background-image: url(gfx/dashboard_840x220.png);*/
-    background-image: url(gfx/dashboard_blue_840x220.png);
+    position: relative;
+    width: 100%;
+    height: 50%;
+}
+
+#dashboard_bg{
+    width:100%;
+    height:100%;
 }
 
 .ledon {
@@ -75,8 +87,8 @@ body {
 
 #version {
     position: absolute;
-    left: 790px;
-    top: 190px;
+    right: 10px;
+    bottom: 10px;
     color: #8186d9;
 }
 
@@ -87,8 +99,8 @@ body {
 
 #recording_container {
     position: absolute;
-    left: 410px;
-    top: 20px;
+    left: 50%;
+    top: 9%;
 }
 
 #recording_on {
@@ -114,8 +126,8 @@ body {
 
 #playing_container {
     position: absolute;
-    left: 210px;
-    top: 20px;
+    left: 25%;
+    top: 9%;
 }
 
 #playing_on {
@@ -140,8 +152,8 @@ body {
 
  #rerhythming_container {
     position: absolute;
-    left: 315px;
-    top: 50px;
+    left: 37%;
+    top: 22%;
 }
 
 #rerhythming_on {
@@ -166,8 +178,8 @@ body {
 
 #songs_container {
     position: absolute;
-    left: 410px;
-    top: 80px;
+    left: 50%;
+    top: 32%;
 }
 
 #song1_text {
@@ -230,8 +242,8 @@ body {
 
 #drums_container {
     position: absolute;
-    left: 220px;
-    top: 70px;
+    left: 26%;
+    top: 29%;
 }
 
 #drum1 {
@@ -286,102 +298,106 @@ body {
  *  NOTES
  */
 
+ .notes-container {
+    position: absolute;
+    width:100%;
+    height:50%;
+    top: 50%;
+    display: grid;
+    grid-template-columns: auto auto auto auto auto auto auto auto auto auto auto auto auto auto;
+}
+
 .note {
-    background-color: white;
-    width: 60px;
-    height: 180px;
-    background-image: url(gfx/white_60x180.png);
+    width: 100%;
+    height: 100%;
     background-color: black;
     color: gray;
     line-height: 2.5;
     text-align: center;
 }
 
-.notes-container {
-    position: absolute;
-    left: 0 px;
-    top: 220px;
-    display: grid;
-    grid-template-columns: auto auto auto auto auto auto auto auto auto auto auto auto auto auto;
+
+.note-pressed {
+    width: 100%;
+    height: 100%;
+    cursor: pointer;
 }
+
+/**
+ *  HALFNOTES
+ */
+
 
 .halfnotes-container {
     position: absolute;
-    left: 0 px;
-    top: 220px;
-    display: grid;
-    grid-template-columns: auto auto auto auto auto auto auto auto auto auto auto auto;
-}
-
-.note-pressed {
-    width: 60px;
-    height: 180px;
-    cursor: pointer;
-    /*background-image: url(gfx/notes_96x224px.png);*/
+    width:100%;
+    top: 50%;
+    height:30%;
+    display: flex;
 }
 
 .halfnote {
     position: relative;
-    width: 40px;
-    height: 120px;
-    /*background-color: black;*/
-    background-image: url(gfx/black_40x120.png);
+    width: 4%;
+    height: 100%;
 }
+
 
 .halfnote-pressed {
     position: relative;
-    width: 40px;
-    height: 120px;
+    width: 4%;
+    height: 100%;
     cursor: pointer;
-    /*background-image: url(gfx/notes_96x224px.png);*/
 }
+
+
 
 #cis4,
 #cis4pressed {
-    left: 40px;
+    left: 5%;
 }
 
 #dis4,
 #dis4pressed {
-    left: 60px;
+    left: 8.5%;
 }
 
 #fis4,
 #fis4pressed {
-    left: 140px;
+    left: 18.5%;
 }
 
 #gis4,
 #gis4pressed {
-    left: 160px;
+    left: 21.7%;
 }
 
 #ais4,
 #ais4pressed {
-    left: 180px;
+    left: 25%;
 }
 
 #cis5,
 #cis5pressed {
-    left: 260px;
+    left: 35%;
 }
 
 #dis5,
 #dis5pressed {
-    left: 280px;
+    left: 38.5%;
 }
 
 #fis5,
 #fis5pressed {
-    left: 360px;
+    left: 48.5%;
 }
 
 #gis5,
 #gis5pressed {
-    left: 380px;
+    left: 52%;
 }
 
 #ais5,
 #ais5pressed {
-    left: 400px;
+    left: 55%;
 }
