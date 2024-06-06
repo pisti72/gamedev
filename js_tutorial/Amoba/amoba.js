@@ -18,24 +18,24 @@ let board_div = document.getElementById("board");
 function onload() {
     w = document.body.clientWidth;
     h = document.body.clientHeight;
-    COLUMNS = Math.floor(w/44);
-    ROWS = Math.floor(h/50);
+    COLUMNS = Math.floor(w / 44);
+    ROWS = Math.floor(h / 50);
     let t = "<table>";
-    for(let j=0;j<ROWS;j++){
+    for (let j = 0; j < ROWS; j++) {
         t += "<tr>";
-        for(let i=0;i<COLUMNS;i++){
-            t += "<td onclick=\"clicked("+i+","+j+",this)\">&nbsp;</td>";
+        for (let i = 0; i < COLUMNS; i++) {
+            t += "<td onclick=\"clicked(" + i + "," + j + ",this)\">&nbsp;</td>";
             let cell = {
-                row:j,
-                column:i,
-                value:EMPTY,
-                score_Vertical:{x:0,o:0},
-                score_Horizontal:{x:0,o:0},
-                score_DiagDown:{x:0,o:0},
-                score_DiagUp:{x:0,o:0},
-                set: function(){
-                    if(value == EMPTY){
-                        
+                row: j,
+                column: i,
+                value: EMPTY,
+                score_Vertical: { x: 0, o: 0 },
+                score_Horizontal: { x: 0, o: 0 },
+                score_DiagDown: { x: 0, o: 0 },
+                score_DiagUp: { x: 0, o: 0 },
+                set: function () {
+                    if (value == EMPTY) {
+
                     }
                 }
             }
@@ -47,41 +47,41 @@ function onload() {
     board_div.innerHTML = t;
 }
 
-function clicked(column,row,obj){
-    let cell = getCellByCoord(column,row);
-    if(cell.value == EMPTY){
+function clicked(column, row, obj) {
+    let cell = getCellByCoord(column, row);
+    if (cell.value == EMPTY) {
         cell.value = CIRCLE;
-        obj.innerHTML="<span class=\"blue\">O</span>";
+        obj.innerHTML = "<span class=\"blue\">O</span>";
         scoreEachCell();
-    }else{
+    } else {
         alert("Not empty");
     }
     //obj.innerHTML="<span class=\"red\">X</span>";
 }
 
-function getCellByCoord(column,row){
-    for(let i=0; i<board.length; i++){
+function getCellByCoord(column, row) {
+    for (let i = 0; i < board.length; i++) {
         let cell = board[i];
-        if(cell.row == row && cell.column == column){
+        if (cell.row == row && cell.column == column) {
             return cell;
         }
     }
     alert("Not found cell");
 }
 
-function scoreEachCell(){
-    for(let i=0; i<board.length; i++){
+function scoreEachCell() {
+    for (let i = 0; i < board.length; i++) {
         let cell = board[i];
         let score = deepMiner(cell.column, cell.row, 5);
     }
 }
 
-function deepMiner(column,row,xd,yd,n){
-    if(n>0){
-        deepMiner(column+xd, row+xd, xd, yd, n-1);
+function deepMiner(column, row, xd, yd, n) {
+    if (n > 0) {
+        deepMiner(column + xd, row + xd, xd, yd, n - 1);
     }
 }
 
-function rnd(n){
-    return Math.floor(Math.random()*n);
+function rnd(n) {
+    return Math.floor(Math.random() * n);
 }
