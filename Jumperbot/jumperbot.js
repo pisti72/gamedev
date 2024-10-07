@@ -11,11 +11,15 @@ window.onload = function () {
     document.addEventListener('keydown', function (e) {
         //console.log(e.key);
         if (e.key == 'd' || e.key == 'ArrowRight') {
-            engine.getActorByName('P').xforce = 1.5;
+            var player = engine.getActorByName('P')
+            player.xforce = 1.5
+            player.flip = true
         } else if (e.key == 'a' || e.key == 'ArrowLeft') {
-            engine.getActorByName('P').xforce = -1.5;
+            var player = engine.getActorByName('P')
+            player.xforce = -1.5
+            player.flip = false
         }
-        if (e.key == ' ' || e.key == 'w') {
+        if (e.key == ' ' || e.key == 'w' || e.key == 'ArrowUp') {
             engine.getActorByName('P').mustJump = true;
         }
         if (e.key == 'o') {
@@ -39,7 +43,7 @@ window.onload = function () {
         if (e.key == 'a' || e.key == 'd' || e.key == 'ArrowRight' || e.key == 'ArrowLeft') {
             engine.getActorByName('P').xforce = 0;
         }
-        if (e.key == ' ' || e.key == 'w') {
+        if (e.key == ' ' || e.key == 'w' || e.key == 'ArrowUp') {
             engine.getActorByName('P').mustJump = false;
         }
     })

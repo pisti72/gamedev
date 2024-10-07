@@ -17,7 +17,7 @@ var engine = {
             wall: true,
             collectable: false,
             mob: false,
-            player: false
+            player: false,
         },
         {
             char: 'C',
@@ -142,6 +142,7 @@ var engine = {
                 xforce: 0,
                 visible: true,
                 mustJump: false,
+                flipped: false
             }
         );
     },
@@ -149,6 +150,7 @@ var engine = {
         for (var i = 0; i < this.actor.length; i++) {
             var actor = this.actor[i];
             if (actor.visible) {
+
                 this.ctx.drawImage(this.img, this.tile * actor.offset, 0,
                     this.tile, this.tile,
                     Math.floor(actor.x + this.camera.x), Math.floor(actor.y + this.camera.y),
