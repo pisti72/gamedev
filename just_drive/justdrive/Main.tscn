@@ -1,0 +1,15 @@
+[gd_scene load_steps=3 format=2]
+
+[ext_resource path="res://VW.tscn" type="PackedScene" id=1]
+[ext_resource path="res://Road.tscn" type="PackedScene" id=2]
+
+[node name="Main" type="Node"]
+
+[node name="VW" parent="." instance=ExtResource( 1 )]
+transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 2.07815, 0 )
+
+[node name="Camera" type="Camera" parent="."]
+transform = Transform( 1, 0, 0, 0, 0.947277, 0.320415, 0, -0.320415, 0.947277, 0, 3.70329, 9.66848 )
+
+[node name="Road" parent="." instance=ExtResource( 2 )]
+transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, -1.62222, -1.32323, -1.09619 )
