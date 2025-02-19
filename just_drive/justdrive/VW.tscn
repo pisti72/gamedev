@@ -15,12 +15,14 @@ transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, 0.0377445, 0, 0.0146637 )
 physics_material_override = SubResource( 1 )
 
 [node name="CollisionShape" type="CollisionShape" parent="VehicleBody"]
+transform = Transform( 3.09753, 0, 0, 0, 1, 0, 0, 0, 1.3198, 0, 0, 0 )
 shape = SubResource( 2 )
 
+[node name="vw" parent="VehicleBody/CollisionShape" instance=ExtResource( 2 )]
+transform = Transform( 0.322838, 0, 0, 0, 1, 0, 0, 0, 0.757693, 0.59911, -1.61516, 2.68858 )
+
 [node name="VehicleWheel" type="VehicleWheel" parent="VehicleBody"]
-transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 2.23517e-08, 3.01594 )
+transform = Transform( -4.37114e-08, 0, -1, 0, 1, 0, 1, 0, -4.37114e-08, -1.85555, -0.924444, 1.19292 )
 
-[node name="wheel" parent="VehicleBody" instance=ExtResource( 1 )]
-transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, 1.25933, 0.60817, 0.553314 )
-
-[node name="vw" parent="VehicleBody" instance=ExtResource( 2 )]
+[node name="wheel" parent="VehicleBody/VehicleWheel" instance=ExtResource( 1 )]
+transform = Transform( -1, 0, -8.74228e-08, 0, 1, 0, 8.74228e-08, 0, -1, -1.16879, 0.72324, 2.30522 )
