@@ -3,6 +3,10 @@
 This game is my entry for (https://itch.io/jam/road-trip-game-jam) competition.
 from January 23rd 2025 to April 24th 2025
 
+# Tutorials
+[Godot 4 Vehicle Body Tutorial] (https://www.youtube.com/watch?v=Wj1FfilAe2Y)
+(https://github.com/godotengine/godot-demo-projects/tree/master/3d/truck_town/vehicles)
+
 # Devlog
 
 2025-02-13 THU project started
@@ -13,8 +17,8 @@ from January 23rd 2025 to April 24th 2025
 2025-02-17 MON golf interior added
 2025-02-18 TUE godot version created
 2025-02-19 WED possible html version template added
-2025-02-20 THU
-2025-02-21 FRI
+2025-02-20 THU more detailed car 
+2025-02-21 FRI driveable model
 2025-02-22 SAT
 2025-02-23 SUN
 

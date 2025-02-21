@@ -1,0 +1,41 @@
+[gd_scene load_steps=3 format=2]
+
+[ext_resource path="res://VehicleBody.gd" type="Script" id=1]
+
+[sub_resource type="BoxShape" id=1]
+
+[node name="Car" type="Spatial"]
+
+[node name="VehicleBody" type="VehicleBody" parent="."]
+script = ExtResource( 1 )
+
+[node name="CollisionShape" type="CollisionShape" parent="VehicleBody"]
+transform = Transform( 1, 0, 0, 0, 0.467244, 0, 0, 0, 0.709675, 0, 0, 0 )
+shape = SubResource( 1 )
+
+[node name="CSGPolygon" type="CSGPolygon" parent="VehicleBody/CollisionShape"]
+transform = Transform( 0.900669, 0.00833592, -0.00413769, -0.0116223, 1.25576, 5.99486e-06, 0.00843395, 6.93336e-05, 1.83599, 0, 0, 0.919298 )
+polygon = PoolVector2Array( -1.23546, -0.0959751, -0.700762, 0.812635, 0.818865, 0.821392, 1, 0, 1.02764, -0.727787, -1.07811, -0.769774 )
+
+[node name="FrontL" type="VehicleWheel" parent="VehicleBody"]
+transform = Transform( -4.37114e-08, 0, -1, 0, 1, 0, 1, 0, -4.37114e-08, -0.763465, -0.459534, 0.679491 )
+steering = 10.0
+use_as_steering = true
+
+[node name="FrontR" type="VehicleWheel" parent="VehicleBody"]
+transform = Transform( -4.37114e-08, 0, -1, 0, 1, 0, 1, 0, -4.37114e-08, -0.763465, -0.459534, -0.774241 )
+use_as_steering = true
+
+[node name="RearL" type="VehicleWheel" parent="VehicleBody"]
+transform = Transform( -4.37114e-08, 0, -1, 0, 1, 0, 1, 0, -4.37114e-08, 0.663175, -0.459534, 0.679491 )
+engine_force = 100.0
+use_as_traction = true
+
+[node name="CSGCylinder" type="CSGCylinder" parent="VehicleBody/RearL"]
+transform = Transform( -4.37114e-08, 1, 2.08562e-08, -0.477133, -2.08562e-08, 2.08562e-08, 2.08562e-08, -4.37114e-08, 0.477133, 0, 0, 0 )
+height = 0.432259
+sides = 12
+
+[node name="RearR" type="VehicleWheel" parent="VehicleBody"]
+transform = Transform( -4.37114e-08, 0, -1, 0, 1, 0, 1, 0, -4.37114e-08, 0.663175, -0.459534, -0.783381 )
+use_as_traction = true
