@@ -7,6 +7,9 @@ from January 23rd 2025 to April 24th 2025
 [Godot 4 Vehicle Body Tutorial] (https://www.youtube.com/watch?v=Wj1FfilAe2Y)
 (https://github.com/godotengine/godot-demo-projects/tree/master/3d/truck_town/vehicles)
 
+http://ehouais.net/
+https://js1k.com/2015-hypetrain/demo/2111
+
 # Devlog
 
 2025-02-13 THU project started
@@ -19,10 +22,10 @@ from January 23rd 2025 to April 24th 2025
 2025-02-19 WED possible html version template added
 2025-02-20 THU more detailed car 
 2025-02-21 FRI driveable model
-2025-02-22 SAT
-2025-02-23 SUN
+2025-02-22 SAT nope
+2025-02-23 SUN nope
 
-2025-02-24 MON
+2025-02-24 MON nope
 2025-02-25 TUE
 2025-02-26 WED
 2025-02-27 THU
