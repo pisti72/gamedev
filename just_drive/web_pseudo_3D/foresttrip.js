@@ -2,7 +2,7 @@ WIDTH = innerWidth
 HEIGHT = innerHeight
 FOV = WIDTH / 2
 HEIGHT_HALF = HEIGHT / 2
-FOG_BEGINS = 0
+FOG_BEGINS = 1000
 FOG_ENDS = 2000
 FAREST = 10000
 BACKGROUND_COLOR = "black"
@@ -19,6 +19,7 @@ is_right_pressed = false
 is_up_pressed = false
 is_down_pressed = false
 sections = []
+slices = []
 mycar = {
     x: 0, y: 100, z: 0, speed: 0, xd: 0
 }
@@ -27,13 +28,13 @@ let far = FAREST / SEGMENT_DISTANCE
 for (i = 0; i < far; i++) {
     //left field
     for (j = 0; j < 60; j++) {
-        let crop = rnd(0, 20) + 50 +50
-        add_section(-250 - rnd(0, 1400)-1400,crop, FAREST - i * SEGMENT_DISTANCE, 4, crop, 150 + rnd(0, 70))
-        add_section(+250 + rnd(0, 1400)+1400,crop, FAREST - i * SEGMENT_DISTANCE, 4, crop, 150 + rnd(0, 70))
+        let crop = rnd(0, 20) + 50 + 50
+        add_section(-250 - rnd(0, 1400) - 1400, crop, FAREST - i * SEGMENT_DISTANCE, 4, crop, 150 + rnd(0, 70))
+        add_section(+250 + rnd(0, 1400) + 1400, crop, FAREST - i * SEGMENT_DISTANCE, 4, crop, 150 + rnd(0, 70))
     }
-    for (j = 0; j < 14; j++){
-        add_section(-250-1350+j*100, 2, FAREST - i * SEGMENT_DISTANCE, 100, h, 80 + rnd(0,70))
-        add_section(+250+1350-j*100, 2, FAREST - i * SEGMENT_DISTANCE, 100, h, 80 + rnd(0,70))
+    for (j = 0; j < 14; j++) {
+        add_section(-250 - 1350 + j * 100, 2, FAREST - i * SEGMENT_DISTANCE, 100, h, 80 + rnd(0, 70))
+        add_section(+250 + 1350 - j * 100, 2, FAREST - i * SEGMENT_DISTANCE, 100, h, 80 + rnd(0, 70))
     }
     add_section(0, 0, FAREST - i * SEGMENT_DISTANCE, 500, h, 80 + (10 - i) % 10)
     if (i % 30 > 15) {
@@ -42,7 +43,7 @@ for (i = 0; i < far; i++) {
     //side lanes
     add_section(-200, 2, FAREST - i * SEGMENT_DISTANCE, 30, h, 220)
     add_section(200, 2, FAREST - i * SEGMENT_DISTANCE, 30, h, 220)
-    
+
 }
 
 document.addEventListener('keydown', function (e) {
@@ -101,9 +102,9 @@ function update() {
         let section = sections[i]
         diff = section.z - mycar.z
         if (diff > 0 && diff < FOG_ENDS) {
-            let delta =  FOG_BEGINS - FOG_ENDS
-            let color_with_fog = (clamp(FOG_BEGINS, FOG_ENDS, diff) - FOG_BEGINS ) / delta + 1
-            color_with_fog =  section.color * color_with_fog
+            let delta = FOG_BEGINS - FOG_ENDS
+            let color_with_fog = (clamp(FOG_BEGINS, FOG_ENDS, diff) - FOG_BEGINS) / delta + 1
+            color_with_fog = section.color * color_with_fog
             c = clamp(0, 255, color_with_fog)
             ctx.fillStyle = "rgb(" + c + "," + c + "," + c + ")"
             f = FOV / diff
@@ -113,6 +114,17 @@ function update() {
         }
     }
     requestAnimationFrame(update)
+}
+
+function add_slice(x, y, z) {
+    let slice = { x: x, y: y, z: z }
+    slices.push(slice)
+}
+
+function add_rectangle(x, y, width, height, color) {
+    let slice = slices[slices.length]
+    let rectangle = { x: x, y: y, width: width, height: height, color: color }
+    slice.push(rectangle)
 }
 
 function add_section(x, y, z, width, height, color) {
