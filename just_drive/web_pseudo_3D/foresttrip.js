@@ -3,7 +3,7 @@ HEIGHT = innerHeight
 FOV = WIDTH / 2
 HEIGHT_HALF = HEIGHT / 2
 FOG_BEGINS = 1000
-FOG_ENDS = 2000
+FOG_ENDS = 3000
 FAREST = 10000
 BACKGROUND_COLOR = "black"
 SEGMENT_DISTANCE = 30
@@ -18,32 +18,34 @@ is_left_pressed = false
 is_right_pressed = false
 is_up_pressed = false
 is_down_pressed = false
-sections = []
+//sections = []
 slices = []
 mycar = {
     x: 0, y: 100, z: 0, speed: 0, xd: 0
 }
+ROAD_WIDTH = 1000
 h = SEGMENT_DISTANCE
 let far = FAREST / SEGMENT_DISTANCE
 for (i = 0; i < far; i++) {
+    add_slice(0, 0, FAREST - i * SEGMENT_DISTANCE)
     //left field
     for (j = 0; j < 60; j++) {
         let crop = rnd(0, 20) + 50 + 50
-        add_section(-250 - rnd(0, 1400) - 1400, crop, FAREST - i * SEGMENT_DISTANCE, 4, crop, 150 + rnd(0, 70))
-        add_section(+250 + rnd(0, 1400) + 1400, crop, FAREST - i * SEGMENT_DISTANCE, 4, crop, 150 + rnd(0, 70))
+        //add_rectangle(-250 - rnd(0, 1400) - 1400, crop, 4, crop, 150 + rnd(0, 70))
+        //add_rectangle(+250 + rnd(0, 1400) + 1400, crop, 4, crop, 150 + rnd(0, 70))
     }
     for (j = 0; j < 14; j++) {
-        add_section(-250 - 1350 + j * 100, 2, FAREST - i * SEGMENT_DISTANCE, 100, h, 80 + rnd(0, 70))
-        add_section(+250 + 1350 - j * 100, 2, FAREST - i * SEGMENT_DISTANCE, 100, h, 80 + rnd(0, 70))
+        add_rectangle(-ROAD_WIDTH/2 - 1350 + j * 100, 2, 100, h, 80 + rnd(0, 70))
+        add_rectangle(ROAD_WIDTH/2 + 1350 - j * 100, 2, 100, h, 80 + rnd(0, 70))
     }
-    add_section(0, 0, FAREST - i * SEGMENT_DISTANCE, 500, h, 80 + (10 - i) % 10)
+    add_rectangle(0, 0, ROAD_WIDTH, h, 80 + (10 - i) % 10)
+    //middle lanes
     if (i % 30 > 15) {
-        add_section(0, 2, FAREST - i * SEGMENT_DISTANCE, 20, h, 240)
+        add_rectangle(0, 2, 20, h, 240)
     }
     //side lanes
-    add_section(-200, 2, FAREST - i * SEGMENT_DISTANCE, 30, h, 220)
-    add_section(200, 2, FAREST - i * SEGMENT_DISTANCE, 30, h, 220)
-
+    add_rectangle(-ROAD_WIDTH/2+50, 2, 30, h, 220)
+    add_rectangle(ROAD_WIDTH/2-50, 2, 30, h, 220)
 }
 
 document.addEventListener('keydown', function (e) {
@@ -77,6 +79,15 @@ document.addEventListener('keyup', function (e) {
         is_down_pressed = false
     }
 })
+window.addEventListener('resize', function(e) {
+    WIDTH = innerWidth
+    HEIGHT = innerHeight
+    FOV = WIDTH / 2
+    HEIGHT_HALF = HEIGHT / 2
+    canvas.width = WIDTH
+    canvas.height = HEIGHT
+    console.log(WIDTH)
+})
 
 update()
 function update() {
@@ -98,33 +109,41 @@ function update() {
     mycar.speed *= .99
     ctx.fillStyle = BACKGROUND_COLOR
     ctx.fillRect(0, 0, WIDTH, HEIGHT)
-    for (i = 0; i < sections.length; i++) {
-        let section = sections[i]
-        diff = section.z - mycar.z
+    for (i = 0; i < slices.length; i++) {
+        let slice = slices[i]
+        diff = slice.z - mycar.z
         if (diff > 0 && diff < FOG_ENDS) {
+            let f = FOV / diff
             let delta = FOG_BEGINS - FOG_ENDS
             let color_with_fog = (clamp(FOG_BEGINS, FOG_ENDS, diff) - FOG_BEGINS) / delta + 1
-            color_with_fog = section.color * color_with_fog
-            c = clamp(0, 255, color_with_fog)
-            ctx.fillStyle = "rgb(" + c + "," + c + "," + c + ")"
-            f = FOV / diff
-            x = (section.x - section.width / 2 - mycar.x) * f + FOV
-            y = HEIGHT_HALF - (section.y - section.height / 2 - mycar.y) * f
-            ctx.fillRect(x, y, section.width * f, section.height * f)
+            for (j = 0; j < slice.rectangles.length; j++) {
+                let rectangle = slice.rectangles[j]
+                let c = rectangle.color * color_with_fog
+                c = clamp(0, 255, c)
+                ctx.fillStyle = "rgb(" + c + "," + c + "," + c + ")"
+
+                x = (rectangle.x - rectangle.width / 2 - mycar.x) * f + FOV
+                y = HEIGHT_HALF - (rectangle.y - rectangle.height / 2 - mycar.y) * f
+                ctx.fillRect(x, y, rectangle.width * f, rectangle.height * f)
+            }
+
+        }else if(diff < 0){
+            slice.z += FAREST
+            slices.sort(function(a,b){return b.z-a.z})
         }
     }
     requestAnimationFrame(update)
 }
 
 function add_slice(x, y, z) {
-    let slice = { x: x, y: y, z: z }
+    let slice = { x: x, y: y, z: z, rectangles: [] }
     slices.push(slice)
 }
 
 function add_rectangle(x, y, width, height, color) {
-    let slice = slices[slices.length]
+    let slice = slices[slices.length - 1]
     let rectangle = { x: x, y: y, width: width, height: height, color: color }
-    slice.push(rectangle)
+    slice.rectangles.push(rectangle)
 }
 
 function add_section(x, y, z, width, height, color) {
