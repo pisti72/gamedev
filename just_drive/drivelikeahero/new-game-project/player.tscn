@@ -1,0 +1,19 @@
+[gd_scene load_steps=3 format=3 uid="uid://ea4lqjnmlqma"]
+
+[ext_resource type="PackedScene" uid="uid://c3sobjciq5s5j" path="res://models/dashboard.dae" id="1_4flbx"]
+
+[sub_resource type="CylinderShape3D" id="CylinderShape3D_sh265"]
+height = 2.30322
+radius = 1.63037
+
+[node name="Player" type="VehicleBody3D"]
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.151611, 0)
+shape = SubResource("CylinderShape3D_sh265")
+
+[node name="dashboard" parent="." instance=ExtResource("1_4flbx")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.00823212, 0.266596, 0.210095)
+
+[node name="Camera3D" type="Camera3D" parent="."]
+transform = Transform3D(-0.999979, 0, -0.00647508, 0, 1, 0, 0.00647508, 0, -0.999979, 0.339939, 0.472138, 0.113313)

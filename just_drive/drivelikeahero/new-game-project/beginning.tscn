@@ -1,0 +1,48 @@
+[gd_scene load_steps=8 format=3 uid="uid://532u13hewic7"]
+
+[ext_resource type="PackedScene" uid="uid://ea4lqjnmlqma" path="res://player.tscn" id="1_twr6n"]
+[ext_resource type="PackedScene" uid="uid://dsfqy1h0ptfyq" path="res://tree.tscn" id="2_ivkut"]
+
+[sub_resource type="ProceduralSkyMaterial" id="ProceduralSkyMaterial_twr6n"]
+sky_top_color = Color(0.361028, 0.493538, 0.990164, 1)
+sky_horizon_color = Color(0.968308, 0.464306, 0.63106, 1)
+ground_bottom_color = Color(0.2, 0.713726, 0.133333, 1)
+ground_horizon_color = Color(0.97917, 0.450154, 0.645865, 1)
+
+[sub_resource type="Sky" id="Sky_ivkut"]
+sky_material = SubResource("ProceduralSkyMaterial_twr6n")
+
+[sub_resource type="Environment" id="Environment_w70h5"]
+background_mode = 2
+sky = SubResource("Sky_ivkut")
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_upd4k"]
+size = Vector3(25.101, 1, 25.1222)
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_w70h5"]
+albedo_color = Color(0, 1, 0, 1)
+
+[node name="Beginning" type="Node3D"]
+
+[node name="WorldEnvironment" type="WorldEnvironment" parent="."]
+environment = SubResource("Environment_w70h5")
+
+[node name="ground" type="StaticBody3D" parent="."]
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="ground"]
+transform = Transform3D(1.00613, 0, 0, 0, 1.00613, 0, 0, 0, 1.00613, 0.0753293, 0, -0.0646915)
+shape = SubResource("BoxShape3D_upd4k")
+
+[node name="CSGBox3D" type="CSGBox3D" parent="ground"]
+transform = Transform3D(1.07354, 0, 0, 0, 1, 0, 0, 0, 1, 0.194296, 0, -0.0278625)
+size = Vector3(23.4413, 1, 25.1653)
+material = SubResource("StandardMaterial3D_w70h5")
+
+[node name="Player" parent="." instance=ExtResource("1_twr6n")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 4.05622, 1.59595, -5.21594)
+
+[node name="Tree" parent="." instance=ExtResource("2_ivkut")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 6.34067, 3.98316, 8.70374)
+
+[node name="DirectionalLight3D" type="DirectionalLight3D" parent="."]
+transform = Transform3D(0.947568, 0.197238, -0.251421, 0.319555, -0.584865, 0.745531, 0, -0.786784, -0.617228, 0, 4.96234, 0)
