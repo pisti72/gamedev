@@ -35,8 +35,8 @@ for (i = 0; i < far; i++) {
         //add_rectangle(+250 + rnd(0, 1400) + 1400, crop, 4, crop, 150 + rnd(0, 70))
     }
     for (j = 0; j < 14; j++) {
-        add_rectangle(-ROAD_WIDTH/2 - 1350 + j * 100, 2, 100, h, 80 + rnd(0, 70))
-        add_rectangle(ROAD_WIDTH/2 + 1350 - j * 100, 2, 100, h, 80 + rnd(0, 70))
+        add_rectangle(-ROAD_WIDTH / 2 - 1350 + j * 100, 2, 100, h, 80 + rnd(0, 70))
+        add_rectangle(ROAD_WIDTH / 2 + 1350 - j * 100, 2, 100, h, 80 + rnd(0, 70))
     }
     add_rectangle(0, 0, ROAD_WIDTH, h, 80 + (10 - i) % 10)
     //middle lanes
@@ -44,8 +44,8 @@ for (i = 0; i < far; i++) {
         add_rectangle(0, 2, 20, h, 240)
     }
     //side lanes
-    add_rectangle(-ROAD_WIDTH/2+50, 2, 30, h, 220)
-    add_rectangle(ROAD_WIDTH/2-50, 2, 30, h, 220)
+    add_rectangle(-ROAD_WIDTH / 2 + 50, 2, 30, h, 220)
+    add_rectangle(ROAD_WIDTH / 2 - 50, 2, 30, h, 220)
 }
 
 document.addEventListener('keydown', function (e) {
@@ -79,7 +79,7 @@ document.addEventListener('keyup', function (e) {
         is_down_pressed = false
     }
 })
-window.addEventListener('resize', function(e) {
+window.addEventListener('resize', function (e) {
     WIDTH = innerWidth
     HEIGHT = innerHeight
     FOV = WIDTH / 2
@@ -109,6 +109,17 @@ function update() {
     mycar.speed *= .99
     ctx.fillStyle = BACKGROUND_COLOR
     ctx.fillRect(0, 0, WIDTH, HEIGHT)
+    path = []
+    px = 0
+    py = 0
+    pxv = 0
+    pyv = 0
+    for (i = slices.length - 1; i >= 0; i--) {
+        let s = { x: px, y: py }
+        path.push(s)
+        pxv += 0.1
+        px += 2
+    }
     for (i = 0; i < slices.length; i++) {
         let slice = slices[i]
         diff = slice.z - mycar.z
@@ -122,14 +133,14 @@ function update() {
                 c = clamp(0, 255, c)
                 ctx.fillStyle = "rgb(" + c + "," + c + "," + c + ")"
 
-                x = (rectangle.x - rectangle.width / 2 - mycar.x) * f + FOV
+                x = (rectangle.x - rectangle.width / 2 - mycar.x + path[i].x) * f + FOV
                 y = HEIGHT_HALF - (rectangle.y - rectangle.height / 2 - mycar.y) * f
                 ctx.fillRect(x, y, rectangle.width * f, rectangle.height * f)
             }
 
-        }else if(diff < 0){
+        } else if (diff < 0) {
             slice.z += FAREST
-            slices.sort(function(a,b){return b.z-a.z})
+            slices.sort(function (a, b) { return b.z - a.z })
         }
     }
     requestAnimationFrame(update)
