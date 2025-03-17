@@ -1,0 +1,36 @@
+[gd_scene load_steps=5 format=3 uid="uid://ea4lqjnmlqma"]
+
+[ext_resource type="PackedScene" uid="uid://c3sobjciq5s5j" path="res://models/dashboard.dae" id="1_4flbx"]
+[ext_resource type="Script" uid="uid://b0fbu0y1f28ck" path="res://scripts/player.gd" id="1_onrkg"]
+[ext_resource type="Script" uid="uid://nab6ae5oob1d" path="res://scripts/camera_3d.gd" id="3_i3pqv"]
+
+[sub_resource type="CylinderShape3D" id="CylinderShape3D_sh265"]
+height = 2.30322
+radius = 1.63037
+
+[node name="Player" type="VehicleBody3D"]
+mass = 80.0
+script = ExtResource("1_onrkg")
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.151611, 0)
+shape = SubResource("CylinderShape3D_sh265")
+
+[node name="dashboard" parent="." instance=ExtResource("1_4flbx")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.00823212, 0.266596, 0.210095)
+
+[node name="Camera3D" type="Camera3D" parent="."]
+transform = Transform3D(-0.999979, 0, -0.00647508, 0, 1, 0, 0.00647508, 0, -0.999979, 0.339939, 0.472138, 0.113313)
+script = ExtResource("3_i3pqv")
+
+[node name="FrontLeftWheel" type="VehicleWheel3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 1.4953, -1.12103, 1.61077)
+
+[node name="RearLeftWheel" type="VehicleWheel3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 1.4953, -1.12103, -2.38923)
+
+[node name="RearRightWheel" type="VehicleWheel3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -1.5047, -1.12103, -2.38923)
+
+[node name="FrontRightWheel" type="VehicleWheel3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -1.5047, -1.12103, 1.61077)
