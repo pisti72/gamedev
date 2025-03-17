@@ -43,7 +43,7 @@ JustBoxes={
           let ol = this.overlap(actor,actor2);
           if(ol.x !=0 || ol.y != 0){
             actor.overlapped = true;
-            //actor2.ovelapped = true;
+            actor2.ovelapped = true;
             if(ol.y != 0){
               actor.yv += (ol.y/actor.m)*1000;
             }
@@ -51,11 +51,11 @@ JustBoxes={
               actor.xv += (ol.x/actor.m)*1000;
             }
             
-            //actor.yforce = 0;
-            //actor.xv = 0;
-            //actor.yv = 0;
+            actor.yforce = 0;
+            actor.xv = 0;
+            actor.yv = 0;
           }
-          /*
+          
           if(this.isOverlappedX(actor,actor2)){
             let mu = actor.m * actor.xv + actor2.m * actor2.xv;
             let u = mu/(actor.m + actor2.m);
@@ -72,8 +72,9 @@ JustBoxes={
             let u = mu/(actor.m + actor2.m);
             actor.yv = 2 * u - actor.yv;
             actor2.yv = 2 * u - actor2.yv;
-            */
+            
           }
+        }
       }
       //apply moves
       if(actor.fixed){
