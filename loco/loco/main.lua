@@ -1,75 +1,64 @@
 local tileSize = 120 -- A tile mérete
 local WE = 1
+local INVALID = -1
+
 
 local train = {
-    x = tileSize / 2 + tileSize, -- Vonat kezdeti x pozíciója
-    y = tileSize / 2,            -- Vonat kezdeti y pozíciója
-    speed = tileSize,
-    direction = 0
+    x = tileSize / 2 + tileSize * 2, -- Vonat kezdeti x pozíciója
+    y = tileSize / 2 + tileSize,   -- Vonat kezdeti y pozíciója
+    speed = 2,
+    direction = 0,
+    turning = 0,
 }
 
 local tilemap = {
-    { 2, 1, 1, 2 },
-    { 1, 0, 0, 1 },
-    { 1, 0, 0, 1 },
-    { 2, 1, 1, 2 }
+    { 0, 0, 0, 0, 0, 0 },
+    { 0, 2, 1, 1, 2, 0 },
+    { 0, 1, 0, 0, 1, 0 },
+    { 0, 1, 0, 0, 1, 0 },
+    { 0, 2, 1, 1, 2, 0 },
+    { 0, 0, 0, 0, 0, 0 },
 }
 
--- Segédfüggvény: Normalizálja az irányt 0 és 2π között
-local function normalizeDirection(direction)
-    return direction % (2 * math.pi)
+function love.load()
+    love.window.setTitle("Train")
+    success = love.window.setMode(1240, 600, { fullscreen = false, centered = true })
 end
 
-function love.update(dt)
+function love.update()
     -- A vonat pozíciójának frissítése az irány alapján
-    train.x = train.x + math.cos(train.direction) * train.speed * dt
-    train.y = train.y + math.sin(train.direction) * train.speed * dt
+    train.x = train.x + math.cos(train.direction) * train.speed
+    train.y = train.y + math.sin(train.direction) * train.speed
 
     -- A vonat irányának frissítése a tilemap alapján
-    local tileX = math.floor(train.x / tileSize) + 1
-    local tileY = math.floor(train.y / tileSize) + 1
-
-    if tileY >= 1 and tileY <= #tilemap and tileX >= 1 and tileX <= #tilemap[tileY] then
-        local currentTile = tilemap[tileY][tileX]
-        if currentTile == 2 then
-            -- Fordító tilén van: fokozatosan változtatjuk az irányt
-            train.targetDirection = normalizeDirection(train.targetDirection + math.pi / 2) -- 90 fokos fordulat
-        else
-            -- Nem fordító tilén van: a tile irányához igazítjuk a vonat irányát
-            if currentTile == 1 then
-                -- Vízszintes tile: irány vízszintes (0 vagy π)
-                if math.cos(train.direction) > 0 then
-                    train.targetDirection = 0
-                else
-                    train.targetDirection = math.pi
-                end
-            elseif currentTile == 2 then
-                -- Függőleges tile: irány függőleges (π/2 vagy 3π/2)
-                if math.sin(train.direction) > 0 then
-                    train.targetDirection = math.pi / 2
-                else
-                    train.targetDirection = 3 * math.pi / 2
-                end
+    local currentTile = getTile(train.x, train.y)
+    if not (currentTile == INVALID) then
+        if train.turning == 0 then
+            if currentTile == 2 then
+                train.turning = 48
             end
+        else
+            if train.turning > 2 then
+                train.direction = train.direction + math.pi / 2 / 46
+            end
+            train.turning = train.turning - 1
         end
     end
+end
 
+function getTile(x, y)
+    local tileX = math.floor(x / tileSize) + 1
+    local tileY = math.floor(y / tileSize) + 1
 
-    -- Fokozatos irányváltoztatás
-    local directionDifference = normalizeDirection(train.targetDirection - train.direction)
-    if directionDifference > math.pi then
-        directionDifference = directionDifference - 2 * math.pi
-    end
-
-    local rotationSpeed = 10  -- Forgási sebesség (radián/másodperc)
-    if directionDifference > 0 then
-        train.direction = normalizeDirection(train.direction + rotationSpeed * dt)
-    elseif directionDifference < 0 then
-        train.direction = normalizeDirection(train.direction - rotationSpeed * dt)
+    if tileY >= 1 and tileY <= #tilemap and tileX >= 1 and tileX <= #tilemap[tileY] then
+        return tilemap[tileY][tileX]
+    else
+        return INVALID
     end
 end
 
 function love.draw()
+    love.graphics.clear({ .5, .5, .5, 1 })
     -- Tilemap kirajzolása
     for y, row in ipairs(tilemap) do
         for x, tile in ipairs(row) do
@@ -80,5 +69,6 @@ function love.draw()
     end
 
     -- Vonat kirajzolása
+    love.graphics.setColor(1, 0, 0)
     love.graphics.rectangle("fill", train.x - tileSize / 2, train.y - tileSize / 2, tileSize, tileSize)
 end
