@@ -1,0 +1,27 @@
+html,
+body {
+    height: 100%;
+    margin: 0;
+}
+
+@font-face {
+    font-family: grobold;
+    /* https://www.dafont.com/grobold.font */
+    src: url(assets/GROBOLD.ttf);
+}
+
+body {
+    background-color: #5cf048;
+    font-family: grobold;
+    overflow: hidden;
+}
+
+#loco_right,
+#rail_EW,
+#rail_NS,
+#rail_SW,
+#rail_SE,
+#rail_NW,
+#rail_NE {
+    position: absolute;
+}
