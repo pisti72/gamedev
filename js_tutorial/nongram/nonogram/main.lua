@@ -32,7 +32,7 @@ function love.load()
 
     grid = GRID + MARGIN
     title = "Nonogram"
-    width, height = 1024, 600
+    width, height = 1024, 800
     success = love.window.setMode(width, height)
     --width, height, flags = love.window.getMode()
     love.window.setTitle(title)
@@ -45,8 +45,8 @@ function love.load()
     is_mouse_down = false
     mouse_state = NONE
     tiles = {}
-    load_level_by_id(1000)
-    
+    load_level_by_id(4)
+
     game_state = INGAME
 end
 
@@ -169,12 +169,12 @@ function color_column(column)
     end
     for row = 0, current_level.height do
         local tile = get_tile(column, row)
-        
+
         if tile.img == PICTURE and tile.state == FLAGGED then
             counter = counter + 1
         end
 
-        if counter > 0 and (tile.img == PICTURE and tile.state ~= FLAGGED or row ==  current_level.height) then
+        if counter > 0 and (tile.img == PICTURE and tile.state ~= FLAGGED or row == current_level.height) then
             n = n + 1
             local digit = {
                 value = counter,
@@ -182,7 +182,6 @@ function color_column(column)
             table.insert(blocks, digit)
             counter = 0
         end
-        
     end
     local state = NONE
     if #blocks == #digits then
@@ -227,7 +226,7 @@ function color_row(row)
             counter = counter + 1
         end
 
-        if counter > 0 and (tile.img == PICTURE and tile.state ~= FLAGGED or column ==  current_level.width) then
+        if counter > 0 and (tile.img == PICTURE and tile.state ~= FLAGGED or column == current_level.width) then
             n = n + 1
             local digit = {
                 value = counter,
@@ -235,7 +234,6 @@ function color_row(row)
             table.insert(blocks, digit)
             counter = 0
         end
-        
     end
     local state = NONE
     if #blocks == #digits then
@@ -260,7 +258,7 @@ function color_digits(column, row)
 end
 
 function is_solved()
-    for i=1,#tiles do
+    for i = 1, #tiles do
         local tile = tiles[i]
         if tile.img == PICTURE then
             if tile.value == FILLED and tile.state ~= FLAGGED then
