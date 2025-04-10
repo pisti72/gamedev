@@ -2,34 +2,34 @@ levels = {
     {
         id = 1,
         name = "smiley",
-        left = 1,
-        top = 1,
-        width = 12,
-        height = 12
+        left = 2,
+        top = 2,
+        width = 10,
+        height = 10
     },
     {
         id = 2,
         name = "say something",
-        left = 16,
-        top = 4,
-        width = 13,
-        height = 11
+        left = 17,
+        top = 5,
+        width = 11,
+        height = 9
     },
     {
         id = 3,
         name = "suitcase",
-        left = 3,
-        top = 17,
-        width = 17,
-        height = 17
+        left = 4,
+        top = 18,
+        width = 15,
+        height = 15
     },
     {
         id = 4,
         name = "casette",
-        left = 39,
-        top = 1,
-        width = 18,
-        height = 14
+        left = 40,
+        top = 2,
+        width = 16,
+        height = 12
     },
     {
         id = 5,

@@ -2,9 +2,16 @@ require("levels")
 local current_level = {}
 
 function love.load()
+    START_LEVEL = 1
+
     NONE = 1
     FLAGGED = 2
     CROSS = 3
+
+    OFF = 0
+    ON = 1
+
+    DEBUG = OFF
 
     ACTIVATED = 2
 
@@ -24,9 +31,10 @@ function love.load()
     SOLVED = 2
 
     YELLOW = { 0.8, 0.8, 0.5, 0.5 }
-    RED = { 0.8, 0, 0 }
+    RED = { 0.8, 0.0, 0.0 }
     LIGHTGREY = { 0.7, 0.7, 0.7 }
-    GREEN = { 0, 0.5, 0 }
+    GREEN = { 0.0, 0.5, 0.0 }
+    LIGHTGREEN = { 0.1, 0.7, 0.1 }
     BLACK = { 0.2, 0.2, 0.2 }
 
 
@@ -45,7 +53,7 @@ function love.load()
     is_mouse_down = false
     mouse_state = NONE
     tiles = {}
-    load_level_by_id(4)
+    load_level_by_id(START_LEVEL)
 
     game_state = INGAME
 end
@@ -97,52 +105,54 @@ function copy_pixels()
 end
 
 function counting_rows()
-    for j = 0, current_level.height do
+    for row = 0, current_level.height do
         local counter = 0
         local n = 0
-        for i = 0, current_level.width do
-            local tile = get_tile(i, j)
+        for column = 0, current_level.width do
+            local tile = get_tile(column, row)
+
             if tile.value == FILLED then
                 counter = counter + 1
-            else
-                if counter > 0 then
-                    n = n + 1
-                    local digit = {
-                        img = DIGIT,
-                        value = counter,
-                        x = current_level.width + n,
-                        y = j,
-                        state = NONE
-                    }
-                    table.insert(tiles, digit)
-                    counter = 0
-                end
+            end
+
+            if counter > 0 and (tile.value == EMPTY or column == current_level.width) then
+                n = n + 1
+                local digit = {
+                    img = DIGIT,
+                    value = counter,
+                    x = current_level.width + n,
+                    y = row,
+                    state = NONE
+                }
+                table.insert(tiles, digit)
+                counter = 0
             end
         end
     end
 end
 
 function counting_columns()
-    for i = 0, current_level.width do
+    for column = 0, current_level.width do
         local counter = 0
         local n = 0
-        for j = current_level.height, 0, -1 do
-            local tile = get_tile(i, j)
+        for row = current_level.height, 0, -1 do
+            local tile = get_tile(column, row)
+
             if tile.value == FILLED then
                 counter = counter + 1
-            else
-                if counter > 0 then
-                    n = n + 1
-                    local digit = {
-                        img = DIGIT,
-                        value = counter,
-                        x = i,
-                        y = -n,
-                        state = NONE
-                    }
-                    table.insert(tiles, digit)
-                    counter = 0
-                end
+            end
+
+            if counter > 0 and (tile.value == EMPTY or row == 0) then
+                n = n + 1
+                local digit = {
+                    img = DIGIT,
+                    value = counter,
+                    x = column,
+                    y = -n,
+                    state = NONE
+                }
+                table.insert(tiles, digit)
+                counter = 0
             end
         end
     end
@@ -291,12 +301,7 @@ function update()
 
 end
 
-function love.draw()
-    love.graphics.setColor(0.8, 0.8, 0.8)
-    love.graphics.rectangle("fill", 0, 0, width, height)
-    love.graphics.setColor(0, 0, 0)
-    --love.graphics.print("Hello World! " .. love.mouse.getX() .. "," .. love.mouse.getY(), 400, 300)
-    --love.graphics.print("Tiles: " .. #tiles, 400, 320)
+function draw_quiz()
     for i = 1, #tiles do
         local tile = tiles[i]
         local x = tile.x * grid + current_level.offset_x
@@ -335,12 +340,14 @@ function love.draw()
                     color_digits(tile.x, tile.y)
                     if is_solved() then
                         game_state = SOLVED
-                    else
-                        game_state = INGAME
                     end
                 else
                     is_mouse_down = false
                 end
+            end
+            if DEBUG == ON and tile.value == FILLED then
+                love.graphics.setColor(BLACK)
+                love.graphics.rectangle("fill", x, y, GRID, GRID)
             end
         elseif tile.img == DIGIT then
             local color = BLACK
@@ -351,11 +358,39 @@ function love.draw()
             love.graphics.print(tile.value, x, y)
         end
     end
+end
 
-    if game_state == SOLVED then
+function draw_solved()
+    for i = 1, #tiles do
+        local tile = tiles[i]
+        local x = tile.x * grid + current_level.offset_x
+        local y = tile.y * grid + current_level.offset_y
+        if tile.img == PICTURE then
+            if tile.value == FILLED then
+                love.graphics.setColor(LIGHTGREEN)
+                love.graphics.rectangle("fill", x, y, GRID, GRID)
+            end
+        end
+    end
+end
+
+function love.draw()
+    love.graphics.setColor(0.8, 0.8, 0.8)
+    love.graphics.rectangle("fill", 0, 0, width, height)
+    love.graphics.setColor(0, 0, 0)
+    --love.graphics.print("Hello World! " .. love.mouse.getX() .. "," .. love.mouse.getY(), 400, 300)
+    --love.graphics.print("Tiles: " .. #tiles, 400, 320)
+
+    if game_state == INGAME then
+        draw_quiz()
+    elseif game_state == SOLVED then
+        draw_solved()
         love.graphics.setColor(BLACK)
         love.graphics.print("SOLVED", 20, 20)
     end
+
+    love.graphics.setColor(BLACK)
+    love.graphics.print(current_level.name, 20, 40)
 end
 
 function love.keypressed(key, scancode, isrepeat)
