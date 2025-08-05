@@ -50,7 +50,7 @@ Vazul = {
         local success = love.window.setMode( Vazul.width, Vazul.height, flags )
         --local font = love.graphics.newFont("Vazul/Volter__28Goldfish_29.ttf", 20)
         local font = love.graphics.newFont("Vazul/zx-spectrum.ttf", 3 * 7)
-        Vazul.player = {x=0, y=-1000, z=20, rot_z=0, sin=0, cos=1, move_x = 0, move_y = Vazul.XY_SPEED}
+        Vazul.player = {x=0, y=-1000, z=20, rot_z=0, rot_zd=0, sin=0, cos=1, move_x = 0, move_y = Vazul.XY_SPEED}
         love.graphics.setFont(font)
         love.graphics.setLineWidth( Vazul.LINE_WIDTH )
         love.graphics.setLineStyle( "rough" )
@@ -140,7 +140,11 @@ Vazul = {
     set_player = function(x,y,z)
     end,
     turn_left = function()
-        Vazul.player.rot_z = Vazul.player.rot_z - Vazul.ROT_Z_SPEED
+        Vazul.player.rot_zd = Vazul.player.rot_zd - 0.001
+        if Vazul.player.rot_zd < -Vazul.ROT_Z_SPEED then
+            Vazul.player.rot_zd = -Vazul.ROT_Z_SPEED
+        end
+        Vazul.player.rot_z = Vazul.player.rot_z + Vazul.player.rot_zd
         Vazul.player.rot_z = Vazul.infinity(Vazul.player.rot_z, 0 , 360)
         Vazul.calculate_move_xy()
     end,
