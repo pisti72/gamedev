@@ -1,7 +1,8 @@
-[gd_scene load_steps=8 format=3 uid="uid://532u13hewic7"]
+[gd_scene load_steps=9 format=3 uid="uid://532u13hewic7"]
 
 [ext_resource type="PackedScene" uid="uid://ea4lqjnmlqma" path="res://player.tscn" id="1_twr6n"]
 [ext_resource type="PackedScene" uid="uid://dsfqy1h0ptfyq" path="res://tree.tscn" id="2_ivkut"]
+[ext_resource type="PackedScene" uid="uid://dxi1pcwd7bvo7" path="res://tree_2.tscn" id="3_ivkut"]
 
 [sub_resource type="ProceduralSkyMaterial" id="ProceduralSkyMaterial_twr6n"]
 sky_top_color = Color(0.361028, 0.493538, 0.990164, 1)
@@ -67,3 +68,6 @@ transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 39.7938, 3.50655, -26.6951)
 
 [node name="DirectionalLight3D" type="DirectionalLight3D" parent="."]
 transform = Transform3D(0.947568, 0.197238, -0.251421, 0.319555, -0.584865, 0.745531, 0, -0.786784, -0.617228, 0, 4.96234, 0)
+
+[node name="Tree6" parent="." instance=ExtResource("3_ivkut")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -24.2233, 2.83675, 21.9063)

@@ -10,6 +10,10 @@ from January 23rd 2025 to April 24th 2025
 http://ehouais.net/
 https://js1k.com/2015-hypetrain/demo/2111
 
+# How head should work in Godot
+https://youtu.be/ClRH5HruUEQ?si=bWdoLMRPRSLDcaXg
+
+
 # Devlog
 
 2025-02-13 THU project started
@@ -43,7 +47,7 @@ https://js1k.com/2015-hypetrain/demo/2111
 
 2025-03-10 MON
 2025-03-11 TUE
-2025-03-12 WED
+2025-03-12 WED Car works in Godot
 2025-03-13 THU
 2025-03-14 FRI
 2025-03-15 SAT
