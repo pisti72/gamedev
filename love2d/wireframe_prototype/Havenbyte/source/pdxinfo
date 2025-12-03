@@ -1,0 +1,8 @@
+name=Havenbyte
+author=Istvan Szalontai
+description=Big world in a small handheld console
+bundleID=com.szalontai.havenbyte
+version=0.1
+buildNumber=23a15172
+imagePath=system
+contentWarning=No violence, just creativity and adventure!

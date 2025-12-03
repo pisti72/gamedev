@@ -1,0 +1,117 @@
+[gd_scene load_steps=16 format=3 uid="uid://yv6bta86c2ly"]
+
+[ext_resource type="Script" uid="uid://ps0qh10c724k" path="res://pad_left.gd" id="1_ig7tw"]
+[ext_resource type="Script" uid="uid://cdit2tfw787lb" path="res://ball.gd" id="2_0xm2m"]
+
+[sub_resource type="PhysicsMaterial" id="PhysicsMaterial_0xm2m"]
+friction = 0.0
+bounce = 1.0
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_7dm0k"]
+size = Vector2(1149, 30)
+
+[sub_resource type="CanvasItemMaterial" id="CanvasItemMaterial_ig7tw"]
+
+[sub_resource type="BoxMesh" id="BoxMesh_0xm2m"]
+
+[sub_resource type="PhysicsMaterial" id="PhysicsMaterial_1bvp3"]
+friction = 0.0
+bounce = 1.0
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_ig7tw"]
+size = Vector2(20, 89)
+
+[sub_resource type="BoxMesh" id="BoxMesh_h2yge"]
+
+[sub_resource type="PhysicsMaterial" id="PhysicsMaterial_lquwl"]
+friction = 0.0
+bounce = 1.0
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_0xm2m"]
+size = Vector2(20, 593)
+
+[sub_resource type="PhysicsMaterial" id="PhysicsMaterial_7mycd"]
+friction = 0.0
+bounce = 1.0
+
+[sub_resource type="PhysicsMaterial" id="PhysicsMaterial_h2yge"]
+bounce = 1.0
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_h2yge"]
+
+[sub_resource type="BoxMesh" id="BoxMesh_1bvp3"]
+
+[node name="Main" type="Node2D"]
+
+[node name="Top" type="StaticBody2D" parent="."]
+physics_material_override = SubResource("PhysicsMaterial_0xm2m")
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Top"]
+position = Vector2(573.5, 13)
+shape = SubResource("RectangleShape2D_7dm0k")
+
+[node name="MeshInstance2D" type="MeshInstance2D" parent="Top"]
+modulate = Color(1, 0.254902, 1, 1)
+material = SubResource("CanvasItemMaterial_ig7tw")
+position = Vector2(572.25, 13)
+scale = Vector2(1145.5, 30)
+mesh = SubResource("BoxMesh_0xm2m")
+
+[node name="Bottom" type="StaticBody2D" parent="."]
+position = Vector2(8, 619)
+physics_material_override = SubResource("PhysicsMaterial_1bvp3")
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Bottom"]
+position = Vector2(573.5, 13)
+shape = SubResource("RectangleShape2D_7dm0k")
+
+[node name="MeshInstance2D" type="MeshInstance2D" parent="Bottom"]
+modulate = Color(1, 0.254902, 1, 1)
+material = SubResource("CanvasItemMaterial_ig7tw")
+position = Vector2(572.25, 13)
+scale = Vector2(1145.5, 30)
+mesh = SubResource("BoxMesh_0xm2m")
+
+[node name="PadLeft" type="CharacterBody2D" parent="."]
+position = Vector2(153, 280)
+script = ExtResource("1_ig7tw")
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="PadLeft"]
+position = Vector2(0, -0.5)
+shape = SubResource("RectangleShape2D_ig7tw")
+
+[node name="MeshInstance2D" type="MeshInstance2D" parent="PadLeft"]
+modulate = Color(0.12549, 0.145098, 1, 1)
+position = Vector2(0.5, -0.5)
+scale = Vector2(21, 89)
+mesh = SubResource("BoxMesh_h2yge")
+
+[node name="Left" type="StaticBody2D" parent="."]
+position = Vector2(13, 325)
+physics_material_override = SubResource("PhysicsMaterial_lquwl")
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Left"]
+position = Vector2(0, -0.5)
+shape = SubResource("RectangleShape2D_0xm2m")
+
+[node name="Right" type="StaticBody2D" parent="."]
+position = Vector2(1140, 322)
+physics_material_override = SubResource("PhysicsMaterial_7mycd")
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Right"]
+position = Vector2(0, -0.5)
+shape = SubResource("RectangleShape2D_0xm2m")
+
+[node name="Ball" type="RigidBody2D" parent="."]
+position = Vector2(553, 308)
+mass = 0.1
+physics_material_override = SubResource("PhysicsMaterial_h2yge")
+script = ExtResource("2_0xm2m")
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Ball"]
+shape = SubResource("RectangleShape2D_h2yge")
+
+[node name="MeshInstance2D" type="MeshInstance2D" parent="Ball"]
+position = Vector2(1.90735e-06, -1.90735e-06)
+scale = Vector2(20, 20)
+mesh = SubResource("BoxMesh_1bvp3")

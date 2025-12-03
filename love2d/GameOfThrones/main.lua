@@ -65,7 +65,7 @@ function love.load()
     GREEN = 5
     PINK = 6
     DARKGRAY = 7
-    BLACK = 8
+    FLAGGED = 8
     
     STATE_TITLE = 0
     STATE_INGAME = 1
@@ -431,7 +431,7 @@ function moveActors()
     for k,v in pairs(actors) do
         if not(v.v == 0) then
             if not(v.typ == FLAME) then
-                createParticles(1, BLACK, 20, v.x,v.y + gridHalf,1)
+                createParticles(1, FLAGGED, 20, v.x,v.y + gridHalf,1)
             end
             if v.axis == HORIZONTAL then
                 v.x = v.x + v.v

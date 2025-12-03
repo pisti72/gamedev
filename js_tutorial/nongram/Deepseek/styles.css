@@ -1,0 +1,86 @@
+body {
+    font-family: Arial, sans-serif;
+    text-align: center;
+    margin: 20px;
+}
+
+.nonogram-container {
+    display: inline-block;
+    margin: 20px auto;
+}
+
+.clues-row {
+    display: flex;
+}
+
+.corner {
+    width: 60px;
+    height: 60px;
+    border: 1px solid #ccc;
+}
+
+.column-clues {
+    display: flex;
+}
+
+.column-clues div {
+    width: 30px;
+    height: 60px;
+    border: 1px solid #ccc;
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-end;
+    align-items: center;
+    font-weight: bold;
+}
+
+.clues-and-grid {
+    display: flex;
+}
+
+.row-clues {
+    display: flex;
+    flex-direction: column;
+}
+
+.row-clues div {
+    width: 60px;
+    height: 30px;
+    border: 1px solid #ccc;
+    display: flex;
+    justify-content: flex-end;
+    align-items: center;
+    padding-right: 5px;
+    font-weight: bold;
+}
+
+.grid {
+    display: grid;
+    grid-template-columns: repeat(5, 30px);
+    grid-template-rows: repeat(5, 30px);
+    gap: 1px;
+}
+
+.grid div {
+    width: 30px;
+    height: 30px;
+    background-color: white;
+    border: 1px solid #ccc;
+    cursor: pointer;
+}
+
+.grid div.filled {
+    background-color: black;
+}
+
+button {
+    margin-top: 20px;
+    padding: 10px 20px;
+    font-size: 16px;
+    cursor: pointer;
+}
+
+#message {
+    margin-top: 10px;
+    font-weight: bold;
+}
