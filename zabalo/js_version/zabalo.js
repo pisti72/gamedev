@@ -5,7 +5,7 @@ const TILE = 20;
 const MAP_WIDTH = 30;
 const MAP_HEIGHT = 26;
 const MAX_PALYA = 6;
-const START_LEVEL = 5; // Change this to test specific levels (0-5)
+const START_LEVEL = 0; // Change this to test specific levels (0-5)
 const SEB_LASSU = 14;
 const SEB_NORMAL = 8;
 const SEB_GYORS = 4;
@@ -222,6 +222,28 @@ class GameMap {
                 }
                 if (this.tiles[i][j] === '.') {
                     this.gemsRemaining++;
+                }
+            }
+        }
+
+        return { playerPos, enemyPositions };
+    }
+
+    resetPositions(levelIndex) {
+        const level = Map.levels[levelIndex];
+        const playerPos = { x: 0, y: 0 };
+        const enemyPositions = [];
+
+        for (let j = 0; j < level.length; j++) {
+            for (let i = 0; i <= MAP_WIDTH; i++) {
+                const tile = level[j].charAt(i);
+                
+                if (tile === '2') {
+                    playerPos.x = i;
+                    playerPos.y = j;
+                }
+                if (tile === '3') {
+                    enemyPositions.push({ x: i, y: j });
                 }
             }
         }
@@ -447,6 +469,11 @@ class Zabalo {
         this.pressedkey = 0;
         this.gamestate = 1;
         
+        // Timing for consistent game speed
+        this.lastTime = 0;
+        this.accumulator = 0;
+        this.timestep = 20; // 20ms per game tick (50 FPS)
+        
         // Load sprite image
         this.elemek = new Image();
         this.elemek.src = 'sprites_20x20.png';
@@ -485,10 +512,27 @@ class Zabalo {
     }
     
     init() {
-        this.gameLoop();
+        this.lastTime = performance.now();
+        this.gameLoop(this.lastTime);
     }
     
-    gameLoop() {
+    gameLoop(currentTime) {
+        requestAnimationFrame((time) => this.gameLoop(time));
+        
+        const deltaTime = currentTime - this.lastTime;
+        this.lastTime = currentTime;
+        this.accumulator += deltaTime;
+        
+        // Fixed timestep update
+        while (this.accumulator >= this.timestep) {
+            this.update();
+            this.accumulator -= this.timestep;
+        }
+        
+        this.render();
+    }
+    
+    update() {
         switch(this.gamestate) {
             case 1: this.focim_inic(); break;
             case 2: this.focim(); break;
@@ -503,9 +547,6 @@ class Zabalo {
         
         this.utem++;
         if (this.utem >= 255) this.utem = 0;
-        
-        this.render();
-        setTimeout(() => this.gameLoop(), 20);
     }
     
     jatek() {
@@ -565,11 +606,14 @@ class Zabalo {
     }
     
     megegyszer_inic() {
-        const { playerPos, enemyPositions } = this.gameMap.loadLevel(this.currentLevel);
+        const { playerPos, enemyPositions } = this.gameMap.resetPositions(this.currentLevel);
         this.player.setPosition(playerPos.x, playerPos.y);
-        this.enemies = enemyPositions.map((pos, i) => 
-            new Enemy(pos.x, pos.y, (i % 2 === 0) ? 8 : 9)
-        );
+        this.player.dx = 0;
+        this.player.dy = 0;
+        this.enemies = enemyPositions.map((pos, i) => {
+            const faceIndex = this.currentLevel % 2 === 0 ? 8 + (i % 2) : 18 + (i % 2);
+            return new Enemy(pos.x, pos.y, faceIndex);
+        });
         this.gamestate = 7;
     }
     
