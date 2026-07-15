@@ -1,0 +1,12 @@
+[gd_scene load_steps=2 format=3 uid="uid://c26g1h1hhbqys"]
+
+[ext_resource type="Script" path="res://scripts/dungeon.gd" id="1_eg6jw"]
+
+[node name="Dungeon" type="Node3D" unique_id=808071755]
+script = ExtResource("1_eg6jw")
+
+[node name="DirectionalLight3D" type="DirectionalLight3D" parent="."]
+transform = Transform3D(0.964966, -0.00185787, -0.26237, 0, 0.999975, -0.00714121, 0.262376, 0.00692106, 0.964942, 0, 0, 0)
+light_energy = 1.6
+
+[node name="WorldEnvironment" type="WorldEnvironment" parent="."]
