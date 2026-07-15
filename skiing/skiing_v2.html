@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Skiing Game</title>
+    <link rel="stylesheet" href="skiing.css">
+</head>
+<body>
+    <div id="ui">
+        <small class="credit">WRITTEN BY ISTVÁN SZALONTAI 2011</small>
+        <span id="hiscore" class="score-display">HISCORE: 0</span>
+        <span id="score" class="score-display">SCORE: 0</span>
+    </div>
+    
+    <div id="game-container"></div>
+
+    <!-- Start Modal -->
+    <div id="start-modal" class="modal active">
+        <div class="modal-content">
+            <h1>⛷️ Skiing Game</h1>
+            <p>Move your mouse to control the skier<br>
+            Collect medals 🏅 (+50 points)<br>
+            Pass through flags 🚩 (+10 points)<br>
+            Avoid the trees 🌲!</p>
+            <button class="modal-button" onclick="game.startGame()">Start Game</button>
+        </div>
+    </div>
+
+    <!-- Game Over Modal -->
+    <div id="gameover-modal" class="modal">
+        <div class="modal-content">
+            <h1>Game Over!</h1>
+            <p class="score-text" id="final-score">Your score: 0</p>
+            <button class="modal-button" onclick="game.restartGame()">Play Again</button>
+        </div>
+    </div>
+
+    <script src="skiing.js"></script>
+</body>
+</html>
